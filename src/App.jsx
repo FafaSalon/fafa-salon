@@ -30,7 +30,6 @@ const realImages = {
   keratin: "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=900&auto=format&fit=crop",
   colour: "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=900&auto=format&fit=crop",
   treatment: "https://images.unsplash.com/photo-1620331311520-246422fd82f9?q=80&w=900&auto=format&fit=crop",
-  walkin: "https://images.unsplash.com/photo-1562322140-8baeececf3df?q=80&w=900&auto=format&fit=crop",
   combo: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=900&auto=format&fit=crop",
 };
 const salonToolsBg = realImages.homepage;
@@ -99,22 +98,7 @@ const services = {
     ],
     time: "Single Service: 11 am - 5.00 pm",
   },
-  walkin: {
-    no: "05",
-    title: "Walk In Services",
-    cardTitle: "Walk In",
-    short: "Wash, blow, cut & styling.",
-    visual: "walkin",
-    booking: "Walk In Services",
-    intro: "Walk-in available from 11 am - 5.00 pm depending on available slot.",
-    panels: [
-      { title: "Wash & Blow", text: "Double Cleanse + Head Massage + Blow Dry. Short RM28, Medium RM38, Long RM48." },
-      { title: "Cut & Blow", text: "RM38." },
-      { title: "Styling / Iron Add On", text: "Iron atau simple styling boleh add on RM10." },
-      { title: "Haircut Add On", text: "Add on any style haircut RM20 untuk servis tertentu." },
-    ],
-    time: "Walk In Available: 11 am - 5.00 pm",
-  },
+
 };
 
 
@@ -170,7 +154,6 @@ const nav = [
   ["keratin", "Keratin"],
   ["colour", "Colour"],
   ["treatment", "Treatment"],
-  ["walkin", "Walk In"],
   ["combo", "Combo"],
 ];
 
@@ -498,7 +481,6 @@ function ServiceVisual({ type, compact = false }) {
     keratin: realImages.keratin,
     colour: realImages.colour,
     treatment: realImages.treatment,
-    walkin: realImages.walkin,
     comboStraight: realImages.rebonding,
     comboColour: realImages.colour,
     comboKeratin: realImages.keratin,
@@ -510,7 +492,7 @@ function ServiceVisual({ type, compact = false }) {
       comboStraight: [realImages.rebonding, realImages.keratin],
       comboColour: [realImages.rebonding, realImages.colour],
       comboKeratin: [realImages.colour, realImages.keratin],
-      comboTreatment: [realImages.treatment, realImages.walkin],
+      comboTreatment: [realImages.treatment, realImages.combo],
     };
 
     return (
@@ -538,7 +520,7 @@ function BottomBar({ go, page }) {
 
 const bookingChoices = [
   'Silky Rebonding', 'Soft Relaxing',
-  ...Object.values(services).filter(item => !['rebonding', 'treatment', 'walkin'].includes(item.visual)).map(item => item.booking),
+  ...Object.values(services).filter(item => !['rebonding', 'treatment'].includes(item.visual)).map(item => item.booking),
   'Bleach + Colour', 'Highlight + Colour', 'Touch-up Rebonding',
   'Soft Treatment', 'Protein Treatment', 'Scalp Treatment',
   'Hair Cut & Styling', 'Hair Wash', 'Setting Curl', 'Hairdo',
@@ -554,7 +536,7 @@ function malaysiaToday() {
 }
 function initialBookingServices() {
   const requested = new URLSearchParams(window.location.hash.split('?')[1] || '').get('service');
-  const mapped = { 'Light Hair Treatment': 'Soft Treatment', 'Walk In Services': 'Hair Wash' }[requested] || requested;
+  const mapped = { 'Light Hair Treatment': 'Soft Treatment' }[requested] || requested;
   return bookingChoices.includes(mapped) ? [mapped] : [];
 }
 function BookingPage({ go }) {
@@ -563,9 +545,9 @@ function BookingPage({ go }) {
   const [error, setError] = useState('');
   const update = (key, value) => { setForm(prev => ({ ...prev, [key]: value })); };
   const today = malaysiaToday();
-  const walkInOnly = selected.length > 0 && selected.every(item => ['Hair Cut & Styling', 'Hair Wash'].includes(item));
-  const isCombo = selected.some(item => item.startsWith('Combo ')) || (selected.length > 1 && !walkInOnly);
-  const end = walkInOnly ? 18 : isCombo ? 15.5 : 17;
+  const cutWashOnly = selected.length > 0 && selected.every(item => ['Hair Cut & Styling', 'Hair Wash'].includes(item));
+  const isCombo = selected.some(item => item.startsWith('Combo ')) || (selected.length > 1 && !cutWashOnly);
+  const end = cutWashOnly ? 18 : isCombo ? 15.5 : 17;
   const times = [];
   for (let value = 11; value <= end; value += 0.5) {
     const hour = Math.floor(value);
@@ -586,14 +568,14 @@ function BookingPage({ go }) {
     `Panjang rambut: ${form.length}`, `Ketebalan: ${form.thickness}`,
     `Nota: ${form.notes.trim() || '-'}`, '', hairCheckNote, '',
     'Mohon admin berikan harga dan sahkan slot. Saya faham tempahan belum disahkan dan deposit RM30 seorang hanya dibayar selepas pengesahan admin.',
-    ...(walkInOnly ? ['Cut / Wash: semakan hari yang sama sahaja, minimum 30 minit sebelum datang. Tiada booking awal.'] : []),
+    ...(cutWashOnly ? ['Cut / Wash: semakan hari yang sama sahaja, minimum 30 minit sebelum datang. Tiada booking awal.'] : []),
   ].join('\n');
   const href = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
   const validate = element => {
     const node = element.closest('form');
     if (!selected.length) { setError('Sila pilih sekurang-kurangnya satu servis.'); node.querySelector('input[type=checkbox]').focus(); return false; }
     if (!node.reportValidity()) { setError('Sila lengkapkan semua ruangan wajib dan tandakan persetujuan.'); return false; }
-    if (form.date < today || (walkInOnly && form.date !== today)) { setError('Sila pilih tarikh yang sah. Cut / Wash untuk semakan hari yang sama sahaja.'); return false; }
+    if (form.date < today || (cutWashOnly && form.date !== today)) { setError('Sila pilih tarikh yang sah. Cut / Wash untuk semakan hari yang sama sahaja.'); return false; }
     if (!times.includes(form.time)) { setError('Sila pilih semula masa mengikut servis.'); return false; }
     setError(''); return true;
   };
@@ -651,11 +633,11 @@ function BookingPage({ go }) {
             <legend>02 / CAWANGAN & WAKTU</legend>
             <div className="booking-fields">
               <label className="booking-field">Cawangan *<select value={form.branch} required onChange={event => update('branch', event.target.value)}><option value="">Pilih cawangan</option><option>Setapak, Kuala Lumpur</option><option>Selayang, Batu Caves</option></select></label>
-              <label className="booking-field">Tarikh pilihan *<input type="date" required min={today} max={walkInOnly ? today : undefined} value={form.date} onChange={event => update('date', event.target.value)} /></label>
+              <label className="booking-field">Tarikh pilihan *<input type="date" required min={today} max={cutWashOnly ? today : undefined} value={form.date} onChange={event => update('date', event.target.value)} /></label>
               <label className="booking-field">Masa pilihan *<select value={form.time} required onChange={event => update('time', event.target.value)}><option value="">Pilih masa</option>{times.map(time => <option key={time}>{time}</option>)}</select></label>
             </div>
             <p className="booking-note">Slot tertakluk pada kekosongan. Admin akan sahkan waktu mengikut servis dan jadual cawangan.</p>
-            {walkInOnly && <p className="booking-note">Cut / Wash: semakan hari yang sama sahaja, minimum 30 minit sebelum datang. Tiada booking awal.</p>}
+            {cutWashOnly && <p className="booking-note">Cut / Wash: semakan hari yang sama sahaja, minimum 30 minit sebelum datang. Tiada booking awal.</p>}
           </fieldset>
           <fieldset>
             <legend>03 / MAKLUMAT ANDA</legend>
