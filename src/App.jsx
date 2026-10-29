@@ -42,8 +42,8 @@ function bookingLink(service) {
 const services = {
   rebonding: {
     no: "01",
-    title: "Rebonding & Relaxing",
-    cardTitle: "Rebonding & Relaxing",
+    title: "Rebonding atau Relaxing",
+    cardTitle: "Rebonding atau Relaxing",
     short: "Dua pilihan pelurusan untuk rambut lebih kemas dan mudah diurus.",
     visual: "rebonding",
     booking: "Rebonding / Relaxing",
@@ -75,11 +75,16 @@ const services = {
     no: "03",
     title: "Hair Colour",
     cardTitle: "Colour",
-    short: "Warna cantik tanpa bleach.",
+    short: "Pilihan colour tanpa bleach, bleach + colour atau highlight + colour.",
     visual: "colour",
-    booking: "Hair Colour",
-    intro: "Colour yang tidak memerlukan penggunaan bleach dalam pewarnaan. Hasil warna bergantung kepada warna rambut asal.",
-    panels: [{ title: "Pilihan warna", text: "Honey Brown, Ash Brown, Maroon Red, Maroon Purple, Hazelnut Brown dan Golden Brown." }],
+    booking: "Colour No Bleach",
+    intro: "Pilih servis warna mengikut hasil yang diinginkan. Hairstylist akan semak keadaan dan sejarah rambut sebelum mencadangkan servis yang sesuai.",
+    panels: [
+      { title: "Colour No Bleach", text: "Pewarnaan tanpa bleach. Hasil warna bergantung pada warna asal dan sejarah pewarnaan rambut." },
+      { title: "Bleach + Colour", text: "Proses bleach diikuti pewarnaan untuk pilihan warna yang memerlukan asas rambut lebih cerah. Kesesuaian dinilai oleh hairstylist dahulu." },
+      { title: "Highlight + Colour", text: "Highlight pada bahagian rambut terpilih, diikuti pewarnaan untuk menghasilkan dimensi dan tona warna." },
+      { title: "Pilihan warna", text: "Honey Brown, Ash Brown, Maroon Red, Maroon Purple, Hazelnut Brown dan Golden Brown. Pilihan bergantung pada servis dan keadaan rambut." },
+    ],
     colours: ["Honey Brown", "Ash Brown", "Maroon Red", "Maroon Purple", "Hazelnut Brown", "Golden Brown"],
     time: "Subject to consultation",
   },
@@ -94,7 +99,7 @@ const services = {
     panels: [
       { title: "Soft Treatment", text: "Fokus rambut. Kurang kusut dan mudah diurus. Kesan biasanya sementara dan perlu ulang rawatan." },
       { title: "Scalp Treatment", text: "Fokus kulit kepala. Membersihkan & merawat kulit kepala. Kurangkan kelemumur & kegatalan." },
-      { title: "Combo Soft + Scalp Treatment", text: "Pilihan combo Soft Treatment dan Scalp Treatment untuk kesan lebih baik — rambut lebih mudah diurus dan kulit kepala lebih bersih." },
+      { title: "Soft + Scalp Treatment", text: "Pilihan combo Soft Treatment dan Scalp Treatment untuk kesan lebih baik — rambut lebih mudah diurus dan kulit kepala lebih bersih." },
     ],
     time: "Single Service: 11 am - 5.00 pm",
   },
@@ -108,7 +113,7 @@ const combos = {
     title: "Rebonding / Relaxing + Keratin Brazilian",
     short: "Lurus lebih kemas + bantu kurangkan frizz.",
     visual: "comboStraight",
-    booking: "Combo Rebonding / Relaxing + Keratin Brazilian",
+    booking: "Rebonding / Relaxing + Keratin Brazilian",
     panels: [
       { title: "Sesuai untuk", text: "Customer yang mahu rambut lebih lurus, kemas dan dalam masa yang sama mahu rambut nampak lebih lembut dan kurang frizz." },
       { title: "Nota servis", text: "Hairstylist akan cek keadaan rambut dahulu sama ada lebih sesuai buat rebonding atau relaxing sebelum keratin." },
@@ -119,7 +124,7 @@ const combos = {
     title: "Rebonding / Relaxing + Colour",
     short: "Kemas + warna lebih menyerlah.",
     visual: "comboColour",
-    booking: "Combo Rebonding / Relaxing + Colour",
+    booking: "Rebonding / Relaxing + Colour",
     panels: [
       { title: "Sesuai untuk", text: "Customer yang mahu rambut nampak lebih kemas dan dalam masa yang sama mahu tambah warna rambut." },
       { title: "Nota servis", text: "Pilihan warna bergantung kepada keadaan rambut, sejarah chemical dan consultation hairstylist." },
@@ -130,7 +135,7 @@ const combos = {
     title: "Colour + Keratin Brazilian",
     short: "Warna cantik + rambut lebih lembut.",
     visual: "comboKeratin",
-    booking: "Combo Colour + Keratin Brazilian",
+    booking: "Colour + Keratin Brazilian",
     panels: [
       { title: "Sesuai untuk", text: "Customer yang mahu buat colour dan mahu rambut nampak lebih kemas, lembut dan kurang frizz selepas servis." },
       { title: "Nota servis", text: "Hairstylist akan cek keadaan rambut dan suggest pilihan keratin yang sesuai selepas colour." },
@@ -141,7 +146,7 @@ const combos = {
     title: "Soft + Scalp Treatment",
     short: "Rambut lebih mudah urus + kulit kepala lebih bersih.",
     visual: "comboTreatment",
-    booking: "Combo Soft + Scalp Treatment",
+    booking: "Soft + Scalp Treatment",
     panels: [
       { title: "Sesuai untuk", text: "Customer yang mahu rawatan ringan untuk rambut dan kulit kepala dalam satu sesi." },
       { title: "Kesan / Manfaat", text: "Soft Treatment fokus pada rambut supaya kurang kusut, manakala Scalp Treatment fokus membersihkan dan menyegarkan kulit kepala." },
@@ -150,7 +155,7 @@ const combos = {
 };
 
 const nav = [
-  ["rebonding", "Rebonding & Relaxing"],
+  ["rebonding", "Rebonding atau Relaxing"],
   ["keratin", "Keratin"],
   ["colour", "Colour"],
   ["treatment", "Treatment"],
@@ -337,6 +342,8 @@ function ServicePage({ item, go }) {
           <a className="main-wa" style={{marginTop: 0}} href={bookingLink("Soft Relaxing")}><MessageCircle size={18} /> Pilih Soft Relaxing</a>
         </div> : item.visual === "keratin" ? <div style={{display: "grid", gap: 12, marginTop: 16}}>
           {['Keratin Brazilian Anti Frizz', 'Keratin Brazilian Aqua Repair', 'Keratin Botox Premium'].map(name => <a key={name} className="main-wa" style={{marginTop: 0}} href={bookingLink(name)}><MessageCircle size={18} /> Pilih {name}</a>)}
+        </div> : item.visual === "colour" ? <div style={{display: "grid", gap: 12, marginTop: 16}}>
+          {['Colour No Bleach', 'Bleach + Colour', 'Highlight + Colour'].map(name => <a key={name} className="main-wa" style={{marginTop: 0}} href={bookingLink(name)}><MessageCircle size={18} /> Pilih {name}</a>)}
         </div> : <a className="main-wa" href={bookingLink(item.booking)}><MessageCircle size={18} /> Saya berminat nak buat {item.title}</a>}
       </section>
     </motion.section>
@@ -385,7 +392,7 @@ function ComboPage({ go }) {
                 <h3>{combos[id].title}</h3>
                 <p>{combos[id].short}</p>
                 <a href={bookingLink(combos[id].booking)}>
-                  <MessageCircle size={16} /> Saya berminat nak buat COMBO
+                  <MessageCircle size={16} /> Pilih {combos[id].title}
                 </a>
                 <button className="detail-btn" onClick={() => go(id)}>
                   Lihat detail <ChevronRight size={16} />
@@ -525,13 +532,12 @@ const comboBookingChoices = Object.values(combos).map(item => item.booking);
 const singleBookingChoices = [
   'Silky Rebonding', 'Soft Relaxing',
   'Keratin Brazilian Anti Frizz', 'Keratin Brazilian Aqua Repair', 'Keratin Botox Premium',
-  'Hair Colour', 'Bleach + Colour', 'Highlight + Colour',
+  'Colour No Bleach', 'Bleach + Colour', 'Highlight + Colour',
   'Soft Treatment', 'Scalp Treatment',
 ];
 const otherBookingChoice = 'Lain-lain / Perlukan nasihat';
 const bookingChoices = [...comboBookingChoices, ...singleBookingChoices, otherBookingChoice];
 function allowsCut(service) { return service !== otherBookingChoice; }
-function allowsCurl(service) { return service.includes('Colour'); }
 const lengthChoices = ['1 — Sebahu', '2 — Ketiak–atas bra line', '3 — Bawah bra line–atas pinggang', '4 — Bawah pinggang'];
 const hairCheckNote = 'Hairstylist akan memeriksa paras dan ketebalan rambut sebenar.';
 function malaysiaToday() {
@@ -541,7 +547,7 @@ function malaysiaToday() {
 }
 function initialBookingServices() {
   const requested = new URLSearchParams(window.location.hash.split('?')[1] || '').get('service');
-  const mapped = { 'Light Hair Treatment': 'Soft Treatment' }[requested] || requested;
+  const mapped = { 'Light Hair Treatment': 'Soft Treatment', 'Hair Colour': 'Colour No Bleach' }[requested] || requested?.replace(/^Combo /, '');
   return bookingChoices.includes(mapped) ? [mapped] : [];
 }
 function BookingPage({ go }) {
@@ -551,7 +557,7 @@ function BookingPage({ go }) {
   const [error, setError] = useState('');
   const update = (key, value) => { setForm(prev => ({ ...prev, [key]: value })); };
   const today = malaysiaToday();
-  const isCombo = selected.some(item => item.startsWith('Combo ')) || selected.length > 1;
+  const isCombo = selected.some(item => comboBookingChoices.includes(item)) || selected.length > 1;
   const end = isCombo ? 15.5 : 17;
   const times = [];
   for (let value = 11; value <= end; value += 0.5) {
@@ -569,7 +575,7 @@ function BookingPage({ go }) {
     'Hi FAFA Salon! Saya nak semak harga & kekosongan slot.', '',
     `Nama: ${form.name.trim()}`, `No. telefon: ${form.phone.trim()}`,
     `Cawangan: ${form.branch}`, `Servis: ${selected.join(' + ')}`,
-    ...selected.map(service => { const options = []; if (allowsCut(service) && addOns[service]?.cut) options.push('Hair Cut'); if (allowsCurl(service) && addOns[service]?.curl) options.push('Setting Curl'); return `Add-on (${service}): ${options.join(' + ') || 'Tiada'}`; }),
+    ...selected.map(service => { const options = []; if (allowsCut(service) && addOns[service]?.cut) options.push('Hair Cut'); return `Add-on (${service}): ${options.join(' + ') || 'Tiada'}`; }),
     `Tarikh pilihan: ${dateLabel}`, `Masa pilihan: ${form.time}`,
     `Panjang rambut: ${form.length}`, `Ketebalan: ${form.thickness}`,
     `Nota: ${form.notes.trim() || '-'}`, '', hairCheckNote, '',
@@ -590,7 +596,6 @@ function BookingPage({ go }) {
       {selected.includes(item) && allowsCut(item) && <div className="booking-addons" role="group" aria-label={`Add-on untuk ${item}`}>
         <span className="booking-addon-title">Add-on pilihan</span>
         <label><input type="checkbox" checked={Boolean(addOns[item]?.cut)} onChange={event => setAddOns(prev => ({...prev, [item]: {...prev[item], cut: event.target.checked}}))} /> Add-on Hair Cut</label>
-        {allowsCurl(item) && <label><input type="checkbox" checked={Boolean(addOns[item]?.curl)} onChange={event => setAddOns(prev => ({...prev, [item]: {...prev[item], curl: event.target.checked}}))} /> Add-on Setting Curl</label>}
       </div>}
     </div>
   );
