@@ -636,7 +636,14 @@ function BookingPage({ go }) {
   return (
     <motion.section className="page booking-page" {...pageMotion}>
       <style>{`
-        .booking-page .content-block{padding:26px 20px 36px}
+        .booking-page{background:#090910 !important;color:#fff !important;min-height:100vh;padding-bottom:110px;color-scheme:dark;isolation:isolate;overflow-x:clip}
+        .booking-page,.booking-page *{box-sizing:border-box}
+        .booking-page .content-block{padding:26px 20px 36px;background:radial-gradient(ellipse at top right,rgba(230,80,152,.12),transparent 440px),#090910;color:#fff;width:100%;min-width:0}
+        .booking-page h2,.booking-page strong{color:#fff}
+        .booking-page .lead{color:#e1d5df;font-size:14px;line-height:1.8}
+        .booking-page .kicker{color:#ff80b8}
+        .booking-page input::placeholder,.booking-page textarea::placeholder{color:#b7a9b7;opacity:1}
+        .booking-page select option{color:#fff;background:#1a1a25}
         .booking-page h2{font-size:30px;line-height:1.2;margin:12px 0}
         .booking-page .booking-back{display:flex;align-items:center;gap:7px;background:transparent;color:#ff80b8;padding:0;margin:0 0 24px}
         .booking-page form{display:grid;gap:24px;min-width:0}
@@ -646,12 +653,18 @@ function BookingPage({ go }) {
         .booking-page .booking-choice{display:flex;align-items:flex-start;gap:7px;background:#1a1a25;border:1px solid #453343;border-radius:12px;padding:12px 9px;font-size:12px;line-height:1.5;cursor:pointer;color:#f4eaf0;overflow-wrap:anywhere}
         .booking-page .booking-choice.selected{border-color:#ff79b4;background:#3d2033}
         .booking-page input[type=checkbox]{accent-color:#e65098;width:17px;height:17px;flex-shrink:0;margin:2px 0}
-        .booking-page .booking-fields{display:grid;gap:16px}
-        .booking-page .booking-field{display:grid;gap:8px;font-size:13px;color:#f4eaf0}
-        .booking-page input:not([type=checkbox]),.booking-page select,.booking-page textarea{width:100%;max-width:100%;min-width:0;background:#1a1a25;border:1px solid #453343;border-radius:12px;padding:13px 12px;color:#fff;font:16px system-ui;box-sizing:border-box;color-scheme:dark}
-        .booking-page textarea{min-height:100px;resize:vertical}
+        .booking-page .booking-fields{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;min-width:0}
+        .booking-page .booking-field{display:grid;grid-template-columns:minmax(0,1fr);gap:9px;font-size:14px;font-weight:600;line-height:1.5;color:#fff;min-width:0}
+        .booking-page input:not([type=checkbox]),.booking-page select,.booking-page textarea{width:100%;max-width:100%;min-width:0;background:#1a1a25;border:1px solid #453343;border-radius:12px;padding:13px 12px;color:#fff;font:16px system-ui;box-sizing:border-box;color-scheme:dark;line-height:24px;-webkit-text-fill-color:#fff;opacity:1}
+        .booking-page input:not([type=checkbox]),.booking-page select{height:52px;min-height:52px;max-height:52px;margin:0}
+        .booking-page input[type=date]{display:block;appearance:none;-webkit-appearance:none;inline-size:100%;min-inline-size:0;max-inline-size:100%;text-align:left;padding:13px 12px;overflow:hidden}
+        .booking-page input[type=date]::-webkit-date-and-time-value{text-align:left;min-height:24px;margin:0}
+        .booking-page input[type=date]::-webkit-datetime-edit{padding:0;display:inline-flex;line-height:24px}
+        .booking-page input[type=date]::-webkit-calendar-picker-indicator{margin:0;padding:0;flex-shrink:0}
+        .booking-page textarea{min-height:110px;resize:vertical;font-weight:400}
+        .booking-page .booking-fields input,.booking-page .booking-fields select{font-weight:400}
         .booking-page input:focus-visible,.booking-page select:focus-visible,.booking-page textarea:focus-visible,.booking-page a:focus-visible{outline:2px solid #ff79b4;outline-offset:3px}
-        .booking-page .booking-note{font-size:13px;line-height:1.8;color:#d1c4ce;margin:10px 0 0}
+        .booking-page .booking-note{font-size:13px;line-height:1.8;color:#e1d5df;margin:10px 0 0}
         .booking-page .booking-notice{background:#291b27;border:1px solid #714361;border-radius:16px;padding:16px;font-size:13px;line-height:1.8;color:#f0deea}
         .booking-page .booking-consent{display:flex;gap:10px;font-size:13px;line-height:1.7;color:#e9dce5}
         .booking-page .booking-error{color:#ff9bbf;font-size:13px;line-height:1.6;margin:0}
