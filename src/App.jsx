@@ -36,7 +36,7 @@ const salonToolsBg = realImages.homepage;
 
 function bookingLink(service) {
   if (service === "pertanyaan salon") return `https://wa.me/${phone}?text=${encodeURIComponent("Hi FAFA Salon, saya nak buat pertanyaan salon.")}`;
-  return "#booking";
+  return bookingChoices.includes(service) ? `#booking?service=${encodeURIComponent(service)}` : "#booking";
 }
 
 const services = {
@@ -97,7 +97,6 @@ const services = {
     panels: [
       { title: "Soft Treatment", text: "Fokus rambut. Kurang kusut dan mudah diurus. Kesan biasanya sementara dan perlu ulang rawatan. Fokus pada helaian rambut untuk rasa lebih lembut dan membantu rambut mudah disikat. Ia tidak meluruskan rambut secara kekal. Kesan bergantung pada keadaan rambut dan penjagaan selepas servis." },
       { title: "Scalp Treatment", text: "Fokus kulit kepala. Membersihkan & merawat kulit kepala. Kurangkan kelemumur & kegatalan. Fokus pada pembersihan serta penjagaan kulit kepala. Ia berbeza daripada rawatan untuk helaian rambut dan bukan rawatan perubatan bagi masalah kulit kepala." },
-      { title: "Soft + Scalp Treatment", text: "Pilihan combo Soft Treatment dan Scalp Treatment untuk kesan lebih baik — rambut lebih mudah diurus dan kulit kepala lebih bersih. Dua fokus dalam satu sesi: Soft Treatment untuk helaian rambut, Scalp Treatment untuk kulit kepala. Pilihan jika mahu kedua-dua penjagaan tanpa servis pelurusan atau pewarnaan." },
     ],
     time: "Single Service: 11 am - 5.00 pm",
   },
@@ -619,7 +618,8 @@ function malaysiaToday() {
   return `${part('year')}-${part('month')}-${part('day')}`;
 }
 function initialBookingServices() {
-  return [];
+  const requested = new URLSearchParams(window.location.hash.split('?')[1] || '').get('service');
+  return bookingChoices.includes(requested) ? [requested] : [];
 }
 function BookingPage({ go }) {
   const [selected, setSelected] = useState(initialBookingServices);
