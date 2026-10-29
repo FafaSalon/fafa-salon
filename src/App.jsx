@@ -552,10 +552,12 @@ function initialBookingServices() {
 }
 function BookingPage({ go }) {
   const [selected, setSelected] = useState(initialBookingServices);
-  const [addOns, setAddOns] = useState({});
-  const [form, setForm] = useState({ name: '', phone: '', branch: '', date: '', time: '', length: '', thickness: '', notes: '' });
+  const [wantCut, setWantCut] = useState(false);
+  const [form, setForm] = useState({ name: '', phone: '', branch: '', date: '', time: '', length: '', cutLength: '', thickness: '', notes: '' });
   const [error, setError] = useState('');
   const update = (key, value) => { setForm(prev => ({ ...prev, [key]: value })); };
+  const canAddCut = selected.some(allowsCut);
+  const hasCut = canAddCut && wantCut;
   const today = malaysiaToday();
   const isCombo = selected.some(item => comboBookingChoices.includes(item)) || selected.length > 1;
   const end = isCombo ? 15.5 : 17;
@@ -567,7 +569,7 @@ function BookingPage({ go }) {
   const toggle = item => {
     const next = selected.includes(item) ? selected.filter(value => value !== item) : [...selected, item];
     setSelected(next); setError('');
-    if (selected.includes(item)) setAddOns(prev => { const nextAddOns = {...prev}; delete nextAddOns[item]; return nextAddOns; });
+    if (!next.some(allowsCut)) { setWantCut(false); setForm(prev => ({...prev, cutLength: ''})); }
     setForm(prev => ({ ...prev, time: '' }));
   };
   const dateLabel = form.date ? new Date(`${form.date}T12:00:00`).toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
@@ -575,9 +577,9 @@ function BookingPage({ go }) {
     'Hi FAFA Salon! Saya nak semak harga & kekosongan slot.', '',
     `Nama: ${form.name.trim()}`, `No. telefon: ${form.phone.trim()}`,
     `Cawangan: ${form.branch}`, `Servis: ${selected.join(' + ')}`,
-    ...selected.map(service => { const options = []; if (allowsCut(service) && addOns[service]?.cut) options.push('Hair Cut'); return `Add-on (${service}): ${options.join(' + ') || 'Tiada'}`; }),
+    ...(hasCut ? [`Add-on Hair Cut: potong ke paras ${form.cutLength}`] : []),
     `Tarikh pilihan: ${dateLabel}`, `Masa pilihan: ${form.time}`,
-    `Panjang rambut: ${form.length}`, `Ketebalan: ${form.thickness}`,
+    `Panjang rambut sekarang${hasCut ? " (sebelum potong)" : ""}: ${form.length}`, `Ketebalan: ${form.thickness}`,
     `Nota: ${form.notes.trim() || '-'}`, '', hairCheckNote, '',
     'Mohon admin berikan harga dan sahkan slot. Saya faham tempahan belum disahkan dan deposit RM30 seorang hanya dibayar selepas pengesahan admin.',
   ].join('\n');
@@ -593,10 +595,7 @@ function BookingPage({ go }) {
   const renderChoice = item => (
     <div className={`booking-service-item ${item === otherBookingChoice ? 'booking-other' : ''}`} key={item}>
       <label className={`booking-choice ${selected.includes(item) ? 'selected' : ''}`}><input type="checkbox" checked={selected.includes(item)} onChange={() => toggle(item)} /><span>{item}</span></label>
-      {selected.includes(item) && allowsCut(item) && <div className="booking-addons" role="group" aria-label={`Add-on untuk ${item}`}>
-        <span className="booking-addon-title">Add-on pilihan</span>
-        <label><input type="checkbox" checked={Boolean(addOns[item]?.cut)} onChange={event => setAddOns(prev => ({...prev, [item]: {...prev[item], cut: event.target.checked}}))} /> Add-on Hair Cut</label>
-      </div>}
+
     </div>
   );
   return (
@@ -622,6 +621,13 @@ function BookingPage({ go }) {
         .booking-page .booking-other{grid-column:1/-1;width:min(100%,280px);justify-self:center;margin-top:5px}
         .booking-page .booking-other .booking-choice{justify-content:center;text-align:center}
         .booking-page .booking-addons{margin-top:7px;padding:11px 9px;background:#291b27;border:1px solid #714361;border-radius:12px;display:grid;gap:10px;color:#fff;font-size:12px;line-height:1.5}
+        .booking-page .booking-cut-card{margin-top:22px;padding:16px;border-radius:16px;background:#1b1420;border:1px solid #714361}
+        .booking-page .booking-cut-card.active{border-color:#ff79b4;background:#291b27}
+        .booking-page .booking-cut-toggle{gap:12px;align-items:flex-start;font-size:14px}
+        .booking-page .booking-cut-toggle strong{display:block;font-size:15px;color:#fff}
+        .booking-page .booking-cut-toggle small{display:block;color:#d1c4ce;font-weight:400;line-height:1.6;margin-top:4px}
+        .booking-page .booking-cut-target{border-top:1px solid #714361;margin-top:8px;padding-top:18px}
+        .booking-page .booking-cut-target label.booking-field{display:grid;gap:10px}
         .booking-page .booking-addon-title{color:#ff99c9;font-size:11px;font-weight:700}
         .booking-page .booking-addons label{display:flex;gap:7px;align-items:flex-start;cursor:pointer}
         .booking-page .booking-choice{display:flex;align-items:flex-start;gap:7px;background:#1a1a25;border:1px solid #453343;border-radius:12px;padding:12px 9px;font-size:12px;line-height:1.5;cursor:pointer;color:#f4eaf0;overflow-wrap:anywhere}
@@ -659,6 +665,13 @@ function BookingPage({ go }) {
             <div className="booking-services">{comboBookingChoices.map(renderChoice)}</div>
             <h3 className="booking-group-title">Single Services</h3>
             <div className="booking-services">{singleBookingChoices.map(renderChoice)}{renderChoice(otherBookingChoice)}</div>
+            {canAddCut && <div className={`booking-addons booking-cut-card ${hasCut ? 'active' : ''}`}>
+              <label className="booking-cut-toggle"><input type="checkbox" checked={wantCut} onChange={event => { const checked = event.target.checked; setWantCut(checked); if (!checked) update('cutLength', ''); }} /><span><strong>Add-on Hair Cut</strong><small>Tambah potongan rambut untuk servis pilihan anda.</small></span></label>
+              {hasCut && <div className="booking-cut-target">
+                <label className="booking-field">Nak potong ke paras mana? *<select required value={form.cutLength} onChange={event => update('cutLength', event.target.value)}><option value="">Pilih paras selepas dipotong</option>{lengthChoices.map(item => <option key={item}>{item}</option>)}</select></label>
+                <p className="booking-note" style={{marginTop: 10}}>Pilih paras rambut yang diinginkan selepas dipotong. Hairstylist akan sahkan potongan semasa konsultasi.</p>
+              </div>}
+            </div>}
             <p className="booking-notice" style={{marginTop: 18, marginBottom: 0}}><strong>Hair Cut &amp; Hair Wash</strong><br />Untuk walk-in sahaja dan tidak memerlukan booking. Sila WhatsApp 30 minit sebelum datang untuk semakan kekosongan.</p>
           </fieldset>
           <fieldset>
@@ -675,7 +688,7 @@ function BookingPage({ go }) {
             <div className="booking-fields">
               <label className="booking-field">Nama penuh *<input required maxLength={100} autoComplete="name" value={form.name} onChange={event => update('name', event.target.value)} placeholder="Nama anda" /></label>
               <label className="booking-field">No. telefon / WhatsApp *<input required type="tel" minLength={9} maxLength={20} autoComplete="tel" value={form.phone} onChange={event => update('phone', event.target.value)} placeholder="Contoh: 0123456789" /></label>
-              <label className="booking-field">Panjang rambut *<select required value={form.length} onChange={event => update('length', event.target.value)}><option value="">Pilih paras rambut</option>{lengthChoices.map(item => <option key={item}>{item}</option>)}</select></label>
+              <label className="booking-field">Panjang rambut sekarang{hasCut ? " (sebelum potong)" : ""} *<select required value={form.length} onChange={event => update('length', event.target.value)}><option value="">Pilih paras rambut</option>{lengthChoices.map(item => <option key={item}>{item}</option>)}</select></label>
               <label className="booking-field">Ketebalan rambut *<select required value={form.thickness} onChange={event => update('thickness', event.target.value)}><option value="">Pilih ketebalan</option>{['Nipis', 'Biasa', 'Tebal', 'Sangat tebal'].map(item => <option key={item}>{item}</option>)}</select></label>
               <p className="booking-note">{hairCheckNote}</p>
               <label className="booking-field">Nota tambahan<textarea maxLength={1000} value={form.notes} onChange={event => update('notes', event.target.value)} placeholder="Sejarah colour / bleach, keadaan rambut atau permintaan khas." /></label>
