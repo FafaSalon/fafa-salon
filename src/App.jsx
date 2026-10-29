@@ -3,6 +3,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft,
   CalendarDays,
+  CreditCard,
+  CalendarClock,
+  QrCode,
+  ArrowLeftRight,
+  Banknote,
   ChevronRight,
   Clock3,
   Home,
@@ -265,19 +270,40 @@ function Header({ page, go, menuOpen, setMenuOpen }) {
 function HomePage({ go }) {
   return (
     <motion.section className="page home-page" {...pageMotion}>
+      <style>{`
+        .home-page .hero-content{width:100%;min-width:0}
+        .home-page .hero h1.salon-headline{font-family:"Playfair Display",Georgia,serif;font-size:clamp(30px,9vw,42px);font-weight:800;line-height:1.08;letter-spacing:-1px;margin:20px 0 18px;color:#fff}
+        .home-page .salon-headline span,.home-page .salon-headline em{display:block}
+        .home-page .salon-headline em{font-style:normal;color:#ff66a9}
+        .home-page .hero p.salon-intro{max-width:none;color:#f4edf2;font-size:14px;line-height:1.8;margin:0 0 24px}
+        .home-page .payment-methods{margin:24px 0}
+        .home-page .payment-heading{color:#ff80b8;font-size:11px;letter-spacing:2px;font-weight:800;text-transform:uppercase;margin:0 0 14px}
+        .home-page .payment-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;list-style:none;margin:0;padding:0}
+        .home-page .payment-item{grid-column:span 2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;min-width:0;min-height:92px;padding:13px 5px;border:1px solid rgba(255,255,255,.18);border-radius:16px;background:rgba(17,17,25,.75);color:#fff;text-align:center}
+        .home-page .payment-item:nth-last-child(-n+2){grid-column:span 3}
+        .home-page .payment-symbol{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:rgba(230,80,152,.12);color:#ff80b8}
+        .home-page .payment-item b{color:#fff;font-size:12px;line-height:1.4}
+        .home-page .payment-item.spaylater .payment-symbol{color:#ffbe89;background:rgba(255,126,70,.12)}
+        .home-page .payment-item.qr .payment-symbol{color:#b4d6ff;background:rgba(70,137,255,.12)}
+      `}</style>
       <section className="hero">
         <div className="hero-bg" style={{ backgroundImage: `url(${salonToolsBg})` }} />
         <div className="hero-overlay" />
         <motion.div className="hero-content" initial={{ opacity: 0, y: 26 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55 }}>
           <img className="hero-logo" src="/assets/fafa-logo.png" alt="FAFA Salon Beauty Centre" />
           <span className="kicker">Your Beauty, Our Passion</span>
-          <h1>LOOK GOOD<br />FEEL <em>CONFIDENT</em></h1>
-          <p>Salon wanita & muslimah dengan servis rambut yang kemas, exclusive dan mudah booking.</p>
-          <div className="trust-row">
-            <div><ShieldCheck size={22} /><b>Women Only</b><small>Muslimah friendly</small></div>
-            <div><Sparkles size={22} /><b>Premium Result</b><small>Kemas & cantik</small></div>
-            <div><CalendarDays size={22} /><b>Easy Booking</b><small>WhatsApp terus</small></div>
-          </div>
+          <h1 className="salon-headline"><span>SALON PILIHAN</span><span>WANITA DAN</span><em>MUSLIMAH</em></h1>
+          <p className="salon-intro">Tampil cantik dan berkeyakinan, dengan ruang menunggu selesa untuk suami &amp; anak, lengkap dengan TV (Netflix &amp; YouTube) serta WiFi percuma!</p>
+          <section className="payment-methods" aria-label="Kaedah bayaran">
+            <h2 className="payment-heading">Payment Methods</h2>
+            <ul className="payment-grid">
+              <li className="payment-item"><span className="payment-symbol" aria-hidden="true"><CreditCard size={23} /></span><b>Credit Card</b></li>
+              <li className="payment-item spaylater"><span className="payment-symbol" aria-hidden="true"><CalendarClock size={23} /></span><b>SPayLater</b></li>
+              <li className="payment-item qr"><span className="payment-symbol" aria-hidden="true"><QrCode size={23} /></span><b>QR / TnGo</b></li>
+              <li className="payment-item"><span className="payment-symbol" aria-hidden="true"><ArrowLeftRight size={23} /></span><b>Transfer</b></li>
+              <li className="payment-item"><span className="payment-symbol" aria-hidden="true"><Banknote size={23} /></span><b>Cash</b></li>
+            </ul>
+          </section>
           <div className="hero-actions only-wa"><a href={bookingLink("booking appointment")}>Semak Slot & Booking</a></div>
         </motion.div>
       </section>
