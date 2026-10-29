@@ -57,15 +57,15 @@ const services = {
   },
   keratin: {
     no: "02",
-    title: "Keratin Treatment",
+    title: "Keratin",
     cardTitle: "Keratin",
     short: "Anti frizz, lembut & nampak sihat.",
     visual: "keratin",
-    booking: "Keratin Treatment / Keratin Brazilian",
+    consultation: "Hairstylist akan cek keadaan rambut dahulu dan suggest pilihan keratin yang paling sesuai mengikut kondisi rambut.",
+    booking: "Keratin",
     intro: "Rawatan untuk rambut frizzy, kembang, kering atau ada bekas chemical termasuk rambut colour dan bleach.",
     panels: [
-      { title: "Consultation dahulu", text: "Hairstylist akan cek keadaan rambut dahulu dan suggest pilihan keratin yang paling sesuai mengikut kondisi rambut." },
-      { title: "Keratin Treatment", text: "Sesuai untuk rambut biasa atau separa kering. Merapikan rambut dan beri kilauan sementara." },
+      { title: "Keratin Botox Premium", text: "Sudah tentu pilihan terbaik! Gabungan Anti-Frizz & Repair menjadikan rambut lebih rapi, kemas dan mudah diurus dengan 50% pelurusan. Formula lebih selesa dan tidak pedih seperti Keratin Brazilian." },
       { title: "Keratin Brazilian Anti Frizz", text: "Beri sedikit pelurusan dan kekemasan untuk rambut frizzy dan kembang." },
       { title: "Keratin Brazilian Aqua Repair", text: "Sesuai untuk rambut ada bekas chemical, bleach, rosak dan kering. Membantu melembapkan semula rambut rosak." },
     ],
@@ -286,7 +286,7 @@ function HomePage({ go }) {
                 <div className="icon-badge"><ServiceIcon type={id} /></div>
                 <h3>{services[id].cardTitle}</h3>
                 <p>{services[id].short}</p>
-                <a href={bookingLink(services[id].booking)}><MessageCircle size={16} /> Saya berminat nak buat {services[id].cardTitle.toUpperCase()}</a>
+                <a href={bookingLink(services[id].booking)}><MessageCircle size={16} /> Saya berminat nak buat {services[id].cardTitle}</a>
                 <button className="detail-btn" onClick={() => go(id)}>Lihat detail <ChevronRight size={16} /></button>
               </div>
             </motion.div>
@@ -328,6 +328,7 @@ function ServicePage({ item, go }) {
         <span className="kicker">Exclusive Detail</span>
         <h2>{item.title}</h2>
         <p className="lead">{item.intro}</p>
+        {item.consultation && <div className="keratin-consultation" style={{margin: "20px 0", padding: 0, border: "none", borderRadius: 0, background: "transparent"}}><strong style={{display: "block", marginBottom: 8}}>Konsultasi dahulu</strong><p style={{margin: 0, lineHeight: 1.8}}>{item.consultation}</p></div>}
         <div className="time-pill"><Clock3 size={17} /> {item.time}</div>
         {item.panels.map((panel) => <InfoPanel key={panel.title} title={panel.title} text={panel.text} />)}
         {item.colours && <div className="colour-board">{item.colours.map((c, i) => <div className={`colour-chip c${i}`} key={c}><span>{c}</span></div>)}</div>}
@@ -520,7 +521,8 @@ function BottomBar({ go, page }) {
 
 const bookingChoices = [
   'Silky Rebonding', 'Soft Relaxing',
-  ...Object.values(services).filter(item => !['rebonding', 'treatment'].includes(item.visual)).map(item => item.booking),
+  'Keratin Brazilian Anti Frizz', 'Keratin Brazilian Aqua Repair', 'Keratin Botox Premium',
+  ...Object.values(services).filter(item => !['rebonding', 'keratin', 'treatment'].includes(item.visual)).map(item => item.booking),
   'Bleach + Colour', 'Highlight + Colour', 'Touch-up Rebonding',
   'Soft Treatment', 'Protein Treatment', 'Scalp Treatment',
   'Hair Cut & Styling', 'Hair Wash', 'Setting Curl', 'Hairdo',
