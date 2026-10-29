@@ -630,6 +630,15 @@ function initialBookingServices() {
 function BookingPage({ go }) {
   const [selected, setSelected] = useState(initialBookingServices);
   const [wantCut, setWantCut] = useState(false);
+  useLayoutEffect(() => {
+    if (!initialBookingServices().length) return;
+    const frame = requestAnimationFrame(() => {
+      const target = document.getElementById('booking-selected-services');
+      const header = document.querySelector('.top-nav');
+      if (target) window.scrollTo({top:Math.max(0,window.scrollY + target.getBoundingClientRect().top - (header?.getBoundingClientRect().height || 0) - 16),behavior:'instant'});
+    });
+    return () => cancelAnimationFrame(frame);
+  }, []);
   const [form, setForm] = useState({ name: '', phone: '', branch: '', date: '', time: '', length: '', cutLength: '', thickness: '', notes: '' });
   const [error, setError] = useState('');
   const update = (key, value) => { setForm(prev => ({ ...prev, [key]: value })); };
@@ -737,11 +746,26 @@ function BookingPage({ go }) {
         <form onSubmit={event => { event.preventDefault(); event.currentTarget.querySelector('[data-booking-send]').click(); }}>
           <fieldset>
             <legend>01 / PILIH SERVIS ANDA</legend>
-            <p className="booking-note" style={{ margin: '0 0 12px' }}>Boleh pilih lebih daripada satu servis.</p>
-            <h3 className="booking-group-title">Combo Services</h3>
-            <div className="booking-services">{comboBookingChoices.map(renderChoice)}</div>
-            <h3 className="booking-group-title">Single Services</h3>
-            <div className="booking-services">{singleBookingChoices.map(renderChoice)}{renderChoice(otherBookingChoice)}</div>
+            {selected.length > 0 ? <>
+              <div id="booking-selected-services" aria-live="polite" style={{scrollMarginTop:90}}>
+                <h3 className="booking-group-title" style={{fontSize:18,marginTop:0}}>Servis pilihan anda ✓</h3>
+                <p className="booking-note" style={{margin:'0 0 12px'}}>Servis di bawah sudah ditick. Semak pilihan anda, kemudian terus isi detail di bawah.</p>
+                <div className="booking-services">{selected.map(renderChoice)}</div>
+              </div>
+              <details style={{margin:'16px 0',color:'#ff99c9'}}>
+                <summary style={{cursor:'pointer',padding:'10px 0',fontWeight:700}}>Tambah atau pilih servis lain</summary>
+                <h3 className="booking-group-title">Combo Services</h3>
+                <div className="booking-services">{comboBookingChoices.filter(item => !selected.includes(item)).map(renderChoice)}</div>
+                <h3 className="booking-group-title">Single Services</h3>
+                <div className="booking-services">{singleBookingChoices.filter(item => !selected.includes(item)).map(renderChoice)}{!selected.includes(otherBookingChoice) && renderChoice(otherBookingChoice)}</div>
+              </details>
+            </> : <>
+              <p className="booking-note" style={{margin:'0 0 12px'}}>Boleh pilih lebih daripada satu servis.</p>
+              <h3 className="booking-group-title">Combo Services</h3>
+              <div className="booking-services">{comboBookingChoices.map(renderChoice)}</div>
+              <h3 className="booking-group-title">Single Services</h3>
+              <div className="booking-services">{singleBookingChoices.map(renderChoice)}{renderChoice(otherBookingChoice)}</div>
+            </>}
             {canAddCut && <div className={`booking-addons booking-cut-card ${hasCut ? 'active' : ''}`}>
               <label className="booking-cut-toggle"><input type="checkbox" checked={wantCut} onChange={event => { const checked = event.target.checked; setWantCut(checked); if (!checked) update('cutLength', ''); }} /><span><strong>Add-on Hair Cut</strong><small>Tambah potongan rambut untuk servis pilihan anda.</small></span></label>
               {hasCut && <div className="booking-cut-target">
