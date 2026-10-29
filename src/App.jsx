@@ -285,6 +285,10 @@ function HomePage({ go }) {
         .home-page .payment-item b{color:#fff;font-size:12px;line-height:1.4}
         .home-page .payment-item.spaylater .payment-symbol{color:#ffbe89;background:rgba(255,126,70,.12)}
         .home-page .payment-item.qr .payment-symbol{color:#b4d6ff;background:rgba(70,137,255,.12)}
+        .home-page .hero-actions.only-wa{display:flex;justify-content:center;width:100%;margin:28px auto 8px}
+        .home-page .hero-actions.only-wa a{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;max-width:100%;min-height:68px;padding:20px 14px;box-sizing:border-box;margin:0 auto;background:linear-gradient(135deg,#e52f88,#ff79b4);border:1px solid #ff8fc2;border-radius:18px;color:#fff;font-size:19px;font-weight:900;line-height:1.3;text-align:center;text-decoration:none;box-shadow:0 8px 26px rgba(230,80,152,.3)}
+        .home-page .hero-actions.only-wa a:focus-visible{outline:3px solid white;outline-offset:5px}
+        .home-page .hero-actions.only-wa a:hover{filter:brightness(1.08)}
       `}</style>
       <section className="hero">
         <div className="hero-bg" style={{ backgroundImage: `url(${salonToolsBg})` }} />
@@ -304,7 +308,7 @@ function HomePage({ go }) {
               <li className="payment-item"><span className="payment-symbol" aria-hidden="true"><Banknote size={23} /></span><b>Cash</b></li>
             </ul>
           </section>
-          <div className="hero-actions only-wa"><a href={bookingLink("booking appointment")}>Semak Slot & Booking</a></div>
+          <div className="hero-actions only-wa"><a href={bookingLink("booking appointment")}><CalendarDays size={23} aria-hidden="true" /><span>Semak Slot &amp; Booking</span></a></div>
         </motion.div>
       </section>
 
