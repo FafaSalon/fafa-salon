@@ -83,7 +83,6 @@ const services = {
       { title: "Colour No Bleach", text: "Pewarnaan tanpa bleach. Hasil warna bergantung pada warna asal dan sejarah pewarnaan rambut." },
       { title: "Bleach + Colour", text: "Proses bleach diikuti pewarnaan untuk pilihan warna yang memerlukan asas rambut lebih cerah. Kesesuaian dinilai oleh hairstylist dahulu." },
       { title: "Highlight + Colour", text: "Highlight pada bahagian rambut terpilih, diikuti pewarnaan untuk menghasilkan dimensi dan tona warna." },
-      { title: "Pilihan warna", text: "Honey Brown, Ash Brown, Maroon Red, Maroon Purple, Hazelnut Brown dan Golden Brown. Pilihan bergantung pada servis dan keadaan rambut." },
     ],
     colours: ["Honey Brown", "Ash Brown", "Maroon Red", "Maroon Purple", "Hazelnut Brown", "Golden Brown"],
     time: "Subject to consultation",
@@ -169,14 +168,19 @@ const pageMotion = {
   transition: { duration: 0.42, ease: "easeOut" },
 };
 
+function pageFromHash() {
+  const target = window.location.hash.slice(1).split('?')[0];
+  return ['home', 'booking', 'contact', 'location', 'combo', ...Object.keys(services), ...Object.keys(combos)].includes(target) ? target : 'home';
+}
+
 export default function App() {
-  const [page, setPage] = useState(() => window.location.hash.startsWith("#booking") ? "booking" : "home");
+  const [page, setPage] = useState(pageFromHash);
   const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => {
     const handleHash = () => {
-      if (window.location.hash.startsWith('#booking')) {
-        setPage('booking'); setMenuOpen(false); window.scrollTo({ top: 0 });
-      } else { setPage('home'); setMenuOpen(false); }
+      setPage(pageFromHash());
+      setMenuOpen(false);
+      window.scrollTo({ top: 0 });
     };
     window.addEventListener('hashchange', handleHash);
     return () => window.removeEventListener('hashchange', handleHash);
@@ -185,7 +189,8 @@ export default function App() {
   const currentCombo = combos[page];
 
   const go = (target) => {
-    window.history.replaceState(null, '', window.location.pathname + window.location.search + (target === 'booking' ? '#booking' : ''));
+    const nextHash = target === 'home' ? '' : `#${target}`;
+    if (window.location.hash !== nextHash) window.history.pushState(null, '', window.location.pathname + window.location.search + nextHash);
     setPage(target);
     setMenuOpen(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -335,19 +340,63 @@ function ServicePage({ item, go }) {
         <p className="lead">{item.intro}</p>
         {item.consultation && <div className="keratin-consultation" style={{margin: "20px 0", padding: 0, border: "none", borderRadius: 0, background: "transparent"}}><strong style={{display: "block", marginBottom: 8}}>Konsultasi dahulu</strong><p style={{margin: 0, lineHeight: 1.8}}>{item.consultation}</p></div>}
         <div className="time-pill"><Clock3 size={17} /> {item.time}</div>
-        {item.panels.map((panel) => <InfoPanel key={panel.title} title={panel.title} text={panel.text} />)}
-        {item.colours && <div className="colour-board">{item.colours.map((c, i) => <div className={`colour-chip c${i}`} key={c}><span>{c}</span></div>)}</div>}
+        {item.visual === "colour" ? <ColourCategories item={item} /> : item.panels.map((panel) => <InfoPanel key={panel.title} title={panel.title} text={panel.text} />)}
         {item.visual === "rebonding" ? <div style={{display: "grid", gap: 12}}>
           <a className="main-wa" style={{marginTop: 16}} href={bookingLink("Silky Rebonding")}><MessageCircle size={18} /> Pilih Silky Rebonding</a>
           <a className="main-wa" style={{marginTop: 0}} href={bookingLink("Soft Relaxing")}><MessageCircle size={18} /> Pilih Soft Relaxing</a>
         </div> : item.visual === "keratin" ? <div style={{display: "grid", gap: 12, marginTop: 16}}>
           {['Keratin Brazilian Anti Frizz', 'Keratin Brazilian Aqua Repair', 'Keratin Botox Premium'].map(name => <a key={name} className="main-wa" style={{marginTop: 0}} href={bookingLink(name)}><MessageCircle size={18} /> Pilih {name}</a>)}
-        </div> : item.visual === "colour" ? <div style={{display: "grid", gap: 12, marginTop: 16}}>
-          {['Colour No Bleach', 'Bleach + Colour', 'Highlight + Colour'].map(name => <a key={name} className="main-wa" style={{marginTop: 0}} href={bookingLink(name)}><MessageCircle size={18} /> Pilih {name}</a>)}
-        </div> : <a className="main-wa" href={bookingLink(item.booking)}><MessageCircle size={18} /> Saya berminat nak buat {item.title}</a>}
+        </div> : item.visual === "treatment" ? <div style={{display: "grid", gap: 12, marginTop: 16}}>
+          {["Soft Treatment", "Scalp Treatment", "Soft + Scalp Treatment"].map(name => <a key={name} className="main-wa" style={{marginTop: 0}} href={bookingLink(name)}><MessageCircle size={18} /> Pilih {name}</a>)}
+        </div> : item.visual === "colour" ? null : <a className="main-wa" href={bookingLink(item.booking)}><MessageCircle size={18} /> Saya berminat nak buat {item.title}</a>}
       </section>
     </motion.section>
   );
+}
+
+function ColourCategories({ item }) {
+  const [openCategory, setOpenCategory] = useState(null);
+  const colourGroups = [
+    { title: "Brown Natural", indices: [0, 4, 5] },
+    { title: "Ash Brown", indices: [1] },
+    { title: "Maroon", indices: [2, 3] },
+  ];
+  return <div className="colour-categories">
+    <style>{`
+      .colour-category{margin-top:14px;border:1px solid #edbad1;border-radius:22px;background:#fff;overflow:hidden;box-shadow:0 12px 26px rgba(120,40,80,.06)}
+      .colour-category-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px;text-align:left;background:#fff3f8;border:0;color:#8b1744;cursor:pointer;font:inherit}
+      .colour-category-toggle strong{display:block;font-size:18px;line-height:1.4}
+      .colour-category-toggle small{display:block;margin-top:5px;color:#715664;font-size:12px;line-height:1.5}
+      .colour-category-toggle:focus-visible{outline:3px solid #db3984;outline-offset:-4px}
+      .colour-category-content{padding:20px;color:#513d48}
+      .colour-category-content p{font-size:14px;line-height:1.75;margin:0 0 14px;color:#68515e}
+      .colour-category-content h3{font-size:15px;color:#8b1744;margin:22px 0 0}
+      .colour-category-content .colour-board{margin-top:12px;grid-template-columns:repeat(2,minmax(0,1fr))}
+      .colour-category-content .colour-chip{min-height:104px;padding:12px;border-radius:16px;font-size:13px;text-shadow:0 1px 5px #000}
+      .colour-category-content .main-wa{margin-top:22px}
+    `}</style>
+    {item.panels.map((category, index) => {
+      const isOpen = openCategory === category.title;
+      return <section className="colour-category" key={category.title}>
+        <button type="button" className="colour-category-toggle" aria-expanded={isOpen} aria-controls={`colour-category-${index}`} onClick={() => setOpenCategory(isOpen ? null : category.title)}>
+          <span><strong>{category.title}</strong><small>{isOpen ? "Tutup pilihan warna" : "Tekan untuk lihat pilihan warna & detail"}</small></span>
+          <ChevronRight size={20} aria-hidden="true" style={{flexShrink:0, transform:isOpen ? "rotate(90deg)" : undefined}} />
+        </button>
+        {isOpen && <div className="colour-category-content" id={`colour-category-${index}`}>
+          <p>{category.text}</p>
+          {index === 0 ? <>
+            <p>Terokai pilihan warna mengikut kategori di bawah. Hasil sebenar bergantung pada warna asal dan keadaan rambut.</p>
+            {colourGroups.map(group => <div key={group.title}>
+              <h3>{group.title}</h3>
+              <div className="colour-board">{group.indices.map(i => <div className={`colour-chip c${i}`} key={item.colours[i]}><span>{item.colours[i]}</span></div>)}</div>
+            </div>)}
+            <p style={{marginTop:16,fontSize:12}}>Paparan tona ini sebagai rujukan sahaja. Sahkan pilihan warna dengan hairstylist.</p>
+          </> : <><h3>Pilihan Warna {category.title}</h3><p style={{marginTop:10}}>Pilihan tona warna akan ditentukan bersama hairstylist selepas semakan keadaan rambut dan hasil yang diinginkan. Boleh nyatakan warna pilihan dalam nota booking.</p></>}
+          <a className="main-wa" href={bookingLink(category.title)}><MessageCircle size={18} /> Pilih {category.title}</a>
+        </div>}
+      </section>;
+    })}
+  </div>;
 }
 
 function InfoPanel({ title, text }) {
