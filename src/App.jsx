@@ -49,8 +49,8 @@ const services = {
     booking: "Rebonding / Relaxing",
     intro: "Kedua-dua servis membantu meluruskan dan mengemaskan rambut. Pilihan yang sesuai bergantung pada hasil yang diinginkan, keadaan rambut dan sejarah chemical.",
     panels: [
-      { title: "Silky Rebonding", text: "Untuk hasil lurus yang lebih jelas, licin dan kemas. Sesuai dipertimbangkan untuk rambut kerinting atau bergelombang yang sukar diurus, selepas pemeriksaan hairstylist. Bahagian rambut yang telah direbonding kekal lurus; akar baharu tumbuh mengikut tekstur asal dan mungkin memerlukan touch-up." },
-      { title: "Soft Relaxing", text: "Untuk hasil lurus yang lebih natural dan lembut, tanpa kesan terlalu tegang seperti rebonding. Sesuai dipertimbangkan untuk rambut halus atau biasa yang mahu kelihatan lebih kemas. Ketahanan sekitar 3–6 bulan bergantung pada keadaan rambut dan penjagaan harian." },
+      { title: "Silky Rebonding", text: "Untuk hasil lurus yang lebih jelas, licin dan kemas. Sesuai dipertimbangkan untuk rambut kerinting atau bergelombang yang sukar diurus, selepas pemeriksaan hairstylist. Bahagian rambut yang telah direbonding kekal lurus; akar baharu tumbuh mengikut tekstur asal dan mungkin memerlukan touch-up. Pelurusan menggunakan proses kimia untuk mengubah bentuk rambut. Hasil lebih lurus berbanding rawatan keratin; kesesuaian pada rambut yang pernah colour atau bleach perlu diperiksa dahulu." },
+      { title: "Soft Relaxing", text: "Untuk hasil lurus yang lebih natural dan lembut, tanpa kesan terlalu tegang seperti rebonding. Sesuai dipertimbangkan untuk rambut halus atau biasa yang mahu kelihatan lebih kemas. Ketahanan sekitar 3–6 bulan bergantung pada keadaan rambut dan penjagaan harian. Pelurusan yang menyasarkan rupa lebih natural dan tidak terlalu tegang. Tahap pelurusan serta ketahanan berbeza mengikut tekstur dan keadaan rambut." },
       { title: "Mana satu sesuai untuk anda?", text: "Rebonding untuk hasil lebih lurus dan licin; relaxing untuk hasil lebih natural. Hairstylist akan semak tekstur, kekuatan serta sejarah colour atau bleach sebelum mencadangkan servis. Rambut sensitif, rosak atau pernah bleach perlu dinilai dahulu." },
     ],
     time: "Single Service: 11 am - 5.00 pm",
@@ -65,9 +65,9 @@ const services = {
     booking: "Keratin",
     intro: "Rawatan untuk rambut frizzy, kembang, kering atau ada bekas chemical termasuk rambut colour dan bleach.",
     panels: [
-      { title: "Keratin Botox Premium", text: "Sudah tentu pilihan terbaik! Gabungan Anti-Frizz & Repair menjadikan rambut lebih rapi, kemas dan mudah diurus dengan 50% pelurusan. Formula lebih selesa dan tidak pedih seperti Keratin Brazilian." },
-      { title: "Keratin Brazilian Anti Frizz", text: "Beri sedikit pelurusan dan kekemasan untuk rambut frizzy dan kembang." },
-      { title: "Keratin Brazilian Aqua Repair", text: "Sesuai untuk rambut ada bekas chemical, bleach, rosak dan kering. Membantu melembapkan semula rambut rosak." },
+      { title: "Keratin Botox Premium", text: "Sudah tentu pilihan terbaik! Gabungan Anti-Frizz & Repair menjadikan rambut lebih rapi, kemas dan mudah diurus dengan 50% pelurusan. Formula lebih selesa dan tidak pedih seperti Keratin Brazilian. Pilihan untuk pelanggan yang mengutamakan rambut lebih rapi, lembut dan mudah diurus. Ia bukan pengganti rebonding jika mahukan hasil lurus penuh. Hasil sebenar bergantung pada keadaan rambut." },
+      { title: "Keratin Brazilian Anti Frizz", text: "Beri sedikit pelurusan dan kekemasan untuk rambut frizzy dan kembang. Fokus mengurangkan rupa frizz dan kembang supaya rambut kelihatan lebih kemas. Ia tidak menjamin rambut lurus sepenuhnya; sesuai dibincangkan jika mahu mengekalkan rupa lebih natural." },
+      { title: "Keratin Brazilian Aqua Repair", text: "Sesuai untuk rambut ada bekas chemical, bleach, rosak dan kering. Membantu melembapkan semula rambut rosak. Fokus penjagaan rambut yang kering atau mempunyai sejarah chemical. Rambut yang rapuh perlu diperiksa dahulu; rawatan ini tidak menjamin pemulihan penuh kerosakan rambut." },
     ],
     time: "Single Service: 11 am - 5.00 pm",
   },
@@ -80,9 +80,9 @@ const services = {
     booking: "Colour No Bleach",
     intro: "Pilih servis warna mengikut hasil yang diinginkan. Hairstylist akan semak keadaan dan sejarah rambut sebelum mencadangkan servis yang sesuai.",
     panels: [
-      { title: "Colour No Bleach", text: "Pewarnaan tanpa bleach. Hasil warna bergantung pada warna asal dan sejarah pewarnaan rambut." },
-      { title: "Bleach + Colour", text: "Proses bleach diikuti pewarnaan untuk pilihan warna yang memerlukan asas rambut lebih cerah. Kesesuaian dinilai oleh hairstylist dahulu." },
-      { title: "Highlight + Colour", text: "Highlight pada bahagian rambut terpilih, diikuti pewarnaan untuk menghasilkan dimensi dan tona warna." },
+      { title: "Colour No Bleach", text: "Pewarnaan tanpa bleach. Hasil warna bergantung pada warna asal dan sejarah pewarnaan rambut. Warna dipilih mengikut asas rambut semasa. Rambut gelap tidak semestinya mendapat tona terang seperti contoh. Colour sahaja tidak semestinya dapat mencerahkan rambut yang pernah diwarnakan hitam." },
+      { title: "Bleach + Colour", text: "Proses bleach diikuti pewarnaan untuk pilihan warna yang memerlukan asas rambut lebih cerah. Kesesuaian dinilai oleh hairstylist dahulu. Bleach mencerahkan asas rambut sebelum tona pilihan dimasukkan. Warna sasaran mungkin memerlukan tahap pencerahan berbeza; hairstylist akan menilai kekuatan rambut dan kesesuaian proses dahulu." },
+      { title: "Highlight + Colour", text: "Highlight pada bahagian rambut terpilih, diikuti pewarnaan untuk menghasilkan dimensi dan tona warna. Hanya bahagian rambut tertentu dicerahkan untuk mewujudkan dimensi, kemudian ditambah tona warna. Kesan berbeza daripada pewarnaan penuh; bincangkan kedudukan dan tona highlight semasa konsultasi." },
     ],
     colours: ["Honey Brown", "Ash Brown", "Maroon Red", "Maroon Purple", "Hazelnut Brown", "Golden Brown"],
     time: "Subject to consultation",
@@ -96,9 +96,9 @@ const services = {
     booking: "Light Hair Treatment",
     intro: "Rawatan ringan untuk rambut dan kulit kepala.",
     panels: [
-      { title: "Soft Treatment", text: "Fokus rambut. Kurang kusut dan mudah diurus. Kesan biasanya sementara dan perlu ulang rawatan." },
-      { title: "Scalp Treatment", text: "Fokus kulit kepala. Membersihkan & merawat kulit kepala. Kurangkan kelemumur & kegatalan." },
-      { title: "Soft + Scalp Treatment", text: "Pilihan combo Soft Treatment dan Scalp Treatment untuk kesan lebih baik — rambut lebih mudah diurus dan kulit kepala lebih bersih." },
+      { title: "Soft Treatment", text: "Fokus rambut. Kurang kusut dan mudah diurus. Kesan biasanya sementara dan perlu ulang rawatan. Fokus pada helaian rambut untuk rasa lebih lembut dan membantu rambut mudah disikat. Ia tidak meluruskan rambut secara kekal. Kesan bergantung pada keadaan rambut dan penjagaan selepas servis." },
+      { title: "Scalp Treatment", text: "Fokus kulit kepala. Membersihkan & merawat kulit kepala. Kurangkan kelemumur & kegatalan. Fokus pada pembersihan serta penjagaan kulit kepala. Ia berbeza daripada rawatan untuk helaian rambut dan bukan rawatan perubatan bagi masalah kulit kepala." },
+      { title: "Soft + Scalp Treatment", text: "Pilihan combo Soft Treatment dan Scalp Treatment untuk kesan lebih baik — rambut lebih mudah diurus dan kulit kepala lebih bersih. Dua fokus dalam satu sesi: Soft Treatment untuk helaian rambut, Scalp Treatment untuk kulit kepala. Pilihan jika mahu kedua-dua penjagaan tanpa servis pelurusan atau pewarnaan." },
     ],
     time: "Single Service: 11 am - 5.00 pm",
   },
@@ -114,6 +114,8 @@ const combos = {
     visual: "comboStraight",
     booking: "Rebonding / Relaxing + Keratin Brazilian",
     panels: [
+      { title: "Apa yang digabungkan", text: "Rebonding atau relaxing untuk pelurusan, bersama Keratin Brazilian untuk membantu rambut kelihatan lebih rapi dan kurang frizz. Jenis pelurusan serta keratin dipilih selepas pemeriksaan rambut." },
+      { title: "Sebelum memilih", text: "Maklumkan sejarah colour, bleach dan chemical. Gabungan hanya diteruskan jika keadaan rambut sesuai; hasil dan susunan proses ditentukan oleh hairstylist." },
       { title: "Sesuai untuk", text: "Customer yang mahu rambut lebih lurus, kemas dan dalam masa yang sama mahu rambut nampak lebih lembut dan kurang frizz." },
       { title: "Nota servis", text: "Hairstylist akan cek keadaan rambut dahulu sama ada lebih sesuai buat rebonding atau relaxing sebelum keratin." },
     ],
@@ -125,6 +127,8 @@ const combos = {
     visual: "comboColour",
     booking: "Rebonding / Relaxing + Colour",
     panels: [
+      { title: "Apa yang digabungkan", text: "Rebonding atau relaxing bersama Colour No Bleach. Pelurusan memberi bentuk lebih kemas, manakala colour menambah tona pada rambut. Pilihan warna rujukan ada di bawah." },
+      { title: "Had pilihan colour", text: "Pilihan warna ini merujuk kepada Colour No Bleach. Bleach dan highlight tidak dianggap termasuk dalam combo ini. Sebarang proses tambahan perlu dibincangkan dahulu; kesesuaian gabungan bergantung pada keadaan rambut." },
       { title: "Sesuai untuk", text: "Customer yang mahu rambut nampak lebih kemas dan dalam masa yang sama mahu tambah warna rambut." },
       { title: "Nota servis", text: "Pilihan warna bergantung kepada keadaan rambut, sejarah chemical dan consultation hairstylist." },
     ],
@@ -136,6 +140,8 @@ const combos = {
     visual: "comboKeratin",
     booking: "Colour + Keratin Brazilian",
     panels: [
+      { title: "Apa yang digabungkan", text: "Colour No Bleach untuk tona rambut, bersama Keratin Brazilian untuk membantu mengurangkan rupa frizz dan menjadikan rambut lebih mudah diurus. Ia tidak memberikan jaminan pelurusan penuh seperti rebonding." },
+      { title: "Pemilihan keratin dan warna", text: "Hairstylist akan mencadangkan Anti Frizz atau Aqua Repair berdasarkan keadaan rambut. Pilihan warna rujukan ada di bawah; bleach atau highlight perlu konsultasi berasingan." },
       { title: "Sesuai untuk", text: "Customer yang mahu buat colour dan mahu rambut nampak lebih kemas, lembut dan kurang frizz selepas servis." },
       { title: "Nota servis", text: "Hairstylist akan cek keadaan rambut dan suggest pilihan keratin yang sesuai selepas colour." },
     ],
@@ -147,6 +153,8 @@ const combos = {
     visual: "comboTreatment",
     booking: "Soft + Scalp Treatment",
     panels: [
+      { title: "Apa yang digabungkan", text: "Soft Treatment menjaga helaian rambut supaya lebih lembut dan mudah disikat; Scalp Treatment memfokuskan pembersihan dan penjagaan kulit kepala." },
+      { title: "Hasil yang boleh dijangka", text: "Penjagaan rambut dan kulit kepala dalam satu sesi. Tiada pelurusan kekal atau pertukaran warna. Kesan berbeza mengikut keadaan rambut dan rutin penjagaan harian." },
       { title: "Sesuai untuk", text: "Customer yang mahu rawatan ringan untuk rambut dan kulit kepala dalam satu sesi." },
       { title: "Kesan / Manfaat", text: "Soft Treatment fokus pada rambut supaya kurang kusut, manakala Scalp Treatment fokus membersihkan dan menyegarkan kulit kepala." },
     ],
@@ -372,13 +380,16 @@ function ComboSpotlight({ go, service }) {
   </aside>;
 }
 
+function NoBleachPalette() {
+  const groups = [{title:"Brown Natural",indices:[0,4,5]},{title:"Ash Brown",indices:[1]},{title:"Maroon",indices:[2,3]}];
+  return <div><p style={{marginTop:12}}>Pilihan warna tanpa bleach. Hasil bergantung pada warna asal, sejarah pewarnaan dan keadaan rambut. Warna rujukan ini tidak menjamin hasil yang sama pada setiap rambut.</p>
+    {groups.map(group => <div key={group.title}><h3>{group.title}</h3><div className="colour-board">{group.indices.map(i => <div className={`colour-chip c${i}`} key={i}><span>{services.colour.colours[i]}</span></div>)}</div></div>)}
+    <p style={{marginTop:16,fontSize:12}}>Paparan tona sebagai rujukan sahaja. Rambut yang pernah diwarnakan hitam perlu dinilai dahulu. Nyatakan warna yang diminati dalam nota booking dan sahkan dengan hairstylist.</p>
+  </div>;
+}
+
 function ServiceCategories({ item, categories }) {
   const [openCategory, setOpenCategory] = useState(null);
-  const colourGroups = [
-    { title: "Brown Natural", indices: [0, 4, 5] },
-    { title: "Ash Brown", indices: [1] },
-    { title: "Maroon", indices: [2, 3] },
-  ];
   return <div className="colour-categories">
     <style>{`
       .colour-category{margin-top:14px;border:1px solid #edbad1;border-radius:22px;background:#fff;overflow:hidden;box-shadow:0 12px 26px rgba(120,40,80,.06)}
@@ -404,13 +415,9 @@ function ServiceCategories({ item, categories }) {
           {category.text && <p>{category.text}</p>}
           {category.panels && category.panels.map(panel => <div key={panel.title}><h3>{panel.title}</h3><p style={{marginTop:8}}>{panel.text}</p></div>)}
           {item.visual === "colour" && (index === 0 ? <>
-            <p>Terokai pilihan warna mengikut kategori di bawah. Hasil sebenar bergantung pada warna asal dan keadaan rambut.</p>
-            {colourGroups.map(group => <div key={group.title}>
-              <h3>{group.title}</h3>
-              <div className="colour-board">{group.indices.map(i => <div className={`colour-chip c${i}`} key={item.colours[i]}><span>{item.colours[i]}</span></div>)}</div>
-            </div>)}
-            <p style={{marginTop:16,fontSize:12}}>Paparan tona ini sebagai rujukan sahaja. Sahkan pilihan warna dengan hairstylist.</p>
+            <NoBleachPalette />
           </> : <><h3>Pilihan Warna {category.title}</h3><p style={{marginTop:10}}>Pilihan tona warna akan ditentukan bersama hairstylist selepas semakan keadaan rambut dan hasil yang diinginkan. Boleh nyatakan warna pilihan dalam nota booking.</p></>)}
+          {item.visual === "combo" && /Colour/.test(category.title) && <><h3>Pilihan Warna Colour No Bleach</h3><NoBleachPalette /></>}
           <a className="main-wa" href={bookingLink(category.booking || category.title)}><MessageCircle size={18} /> Saya berminat nak buat {category.title}</a>
         </div>}
       </section>;
