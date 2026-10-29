@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft,
+  Eye,
   CalendarDays,
   CreditCard,
   CalendarClock,
@@ -51,7 +52,6 @@ const services = {
     panels: [
       { title: "Silky Rebonding", text: "Untuk hasil lurus yang lebih jelas, licin dan kemas. Sesuai dipertimbangkan untuk rambut kerinting atau bergelombang yang sukar diurus, selepas pemeriksaan hairstylist. Bahagian rambut yang telah direbonding kekal lurus; akar baharu tumbuh mengikut tekstur asal dan mungkin memerlukan touch-up. Pelurusan menggunakan proses kimia untuk mengubah bentuk rambut. Hasil lebih lurus berbanding rawatan keratin; kesesuaian pada rambut yang pernah colour atau bleach perlu diperiksa dahulu." },
       { title: "Soft Relaxing", text: "Untuk hasil lurus yang lebih natural dan lembut, tanpa kesan terlalu tegang seperti rebonding. Sesuai dipertimbangkan untuk rambut halus atau biasa yang mahu kelihatan lebih kemas. Ketahanan sekitar 3–6 bulan bergantung pada keadaan rambut dan penjagaan harian. Pelurusan yang menyasarkan rupa lebih natural dan tidak terlalu tegang. Tahap pelurusan serta ketahanan berbeza mengikut tekstur dan keadaan rambut." },
-      { title: "Mana satu sesuai untuk anda?", text: "Rebonding untuk hasil lebih lurus dan licin; relaxing untuk hasil lebih natural. Hairstylist akan semak tekstur, kekuatan serta sejarah colour atau bleach sebelum mencadangkan servis. Rambut sensitif, rosak atau pernah bleach perlu dinilai dahulu." },
     ],
     time: "Single Service: 11 am - 5.00 pm",
   },
@@ -102,18 +102,18 @@ const services = {
   },
 
   haircut: {
-    no:"05",title:"Hair Cut",cardTitle:"Hair Cut",visual:"haircut",walkinOnly:true,
-    short:"Potongan rambut mengikut paras dan gaya pilihan.",
-    intro:"Tak perlu booking — boleh walk-in. Mesej sekurang-kurangnya 30 minit sebelum datang pada hari yang sama untuk semakan kekosongan. Slot tidak ditempah dan mungkin perlu menunggu.",
-    time:"Walk-in Hair Cut: slot terakhir 6:00 PM",
-    panels:[{title:"Hair Cut & Styling",text:"Potongan untuk mengubah paras, bentuk, layer atau gaya rambut. Bincangkan gaya dan paras yang diinginkan dengan hairstylist sebelum potongan dimulakan. Potong banyak walaupun lurus tetap dikira Hair Cut."},{title:"Maklumat Walk-in",text:"Hair Cut tidak memerlukan booking. Datang terus atau mesej 30 minit lebih awal pada hari yang sama. Penerimaan tertakluk pada kekosongan dan jadual cawangan; mungkin perlu menunggu giliran."}]
+    no:"05",title:"Hair Cut & Hair Wash",cardTitle:"Hair Cut & Hair Wash",visual:"haircut",walkinOnly:true,
+    short:"Potongan dan cucian rambut. Walk-in sahaja.",
+    intro:"Tak perlu booking. Boleh walk-in atau mesej 30 minit sebelum datang pada hari yang sama untuk semak kekosongan. Mungkin perlu menunggu giliran.",
+    time:"Slot terakhir: Hair Wash 5:30 PM • Hair Cut 6:00 PM",
+    panels:[{title:"Hair Cut & Styling",text:"Potongan untuk ubah paras, bentuk, layer atau gaya rambut. Bincangkan gaya dengan hairstylist sebelum mula. Potong banyak walaupun lurus tetap dikira Hair Cut."},{title:"Hair Wash",text:"Cucian rambut untuk rasa bersih dan segar. Jika mahu tambah potongan atau styling, maklumkan dahulu untuk semakan caj."},{title:"Maklumat Walk-in",text:"Tidak perlu booking. Mesej sekurang-kurangnya 30 minit sebelum datang pada hari yang sama. Slot tertakluk pada kekosongan cawangan dan mungkin perlu menunggu."}]
   },
-  hairwash: {
-    no:"06",title:"Hair Wash",cardTitle:"Hair Wash",visual:"hairwash",walkinOnly:true,
-    short:"Cucian rambut untuk rasa bersih dan segar.",
-    intro:"Tak perlu booking — boleh walk-in. Mesej sekurang-kurangnya 30 minit sebelum datang pada hari yang sama untuk semakan kekosongan. Slot tidak ditempah dan mungkin perlu menunggu.",
-    time:"Walk-in Hair Wash: slot terakhir 5:30 PM",
-    panels:[{title:"Hair Wash",text:"Cucian rambut untuk membersihkan rambut dan menyegarkan kulit kepala. Maklumkan jika mahu tambah potongan atau styling supaya hairstylist boleh terangkan pilihan dan caj sebelum servis."},{title:"Maklumat Walk-in",text:"Hair Wash tidak memerlukan booking. Semak kekosongan pada hari yang sama, sekurang-kurangnya 30 minit sebelum datang, atau walk-in dan tunggu giliran. Penerimaan tertakluk pada kekosongan cawangan."}]
+  eyelash: {
+    no:"06",title:"Eyelash",cardTitle:"Eyelash",visual:"eyelash",walkinOnly:true,
+    short:"Pilihan lentikan atau sambungan bulu mata.",
+    intro:"Walk-in sahaja, tak perlu booking. Datang sebelum 4:00 petang. Mesej 30 minit sebelum datang pada hari yang sama untuk semak kekosongan.",
+    time:"Walk-in Eyelash: sebelum 4:00 PM",
+    panels:[{title:"Eyelash Perm",text:"Melentikkan bulu mata asli supaya nampak lebih terangkat dan kemas, tanpa menambah bulu mata sambungan. Hasil bergantung pada panjang dan keadaan bulu mata asal."},{title:"Eyelash Extension",text:"Menambah sambungan pada bulu mata asli untuk nampak lebih panjang dan penuh. Bincangkan gaya natural atau lebih menyerlah sebelum servis."},{title:"Maklumat Walk-in",text:"Tidak perlu booking. Sila datang sebelum 4:00 petang. Mesej 30 minit lebih awal pada hari yang sama; servis tertakluk pada kekosongan dan mungkin perlu menunggu giliran."}]
   },
 
 };
@@ -330,13 +330,11 @@ function HomePage({ go }) {
           <div className="hero-actions only-wa"><a href={bookingLink("booking appointment")}><CalendarDays size={23} aria-hidden="true" /><span>Semak Slot &amp; Booking</span></a></div>
       </section>
 
-      <section className="policy-card" style={{textAlign:"center",display:"flex",justifyContent:"center"}}>
-        <a className="tc-link" href={tcLink}>View full T&C</a>
-      </section>
-
       <section className="quick-links">
         <button onClick={() => go("contact")}>Contact Us</button>
         <button onClick={() => go("location")}>Our Location</button>
+        <a className="footer-tc" href={tcLink}>View Full T&amp;C</a>
+        <style>{`.quick-links .footer-tc{display:flex;align-items:center;justify-content:center;padding:16px;border-radius:18px;background:#171722;border:1px solid rgba(255,255,255,.12);font:inherit;font-weight:900;color:white;text-align:center;text-decoration:none}`}</style>
       </section>
     </motion.section>
   );
@@ -362,7 +360,7 @@ function ServicePage({ item, go }) {
         <div className="time-pill"><Clock3 size={17} /> {item.time}</div>
         <h3 style={{color:"#8b1744",marginTop:24}}>{item.walkinOnly ? "Walk-in Sahaja • Tak Perlu Booking" : "Single Services"}</h3>
         <ServiceCategories item={item} />
-        {["rebonding", "keratin"].includes(item.visual) && <div style={{marginTop:22}}><h3 style={{color:"#8b1744",fontSize:18}}>Mana satu sesuai untuk anda?</h3>{item.visual === "rebonding" ? <p className="lead">{item.panels[2].text}</p> : <><p className="lead"><strong>Keratin Brazilian Anti Frizz</strong> — untuk rambut frizzy dan kembang yang mahu nampak lebih kemas dengan sedikit pelurusan.</p><p className="lead"><strong>Keratin Brazilian Aqua Repair</strong> — untuk rambut kering atau ada sejarah colour dan bleach yang memerlukan fokus penjagaan.</p><p className="lead"><strong>Keratin Botox Premium</strong> — untuk rambut lebih rapi, lembut dan mudah diurus dengan gabungan Anti-Frizz &amp; Repair serta kesan pelurusan yang lebih ketara.</p><p className="lead">Pilihan yang sesuai bergantung pada keadaan dan sejarah rambut. Hasil sebenar berbeza bagi setiap pelanggan.</p></>}</div>}
+        {!item.walkinOnly && <p className="lead" style={{marginTop:20}}>Hairstylist akan cek keadaan rambut dan cadangkan servis yang sesuai.</p>}
         {!item.walkinOnly && <div style={{marginTop:28}}><ComboSpotlight go={go} service={item.visual} /></div>}
       </section>
     </motion.section>
@@ -546,6 +544,7 @@ function LocationCard({ title, text, link }) {
 }
 
 function ServiceIcon({ type }) {
+  if (type === "eyelash") return <Eye size={18} />;
   if (type === "rebonding") return <Scissors size={18} />;
   if (type === "relaxing") return <Wand2 size={18} />;
   if (type === "keratin") return <Sparkles size={18} />;
@@ -555,6 +554,7 @@ function ServiceIcon({ type }) {
 }
 
 function ServiceVisual({ type, compact = false }) {
+  if (type === "eyelash") return <div className="real-service-visual" style={{minHeight:280,display:"flex",alignItems:"center",justifyContent:"center",background:"linear-gradient(135deg,#501c3c,#17121b)",color:"#ff9bcb"}}><Eye size={110} aria-hidden="true" /></div>;
   const imageMap = {
     haircut: realImages.combo,
     hairwash: realImages.treatment,
