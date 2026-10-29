@@ -335,6 +335,8 @@ function ServicePage({ item, go }) {
         {item.visual === "rebonding" ? <div style={{display: "grid", gap: 12}}>
           <a className="main-wa" style={{marginTop: 16}} href={bookingLink("Silky Rebonding")}><MessageCircle size={18} /> Pilih Silky Rebonding</a>
           <a className="main-wa" style={{marginTop: 0}} href={bookingLink("Soft Relaxing")}><MessageCircle size={18} /> Pilih Soft Relaxing</a>
+        </div> : item.visual === "keratin" ? <div style={{display: "grid", gap: 12, marginTop: 16}}>
+          {['Keratin Brazilian Anti Frizz', 'Keratin Brazilian Aqua Repair', 'Keratin Botox Premium'].map(name => <a key={name} className="main-wa" style={{marginTop: 0}} href={bookingLink(name)}><MessageCircle size={18} /> Pilih {name}</a>)}
         </div> : <a className="main-wa" href={bookingLink(item.booking)}><MessageCircle size={18} /> Saya berminat nak buat {item.title}</a>}
       </section>
     </motion.section>
@@ -519,16 +521,17 @@ function BottomBar({ go, page }) {
   return <div className="bottom-bar"><button onClick={() => go("home")}><Home size={16} /> Home</button><a href={href}><MessageCircle size={16} /> Book Now</a></div>;
 }
 
-const bookingChoices = [
+const comboBookingChoices = Object.values(combos).map(item => item.booking);
+const singleBookingChoices = [
   'Silky Rebonding', 'Soft Relaxing',
   'Keratin Brazilian Anti Frizz', 'Keratin Brazilian Aqua Repair', 'Keratin Botox Premium',
-  ...Object.values(services).filter(item => !['rebonding', 'keratin', 'treatment'].includes(item.visual)).map(item => item.booking),
-  'Bleach + Colour', 'Highlight + Colour', 'Touch-up Rebonding',
-  'Soft Treatment', 'Protein Treatment', 'Scalp Treatment',
-  'Hair Cut & Styling', 'Hair Wash', 'Setting Curl', 'Hairdo',
-  ...Object.values(combos).map(item => item.booking),
-  'Lain-lain / Perlukan nasihat',
+  'Hair Colour', 'Bleach + Colour', 'Highlight + Colour',
+  'Soft Treatment', 'Scalp Treatment',
 ];
+const otherBookingChoice = 'Lain-lain / Perlukan nasihat';
+const bookingChoices = [...comboBookingChoices, ...singleBookingChoices, otherBookingChoice];
+function allowsCut(service) { return service !== otherBookingChoice; }
+function allowsCurl(service) { return service.includes('Colour'); }
 const lengthChoices = ['1 — Sebahu', '2 — Ketiak–atas bra line', '3 — Bawah bra line–atas pinggang', '4 — Bawah pinggang'];
 const hairCheckNote = 'Hairstylist akan memeriksa paras dan ketebalan rambut sebenar.';
 function malaysiaToday() {
@@ -543,13 +546,13 @@ function initialBookingServices() {
 }
 function BookingPage({ go }) {
   const [selected, setSelected] = useState(initialBookingServices);
+  const [addOns, setAddOns] = useState({});
   const [form, setForm] = useState({ name: '', phone: '', branch: '', date: '', time: '', length: '', thickness: '', notes: '' });
   const [error, setError] = useState('');
   const update = (key, value) => { setForm(prev => ({ ...prev, [key]: value })); };
   const today = malaysiaToday();
-  const cutWashOnly = selected.length > 0 && selected.every(item => ['Hair Cut & Styling', 'Hair Wash'].includes(item));
-  const isCombo = selected.some(item => item.startsWith('Combo ')) || (selected.length > 1 && !cutWashOnly);
-  const end = cutWashOnly ? 18 : isCombo ? 15.5 : 17;
+  const isCombo = selected.some(item => item.startsWith('Combo ')) || selected.length > 1;
+  const end = isCombo ? 15.5 : 17;
   const times = [];
   for (let value = 11; value <= end; value += 0.5) {
     const hour = Math.floor(value);
@@ -558,29 +561,39 @@ function BookingPage({ go }) {
   const toggle = item => {
     const next = selected.includes(item) ? selected.filter(value => value !== item) : [...selected, item];
     setSelected(next); setError('');
-    const cutWash = next.length > 0 && next.every(value => ['Hair Cut & Styling', 'Hair Wash'].includes(value));
-    setForm(prev => ({ ...prev, time: '', date: cutWash ? today : prev.date }));
+    if (selected.includes(item)) setAddOns(prev => { const nextAddOns = {...prev}; delete nextAddOns[item]; return nextAddOns; });
+    setForm(prev => ({ ...prev, time: '' }));
   };
   const dateLabel = form.date ? new Date(`${form.date}T12:00:00`).toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
   const message = [
     'Hi FAFA Salon! Saya nak semak harga & kekosongan slot.', '',
     `Nama: ${form.name.trim()}`, `No. telefon: ${form.phone.trim()}`,
     `Cawangan: ${form.branch}`, `Servis: ${selected.join(' + ')}`,
+    ...selected.map(service => { const options = []; if (allowsCut(service) && addOns[service]?.cut) options.push('Hair Cut'); if (allowsCurl(service) && addOns[service]?.curl) options.push('Setting Curl'); return `Add-on (${service}): ${options.join(' + ') || 'Tiada'}`; }),
     `Tarikh pilihan: ${dateLabel}`, `Masa pilihan: ${form.time}`,
     `Panjang rambut: ${form.length}`, `Ketebalan: ${form.thickness}`,
     `Nota: ${form.notes.trim() || '-'}`, '', hairCheckNote, '',
     'Mohon admin berikan harga dan sahkan slot. Saya faham tempahan belum disahkan dan deposit RM30 seorang hanya dibayar selepas pengesahan admin.',
-    ...(cutWashOnly ? ['Cut / Wash: semakan hari yang sama sahaja, minimum 30 minit sebelum datang. Tiada booking awal.'] : []),
   ].join('\n');
   const href = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
   const validate = element => {
     const node = element.closest('form');
     if (!selected.length) { setError('Sila pilih sekurang-kurangnya satu servis.'); node.querySelector('input[type=checkbox]').focus(); return false; }
     if (!node.reportValidity()) { setError('Sila lengkapkan semua ruangan wajib dan tandakan persetujuan.'); return false; }
-    if (form.date < today || (cutWashOnly && form.date !== today)) { setError('Sila pilih tarikh yang sah. Cut / Wash untuk semakan hari yang sama sahaja.'); return false; }
+    if (form.date < today) { setError('Sila pilih tarikh hari ini atau selepasnya.'); return false; }
     if (!times.includes(form.time)) { setError('Sila pilih semula masa mengikut servis.'); return false; }
     setError(''); return true;
   };
+  const renderChoice = item => (
+    <div className={`booking-service-item ${item === otherBookingChoice ? 'booking-other' : ''}`} key={item}>
+      <label className={`booking-choice ${selected.includes(item) ? 'selected' : ''}`}><input type="checkbox" checked={selected.includes(item)} onChange={() => toggle(item)} /><span>{item}</span></label>
+      {selected.includes(item) && allowsCut(item) && <div className="booking-addons" role="group" aria-label={`Add-on untuk ${item}`}>
+        <span className="booking-addon-title">Add-on pilihan</span>
+        <label><input type="checkbox" checked={Boolean(addOns[item]?.cut)} onChange={event => setAddOns(prev => ({...prev, [item]: {...prev[item], cut: event.target.checked}}))} /> Add-on Hair Cut</label>
+        {allowsCurl(item) && <label><input type="checkbox" checked={Boolean(addOns[item]?.curl)} onChange={event => setAddOns(prev => ({...prev, [item]: {...prev[item], curl: event.target.checked}}))} /> Add-on Setting Curl</label>}
+      </div>}
+    </div>
+  );
   return (
     <motion.section className="page booking-page" {...pageMotion}>
       <style>{`
@@ -597,7 +610,15 @@ function BookingPage({ go }) {
         .booking-page form{display:grid;gap:24px;min-width:0}
         .booking-page fieldset{border:0;margin:0;padding:0;min-width:0}
         .booking-page legend{font-size:12px;color:#ff80b8;font-weight:800;letter-spacing:1px;padding:0 0 12px}
-        .booking-page .booking-services{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+        .booking-page .booking-services{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:start}
+        .booking-page .booking-group-title{color:#ff80b8;font:700 14px system-ui;margin:22px 0 12px}
+        .booking-page .booking-service-item{min-width:0}
+        .booking-page .booking-choice{height:100%}
+        .booking-page .booking-other{grid-column:1/-1;width:min(100%,280px);justify-self:center;margin-top:5px}
+        .booking-page .booking-other .booking-choice{justify-content:center;text-align:center}
+        .booking-page .booking-addons{margin-top:7px;padding:11px 9px;background:#291b27;border:1px solid #714361;border-radius:12px;display:grid;gap:10px;color:#fff;font-size:12px;line-height:1.5}
+        .booking-page .booking-addon-title{color:#ff99c9;font-size:11px;font-weight:700}
+        .booking-page .booking-addons label{display:flex;gap:7px;align-items:flex-start;cursor:pointer}
         .booking-page .booking-choice{display:flex;align-items:flex-start;gap:7px;background:#1a1a25;border:1px solid #453343;border-radius:12px;padding:12px 9px;font-size:12px;line-height:1.5;cursor:pointer;color:#f4eaf0;overflow-wrap:anywhere}
         .booking-page .booking-choice.selected{border-color:#ff79b4;background:#3d2033}
         .booking-page input[type=checkbox]{accent-color:#e65098;width:17px;height:17px;flex-shrink:0;margin:2px 0}
@@ -629,17 +650,20 @@ function BookingPage({ go }) {
           <fieldset>
             <legend>01 / PILIH SERVIS ANDA</legend>
             <p className="booking-note" style={{ margin: '0 0 12px' }}>Boleh pilih lebih daripada satu servis.</p>
-            <div className="booking-services">{bookingChoices.map(item => <label key={item} className={`booking-choice ${selected.includes(item) ? 'selected' : ''}`}><input type="checkbox" checked={selected.includes(item)} onChange={() => toggle(item)} /><span>{item}</span></label>)}</div>
+            <h3 className="booking-group-title">Combo Services</h3>
+            <div className="booking-services">{comboBookingChoices.map(renderChoice)}</div>
+            <h3 className="booking-group-title">Single Services</h3>
+            <div className="booking-services">{singleBookingChoices.map(renderChoice)}{renderChoice(otherBookingChoice)}</div>
+            <p className="booking-notice" style={{marginTop: 18, marginBottom: 0}}><strong>Hair Cut &amp; Hair Wash</strong><br />Untuk walk-in sahaja dan tidak memerlukan booking. Sila WhatsApp 30 minit sebelum datang untuk semakan kekosongan.</p>
           </fieldset>
           <fieldset>
             <legend>02 / CAWANGAN & WAKTU</legend>
             <div className="booking-fields">
               <label className="booking-field">Cawangan *<select value={form.branch} required onChange={event => update('branch', event.target.value)}><option value="">Pilih cawangan</option><option>Setapak, Kuala Lumpur</option><option>Selayang, Batu Caves</option></select></label>
-              <label className="booking-field">Tarikh pilihan *<input type="date" required min={today} max={cutWashOnly ? today : undefined} value={form.date} onChange={event => update('date', event.target.value)} /></label>
+              <label className="booking-field">Tarikh pilihan *<input type="date" required min={today} value={form.date} onChange={event => update('date', event.target.value)} /></label>
               <label className="booking-field">Masa pilihan *<select value={form.time} required onChange={event => update('time', event.target.value)}><option value="">Pilih masa</option>{times.map(time => <option key={time}>{time}</option>)}</select></label>
             </div>
             <p className="booking-note">Slot tertakluk pada kekosongan. Admin akan sahkan waktu mengikut servis dan jadual cawangan.</p>
-            {cutWashOnly && <p className="booking-note">Cut / Wash: semakan hari yang sama sahaja, minimum 30 minit sebelum datang. Tiada booking awal.</p>}
           </fieldset>
           <fieldset>
             <legend>03 / MAKLUMAT ANDA</legend>
