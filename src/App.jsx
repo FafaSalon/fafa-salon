@@ -102,6 +102,21 @@ const services = {
     time: "Single Service: 11 am - 5.00 pm",
   },
 
+  haircut: {
+    no:"05",title:"Hair Cut",cardTitle:"Hair Cut",visual:"haircut",walkinOnly:true,
+    short:"Potongan rambut mengikut paras dan gaya pilihan.",
+    intro:"Tak perlu booking — boleh walk-in. Mesej sekurang-kurangnya 30 minit sebelum datang pada hari yang sama untuk semakan kekosongan. Slot tidak ditempah dan mungkin perlu menunggu.",
+    time:"Walk-in Hair Cut: slot terakhir 6:00 PM",
+    panels:[{title:"Hair Cut & Styling",text:"Potongan untuk mengubah paras, bentuk, layer atau gaya rambut. Bincangkan gaya dan paras yang diinginkan dengan hairstylist sebelum potongan dimulakan. Potong banyak walaupun lurus tetap dikira Hair Cut."},{title:"Maklumat Walk-in",text:"Hair Cut tidak memerlukan booking. Datang terus atau mesej 30 minit lebih awal pada hari yang sama. Penerimaan tertakluk pada kekosongan dan jadual cawangan; mungkin perlu menunggu giliran."}]
+  },
+  hairwash: {
+    no:"06",title:"Hair Wash",cardTitle:"Hair Wash",visual:"hairwash",walkinOnly:true,
+    short:"Cucian rambut untuk rasa bersih dan segar.",
+    intro:"Tak perlu booking — boleh walk-in. Mesej sekurang-kurangnya 30 minit sebelum datang pada hari yang sama untuk semakan kekosongan. Slot tidak ditempah dan mungkin perlu menunggu.",
+    time:"Walk-in Hair Wash: slot terakhir 5:30 PM",
+    panels:[{title:"Hair Wash",text:"Cucian rambut untuk membersihkan rambut dan menyegarkan kulit kepala. Maklumkan jika mahu tambah potongan atau styling supaya hairstylist boleh terangkan pilihan dan caj sebelum servis."},{title:"Maklumat Walk-in",text:"Hair Wash tidak memerlukan booking. Semak kekosongan pada hari yang sama, sekurang-kurangnya 30 minit sebelum datang, atau walk-in dan tunggu giliran. Penerimaan tertakluk pada kekosongan cawangan."}]
+  },
+
 };
 
 
@@ -271,6 +286,17 @@ function HomePage({ go }) {
         .home-page .hero-actions.only-wa a:focus-visible{outline:3px solid white;outline-offset:5px}
         .home-page .hero-actions.only-wa a:hover{filter:brightness(1.08)}
       `}</style>
+      <section className="hero">
+        <div className="hero-bg" style={{ backgroundImage: `url(${salonToolsBg})` }} />
+        <div className="hero-overlay" />
+        <motion.div className="hero-content" initial={{ opacity: 0, y: 26 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55 }}>
+          <img className="hero-logo" src="/assets/fafa-logo.png" alt="FAFA Salon Beauty Centre" />
+          <span className="kicker">Your Beauty, Our Passion</span>
+          <h1 className="salon-headline"><span>SALON PILIHAN</span><span>WANITA DAN</span><em>MUSLIMAH</em></h1>
+          <p className="salon-intro">Tampil cantik dan berkeyakinan, dengan ruang menunggu selesa untuk suami &amp; anak, lengkap dengan TV (Netflix &amp; YouTube) serta WiFi percuma!</p>
+        </motion.div>
+      </section>
+
       <section className="services-section category-menu" aria-label="Pilih kategori servis">
         <style>{`
           .category-menu{padding:24px 18px 28px;background:#17121b}
@@ -282,18 +308,11 @@ function HomePage({ go }) {
           .category-button:focus-visible{outline:3px solid #ff98c9;outline-offset:3px}
         `}</style>
         <div className="section-heading center"><span>Our Services</span><h2>Perkhidmatan Kami</h2></div>
-        <p>Tekan kategori untuk lihat pilihan single service dan combo.</p>
+        <p>Tekan kategori untuk lihat detail servis dan maklumat lanjut.</p>
         <div className="category-buttons">{Object.entries(services).map(([id,item]) => <button type="button" key={id} className="category-button" onClick={() => go(id)}><ServiceIcon type={id} /><span>{item.cardTitle}</span></button>)}</div>
       </section>
 
-      <section className="hero">
-        <div className="hero-bg" style={{ backgroundImage: `url(${salonToolsBg})` }} />
-        <div className="hero-overlay" />
-        <motion.div className="hero-content" initial={{ opacity: 0, y: 26 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55 }}>
-          <img className="hero-logo" src="/assets/fafa-logo.png" alt="FAFA Salon Beauty Centre" />
-          <span className="kicker">Your Beauty, Our Passion</span>
-          <h1 className="salon-headline"><span>SALON PILIHAN</span><span>WANITA DAN</span><em>MUSLIMAH</em></h1>
-          <p className="salon-intro">Tampil cantik dan berkeyakinan, dengan ruang menunggu selesa untuk suami &amp; anak, lengkap dengan TV (Netflix &amp; YouTube) serta WiFi percuma!</p>
+      <section style={{padding:"0 22px 28px",background:"#17121b"}}>
           <section className="payment-methods" aria-label="Kaedah bayaran">
             <h2 className="payment-heading">Payment Methods</h2>
             <ul className="payment-grid">
@@ -305,7 +324,6 @@ function HomePage({ go }) {
             </ul>
           </section>
           <div className="hero-actions only-wa"><a href={bookingLink("booking appointment")}><CalendarDays size={23} aria-hidden="true" /><span>Semak Slot &amp; Booking</span></a></div>
-        </motion.div>
       </section>
 
       <section className="policy-card" style={{textAlign:"center",display:"flex",justifyContent:"center"}}>
@@ -338,10 +356,10 @@ function ServicePage({ item, go }) {
         <h2>{item.title}</h2>
         <p className="lead">{item.intro}</p>
         <div className="time-pill"><Clock3 size={17} /> {item.time}</div>
-        <h3 style={{color:"#8b1744",marginTop:24}}>Single Services</h3>
+        <h3 style={{color:"#8b1744",marginTop:24}}>{item.walkinOnly ? "Walk-in Sahaja • Tak Perlu Booking" : "Single Services"}</h3>
         <ServiceCategories item={item} />
         {["rebonding", "keratin"].includes(item.visual) && <div style={{marginTop:22}}><h3 style={{color:"#8b1744",fontSize:18}}>Mana satu sesuai untuk anda?</h3>{item.visual === "rebonding" ? <p className="lead">{item.panels[2].text}</p> : <><p className="lead"><strong>Keratin Brazilian Anti Frizz</strong> — untuk rambut frizzy dan kembang yang mahu nampak lebih kemas dengan sedikit pelurusan.</p><p className="lead"><strong>Keratin Brazilian Aqua Repair</strong> — untuk rambut kering atau ada sejarah colour dan bleach yang memerlukan fokus penjagaan.</p><p className="lead"><strong>Keratin Botox Premium</strong> — untuk rambut lebih rapi, lembut dan mudah diurus dengan gabungan Anti-Frizz &amp; Repair serta kesan pelurusan yang lebih ketara.</p><p className="lead">Pilihan yang sesuai bergantung pada keadaan dan sejarah rambut. Hasil sebenar berbeza bagi setiap pelanggan.</p></>}</div>}
-        <div style={{marginTop:28}}><ComboSpotlight go={go} service={item.visual} /></div>
+        {!item.walkinOnly && <div style={{marginTop:28}}><ComboSpotlight go={go} service={item.visual} /></div>}
       </section>
     </motion.section>
   );
@@ -423,7 +441,7 @@ function ServiceCategories({ item, categories }) {
             <NoBleachPalette />
           </> : <><h3>Pilihan Warna {category.title}</h3><p style={{marginTop:10}}>Pilihan tona warna akan ditentukan bersama hairstylist selepas semakan keadaan rambut dan hasil yang diinginkan. Boleh nyatakan warna pilihan dalam nota booking.</p></>)}
           {item.visual === "combo" && /Colour/.test(category.title) && <><h3>Pilihan Warna Colour No Bleach</h3><NoBleachPalette /></>}
-          <a className="main-wa" href={bookingLink(category.booking || category.title)}><MessageCircle size={18} /> Saya berminat nak buat {category.title}</a>
+          {!item.walkinOnly && <a className="main-wa" href={bookingLink(category.booking || category.title)}><MessageCircle size={18} /> Saya berminat nak buat {category.title}</a>}
         </div>}
       </section>;
     })}
@@ -534,6 +552,8 @@ function ServiceIcon({ type }) {
 
 function ServiceVisual({ type, compact = false }) {
   const imageMap = {
+    haircut: realImages.combo,
+    hairwash: realImages.treatment,
     rebonding: realImages.rebonding,
     relaxing: realImages.relaxing,
     keratin: realImages.keratin,
@@ -573,7 +593,7 @@ function ServiceVisual({ type, compact = false }) {
 function BottomBar({ go, page }) {
   const current = services[page] || combos[page];
   const href = current ? bookingLink(current.booking) : bookingLink("booking appointment");
-  return <div className="bottom-bar"><button onClick={() => go("home")}><Home size={16} /> Home</button><a href={href}><MessageCircle size={16} /> Book Now</a></div>;
+  return <div className="bottom-bar"><button onClick={() => go("home")}><Home size={16} /> Home</button>{!current?.walkinOnly && <a href={href}><MessageCircle size={16} /> Book Now</a>}</div>;
 }
 
 const comboBookingChoices = Object.values(combos).map(item => item.booking);
