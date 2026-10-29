@@ -602,7 +602,7 @@ function ServiceVisual({ type, compact = false }) {
 
 function BottomBar({ go, page }) {
   const current = services[page] || combos[page];
-  const href = current ? bookingLink(current.booking) : bookingLink("booking appointment");
+  const href = "#booking";
   return <div className="bottom-bar"><button onClick={() => go("home")}><Home size={16} /> Home</button>{!current?.walkinOnly && <a href={href}><MessageCircle size={16} /> Book Now</a>}</div>;
 }
 
