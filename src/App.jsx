@@ -36,7 +36,7 @@ const realImages = {
 const salonToolsBg = realImages.homepage;
 
 function bookingLink(service) {
-  if (service === "pertanyaan salon") return `https://wa.me/${phone}?text=${encodeURIComponent("Hi FAFA Salon, saya nak buat pertanyaan salon.")}`;
+  if (service === "pertanyaan salon") return `https://wa.me/${phone}?text=${encodeURIComponent("Hi FAFA Salon, saya ingin membuat pertanyaan mengenai:\n\n[Tulis pertanyaan anda dengan lengkap di sini sebelum menghantar mesej.]")}`;
   return bookingChoices.includes(service) ? `#booking?service=${encodeURIComponent(service)}` : "#booking";
 }
 
