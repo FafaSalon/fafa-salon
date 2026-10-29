@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft,
@@ -61,7 +61,6 @@ const services = {
     cardTitle: "Keratin",
     short: "Anti frizz, lembut & nampak sihat.",
     visual: "keratin",
-    consultation: "Hairstylist akan cek keadaan rambut dahulu dan suggest pilihan keratin yang paling sesuai mengikut kondisi rambut.",
     booking: "Keratin",
     intro: "Rawatan untuk rambut frizzy, kembang, kering atau ada bekas chemical termasuk rambut colour dan bleach.",
     panels: [
@@ -208,7 +207,7 @@ export default function App() {
     <main className="site-shell">
       <div className="phone-frame">
         <Header page={page} go={go} menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="wait" onExitComplete={() => window.scrollTo({top:0,behavior:"instant"})}>
           {page === "booking" && <BookingPage key="booking" go={go} />}
           {page === "home" && <HomePage key="home" go={go} />}
           {page === "contact" && <ContactPage key="contact" />}
@@ -326,6 +325,7 @@ function HomePage({ go }) {
 }
 
 function ServicePage({ item, go }) {
+  useLayoutEffect(() => { window.scrollTo({top:0,behavior:"instant"}); }, [item.title]);
   return (
     <motion.section className="page service-page" {...pageMotion}>
       <section className="service-cover">
@@ -341,11 +341,10 @@ function ServicePage({ item, go }) {
         <span className="kicker">Exclusive Detail</span>
         <h2>{item.title}</h2>
         <p className="lead">{item.intro}</p>
-        {item.consultation && <div className="keratin-consultation" style={{margin: "20px 0", padding: 0, border: "none", borderRadius: 0, background: "transparent"}}><strong style={{display: "block", marginBottom: 8}}>Konsultasi dahulu</strong><p style={{margin: 0, lineHeight: 1.8}}>{item.consultation}</p></div>}
         <div className="time-pill"><Clock3 size={17} /> {item.time}</div>
         <ComboSpotlight go={go} service={item.visual} />
         <ServiceCategories item={item} />
-        {item.visual === "rebonding" && <div style={{marginTop:22}}><h3 style={{color:"#8b1744",fontSize:18}}>Mana satu sesuai untuk anda?</h3><p className="lead">{item.panels[2].text}</p></div>}
+        {["rebonding", "keratin"].includes(item.visual) && <div style={{marginTop:22}}><h3 style={{color:"#8b1744",fontSize:18}}>Mana satu sesuai untuk anda?</h3>{item.visual === "rebonding" ? <p className="lead">{item.panels[2].text}</p> : <><p className="lead"><strong>Keratin Brazilian Anti Frizz</strong> — untuk rambut frizzy dan kembang yang mahu nampak lebih kemas dengan sedikit pelurusan.</p><p className="lead"><strong>Keratin Brazilian Aqua Repair</strong> — untuk rambut kering atau ada sejarah colour dan bleach yang memerlukan fokus penjagaan.</p><p className="lead"><strong>Keratin Botox Premium</strong> — untuk rambut lebih rapi, lembut dan mudah diurus dengan gabungan Anti-Frizz &amp; Repair serta kesan pelurusan yang lebih ketara.</p><p className="lead">Pilihan yang sesuai bergantung pada keadaan dan sejarah rambut. Hasil sebenar berbeza bagi setiap pelanggan.</p></>}</div>}
       </section>
     </motion.section>
   );
@@ -407,7 +406,16 @@ function ServiceCategories({ item, categories }) {
     {(categories || item.panels.filter(panel => panel.title !== "Mana satu sesuai untuk anda?")).map((category, index) => {
       const isOpen = openCategory === category.title;
       return <section className="colour-category" key={category.title}>
-        <button type="button" className="colour-category-toggle" aria-expanded={isOpen} aria-controls={`colour-category-${index}`} onClick={() => setOpenCategory(isOpen ? null : category.title)}>
+        <button type="button" className="colour-category-toggle" aria-expanded={isOpen} aria-controls={`colour-category-${index}`} onClick={event => {
+          const trigger = event.currentTarget;
+          setOpenCategory(isOpen ? null : category.title);
+          if (!isOpen) requestAnimationFrame(() => requestAnimationFrame(() => {
+            if (!trigger.isConnected) return;
+            const header = document.querySelector('.top-nav');
+            const offset = (header?.getBoundingClientRect().height || 0) + 16;
+            window.scrollTo({top:Math.max(0,window.scrollY + trigger.getBoundingClientRect().top - offset),behavior:"smooth"});
+          }));
+        }}>
           <span><strong>{category.title}</strong><small>{isOpen ? "Tutup detail" : item.visual === "colour" ? "Tekan untuk lihat pilihan warna & detail" : "Tekan untuk lihat detail servis"}</small></span>
           <ChevronRight size={20} aria-hidden="true" style={{flexShrink:0, transform:isOpen ? "rotate(90deg)" : undefined}} />
         </button>
@@ -455,6 +463,7 @@ function ComboPage({ go }) {
 }
 
 function ComboDetailPage({ item, go }) {
+  useLayoutEffect(() => { window.scrollTo({top:0,behavior:"instant"}); }, [item.title]);
   return (
     <motion.section className="page service-page combo-detail-page" {...pageMotion}>
       <section className="service-cover">
