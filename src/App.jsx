@@ -106,14 +106,14 @@ const services = {
     short:"Potongan dan cucian rambut. Walk-in sahaja.",
     intro:"Tak perlu booking. Boleh walk-in atau mesej 30 minit sebelum datang pada hari yang sama untuk semak kekosongan. Mungkin perlu menunggu giliran.",
     time:"Slot terakhir: Hair Wash 5:30 PM • Hair Cut 6:00 PM",
-    panels:[{title:"Hair Cut & Styling",text:"Potongan untuk ubah paras, bentuk, layer atau gaya rambut. Bincangkan gaya dengan hairstylist sebelum mula. Potong banyak walaupun lurus tetap dikira Hair Cut."},{title:"Hair Wash",text:"Cucian rambut untuk rasa bersih dan segar. Jika mahu tambah potongan atau styling, maklumkan dahulu untuk semakan caj."},{title:"Maklumat Walk-in",text:"Tidak perlu booking. Mesej sekurang-kurangnya 30 minit sebelum datang pada hari yang sama. Slot tertakluk pada kekosongan cawangan dan mungkin perlu menunggu."}]
+    panels:[{title:"Hair Cut & Styling",text:"Potongan untuk ubah paras, bentuk, layer atau gaya rambut. Bincangkan gaya dengan hairstylist sebelum mula. Potong banyak walaupun lurus tetap dikira Hair Cut. Mungkin perlu menunggu giliran."},{title:"Hair Wash",text:"Cucian rambut untuk rasa bersih dan segar. Jika mahu tambah potongan atau styling, maklumkan dahulu untuk semakan caj. Mungkin perlu menunggu giliran."}]
   },
   eyelash: {
     no:"06",title:"Eyelash",cardTitle:"Eyelash",visual:"eyelash",walkinOnly:true,
     short:"Pilihan lentikan atau sambungan bulu mata.",
-    intro:"Walk-in sahaja, tak perlu booking. Datang sebelum 4:00 petang. Mesej 30 minit sebelum datang pada hari yang sama untuk semak kekosongan.",
+    intro:"Walk-in sahaja, tak perlu booking. Datang sebelum 4:00 petang. Mesej 30 minit sebelum datang pada hari yang sama untuk semak kekosongan. Mungkin perlu menunggu giliran.",
     time:"Walk-in Eyelash: sebelum 4:00 PM",
-    panels:[{title:"Eyelash Perm",text:"Melentikkan bulu mata asli supaya nampak lebih terangkat dan kemas, tanpa menambah bulu mata sambungan. Hasil bergantung pada panjang dan keadaan bulu mata asal."},{title:"Eyelash Extension",text:"Menambah sambungan pada bulu mata asli untuk nampak lebih panjang dan penuh. Bincangkan gaya natural atau lebih menyerlah sebelum servis."},{title:"Maklumat Walk-in",text:"Tidak perlu booking. Sila datang sebelum 4:00 petang. Mesej 30 minit lebih awal pada hari yang sama; servis tertakluk pada kekosongan dan mungkin perlu menunggu giliran."}]
+    panels:[{title:"Eyelash Perm",text:"Melentikkan bulu mata asli supaya nampak lebih terangkat dan kemas, tanpa menambah bulu mata sambungan. Hasil bergantung pada panjang dan keadaan bulu mata asal. Walk-in sebelum 4:00 petang; mungkin perlu menunggu giliran."},{title:"Eyelash Extension",text:"Menambah sambungan pada bulu mata asli untuk nampak lebih panjang dan penuh. Bincangkan gaya natural atau lebih menyerlah sebelum servis. Walk-in sebelum 4:00 petang; mungkin perlu menunggu giliran."}]
   },
 
 };
@@ -334,7 +334,7 @@ function HomePage({ go }) {
         <button onClick={() => go("contact")}>Contact Us</button>
         <button onClick={() => go("location")}>Our Location</button>
         <a className="footer-tc" href={tcLink}>View Full T&amp;C</a>
-        <style>{`.quick-links .footer-tc{display:flex;align-items:center;justify-content:center;padding:16px;border-radius:18px;background:#171722;border:1px solid rgba(255,255,255,.12);font:inherit;font-weight:900;color:white;text-align:center;text-decoration:none}`}</style>
+        <style>{`.quick-links button,.quick-links .footer-tc{font-family:inherit;font-size:14px;font-weight:900;line-height:1.4}.quick-links .footer-tc{display:flex;align-items:center;justify-content:center;padding:16px;border-radius:18px;background:#171722;border:1px solid rgba(255,255,255,.12);color:white;text-align:center;text-decoration:none}`}</style>
       </section>
     </motion.section>
   );
@@ -358,7 +358,7 @@ function ServicePage({ item, go }) {
         <h2>{item.title}</h2>
         <p className="lead">{item.intro}</p>
         <div className="time-pill"><Clock3 size={17} /> {item.time}</div>
-        <h3 style={{color:"#8b1744",marginTop:24}}>{item.walkinOnly ? "Walk-in Sahaja • Tak Perlu Booking" : "Single Services"}</h3>
+        <h3 style={{color:"#8b1744",marginTop:24}}>{item.walkinOnly ? "Walk-in sahaja • Tak perlu booking" : "Single Services"}</h3>
         <ServiceCategories item={item} />
         {!item.walkinOnly && <p className="lead" style={{marginTop:20}}>Hairstylist akan cek keadaan rambut dan cadangkan servis yang sesuai.</p>}
         {!item.walkinOnly && <div style={{marginTop:28}}><ComboSpotlight go={go} service={item.visual} /></div>}
