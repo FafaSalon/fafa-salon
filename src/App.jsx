@@ -288,6 +288,7 @@ function HomePage({ go }) {
 
       <section className="services-section">
         <div className="section-heading center"><span>Our Services</span><h2>Perkhidmatan Kami</h2></div>
+        <ComboSpotlight go={go} />
         <div className="service-grid">
           {Object.keys(services).map((id) => (
             <motion.div key={id} className="service-card" initial={{ opacity: 0, y: 26 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
@@ -334,11 +335,41 @@ function ServicePage({ item, go }) {
         <p className="lead">{item.intro}</p>
         {item.consultation && <div className="keratin-consultation" style={{margin: "20px 0", padding: 0, border: "none", borderRadius: 0, background: "transparent"}}><strong style={{display: "block", marginBottom: 8}}>Konsultasi dahulu</strong><p style={{margin: 0, lineHeight: 1.8}}>{item.consultation}</p></div>}
         <div className="time-pill"><Clock3 size={17} /> {item.time}</div>
+        <ComboSpotlight go={go} service={item.visual} />
         <ServiceCategories item={item} />
         {item.visual === "rebonding" && <div style={{marginTop:22}}><h3 style={{color:"#8b1744",fontSize:18}}>Mana satu sesuai untuk anda?</h3><p className="lead">{item.panels[2].text}</p></div>}
       </section>
     </motion.section>
   );
+}
+
+function ComboSpotlight({ go, service }) {
+  const related = {
+    rebonding: ["combo_rebonding_keratin", "combo_rebonding_colour"],
+    keratin: ["combo_rebonding_keratin", "combo_colour_keratin"],
+    colour: ["combo_rebonding_colour", "combo_colour_keratin"],
+    treatment: ["combo_soft_scalp"],
+  };
+  const ids = related[service] || ["combo_rebonding_keratin", "combo_rebonding_colour", "combo_colour_keratin"];
+  return <aside className="combo-spotlight" aria-label="Cadangan Combo Services">
+    <style>{`
+      .combo-spotlight{margin:0 0 26px;padding:24px 20px;background:linear-gradient(145deg,#4d1231,#251627);border:2px solid #fa71b1;border-radius:26px;color:#fff;box-shadow:0 12px 32px #b92b6b24}
+      .content-block .combo-spotlight{margin-top:24px}
+      .combo-spotlight .combo-label{display:inline-flex;align-items:center;gap:7px;color:#ffd4e8;font-weight:800;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+      .combo-spotlight h2,.content-block .combo-spotlight h2{font-family:inherit;font-size:30px;line-height:1.15;margin:12px 0;color:white;font-weight:900}
+      .combo-spotlight .combo-pitch{font-size:18px;font-weight:800;line-height:1.5;margin:0 0 8px;color:#ffb7d8}
+      .combo-spotlight .combo-description{font-size:14px;line-height:1.7;color:#f2deea;margin:0 0 18px}
+      .combo-spotlight .combo-suggestion{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;padding:14px;margin-top:9px;border:1px solid #ffffff40;background:#ffffff0d;border-radius:14px;color:white;font:inherit;font-size:14px;font-weight:700;line-height:1.5;cursor:pointer}
+      .combo-spotlight .combo-all{width:100%;display:flex;justify-content:center;align-items:center;gap:8px;margin-top:18px;padding:16px;border:0;border-radius:16px;background:linear-gradient(120deg,#e84d96,#ff7cba);color:#fff;font:inherit;font-size:16px;font-weight:900;cursor:pointer}
+      .combo-spotlight button:focus-visible{outline:3px solid #fff;outline-offset:3px}
+    `}</style>
+    <span className="combo-label"><Sparkles size={17} aria-hidden="true" /> Gabungkan servis pilihan anda</span>
+    <h2>COMBO SERVICES</h2>
+    <p className="combo-pitch">Lebih berbaloi, dua servis dalam satu sesi.</p>
+    <p className="combo-description">{service === "rebonding" ? "Dah nak buat rebonding atau relaxing? Lengkapkan dengan keratin atau colour untuk gaya yang anda inginkan." : service === "keratin" ? "Nak rambut lebih kemas sambil tambah warna atau pelurusan? Terokai gabungan servis keratin." : service === "colour" ? "Dah pilih colour? Gabungkan dengan keratin atau pelurusan untuk lengkapkan gaya rambut anda." : service === "treatment" ? "Jaga rambut dan kulit kepala sekali dengan gabungan Soft + Scalp Treatment." : "Nak luruskan rambut sekali dengan colour atau keratin? Lihat pilihan gabungan sebelum pilih servis anda."}</p>
+    {ids.map(id => <button type="button" key={id} className="combo-suggestion" onClick={() => go(id)}><span>{combos[id].title}</span><ChevronRight size={19} style={{flexShrink:0}} aria-hidden="true" /></button>)}
+    <button type="button" className="combo-all" onClick={() => go("combo")}>Lihat Semua Combo <ChevronRight size={20} aria-hidden="true" /></button>
+  </aside>;
 }
 
 function ServiceCategories({ item, categories }) {
