@@ -40,23 +40,6 @@ function bookingLink(service) {
   return `#booking?service=${encodeURIComponent(service)}`;
 }
 
-function applyLink(data) {
-  const text = [
-    "Hi FAFA Salon, saya berminat untuk apply kerja.",
-    "",
-    `Nama: ${data.name || "-"}`,
-    `Umur: ${data.age || "-"}`,
-    `No. Telefon: ${data.phone || "-"}`,
-    `Pengalaman kerja salon: ${data.experience || "-"}`,
-    `Servis yang boleh dibuat: ${data.skills || "-"}`,
-    `Branch pilihan: ${data.branch || "-"}`,
-    `Boleh mula kerja: ${data.start || "-"}`,
-    `Ada tempat tinggal sendiri: ${data.stay || "-"}`,
-    `Catatan: ${data.notes || "-"}`,
-  ].join("\n");
-  return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
-}
-
 const services = {
   rebonding: {
     no: "01",
@@ -229,7 +212,6 @@ export default function App() {
           {page === "home" && <HomePage key="home" go={go} />}
           {page === "contact" && <ContactPage key="contact" />}
           {page === "location" && <LocationPage key="location" />}
-          {page === "join" && <JoinPage key="join" />}
           {page === "combo" && <ComboPage key="combo" go={go} />}
           {currentCombo && <ComboDetailPage key={page} item={currentCombo} go={go} />}
           {current && <ServicePage key={page} item={current} go={go} />}
@@ -258,7 +240,6 @@ function Header({ page, go, menuOpen, setMenuOpen }) {
             {nav.map(([id, label]) => <button className={page === id ? "active" : ""} key={id} onClick={() => go(id)}>{label}</button>)}
             <button onClick={() => go("contact")}>Contact</button>
             <button onClick={() => go("location")}>Location</button>
-            <button onClick={() => go("join")}>Join Us</button>
             <button onClick={() => go("booking")}>Booking / Semak Slot</button>
           </motion.div>
         )}
@@ -336,18 +317,11 @@ function HomePage({ go }) {
       </section>
 
       <section className="policy-card">
-        <h2>Terms & Conditions</h2>
-        <p>Extra charge for thick & sensitive hair if any.</p>
-        <p>All services not include hair wash / haircut.</p>
-        <p>Weekend / P.Holiday extra RM10 per service.</p>
-        <p>All prices valid by deposit booking only.</p>
-        <p>Not applicable for walk-in customer.</p>
         <a className="tc-link" href={tcLink}>View full T&C</a>
       </section>
 
       <section className="quick-links">
         <button onClick={() => go("combo")}>Combo Services</button>
-        <button onClick={() => go("join")}>Join Us</button>
         <button onClick={() => go("contact")}>Contact Us</button>
         <button onClick={() => go("location")}>Our Location</button>
       </section>
@@ -496,7 +470,7 @@ function LocationPage() {
       <div className="content-block">
         <span className="kicker">Our Location</span>
         <h2>FAFA Salon Branches</h2>
-        <LocationCard title="Setapak KL" text="Fafa Salon Beauty (Setapak) - Salon Wanita & Muslimah KL" link="https://www.google.com/maps/search/Fafa+Salon+Beauty+Setapak+Salon+Wanita+Muslimah+KL" />
+        <LocationCard title="Setapak KL" text="Fafa Salon Beauty (Setapak) - Salon Wanita & Muslimah KL" link="https://maps.app.goo.gl/ykZWpN2WaiSx8cFM7" />
         <LocationCard title="Selayang Batu Caves" text="Fafa Salon Beauty (Selayang) - Salon Wanita & Muslimah" link="https://www.google.com/maps/search/Fafa+Salon+Beauty+Selayang+Salon+Wanita+Muslimah" />
         <div className="location-card muted"><MapPin size={18} /><div><h3>Cheras</h3><p>Coming Soon</p></div></div>
       </div>
@@ -506,33 +480,6 @@ function LocationPage() {
 
 function LocationCard({ title, text, link }) {
   return <div className="location-card"><MapPin size={18} /><div><h3>{title}</h3><p>{text}</p><a href={link}>Open Google Map</a></div></div>;
-}
-
-function JoinPage() {
-  const [form, setForm] = useState({ name: "", age: "", phone: "", experience: "", skills: "", branch: "", start: "", stay: "", notes: "" });
-  const update = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
-
-  return (
-    <motion.section className="page join-page" {...pageMotion}>
-      <div className="content-block">
-        <span className="kicker">Join Us</span>
-        <h2>Apply Hairstylist</h2>
-        <p className="lead">Isi form di bawah. Bila tekan submit, semua detail akan terus masuk ke WhatsApp FAFA Salon.</p>
-        <div className="job-form">
-          <label>Nama penuh<input value={form.name} onChange={(e) => update("name", e.target.value)} placeholder="Contoh: Nur Aina" /></label>
-          <label>Umur<input value={form.age} onChange={(e) => update("age", e.target.value)} placeholder="Contoh: 23 tahun" /></label>
-          <label>No. telefon<input value={form.phone} onChange={(e) => update("phone", e.target.value)} placeholder="Contoh: 01X-XXXXXXX" /></label>
-          <label>Pengalaman kerja salon<textarea value={form.experience} onChange={(e) => update("experience", e.target.value)} placeholder="Contoh: 1 tahun buat rebonding, colour, treatment" /></label>
-          <label>Servis yang boleh dibuat<textarea value={form.skills} onChange={(e) => update("skills", e.target.value)} placeholder="Contoh: Hair wash, blow, colour, rebonding, keratin" /></label>
-          <label>Branch pilihan<select value={form.branch} onChange={(e) => update("branch", e.target.value)}><option value="">Pilih branch</option><option>Setapak KL</option><option>Selayang Batu Caves</option><option>BTR Cheras</option><option>Mana-mana branch</option></select></label>
-          <label>Boleh mula kerja bila?<input value={form.start} onChange={(e) => update("start", e.target.value)} placeholder="Contoh: Segera / 1 Jun" /></label>
-          <label>Tempat tinggal<select value={form.stay} onChange={(e) => update("stay", e.target.value)}><option value="">Pilih jawapan</option><option>Ada tempat tinggal sendiri</option><option>Perlukan tempat tinggal</option></select></label>
-          <label>Catatan tambahan<textarea value={form.notes} onChange={(e) => update("notes", e.target.value)} placeholder="Contoh: Ada pengalaman salon muslimah / boleh kerja weekend" /></label>
-        </div>
-        <a className="main-wa" target="_blank" rel="noopener noreferrer" href={applyLink(form)}><MessageCircle size={18} /> Submit Application To WhatsApp</a>
-      </div>
-    </motion.section>
-  );
 }
 
 function ServiceIcon({ type }) {
