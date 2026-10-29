@@ -55,36 +55,21 @@ function applyLink(data) {
 const services = {
   rebonding: {
     no: "01",
-    title: "Silky Rebonding",
-    cardTitle: "Rebonding",
-    short: "Rambut lurus, licin & mudah diurus.",
+    title: "Rebonding & Relaxing",
+    cardTitle: "Rebonding & Relaxing",
+    short: "Dua pilihan pelurusan untuk rambut lebih kemas dan mudah diurus.",
     visual: "rebonding",
-    booking: "Silky Rebonding",
-    intro: "Rawatan kimia untuk menjadikan rambut lurus, licin dan kemas untuk jangka masa panjang.",
+    booking: "Rebonding / Relaxing",
+    intro: "Kedua-dua servis membantu meluruskan dan mengemaskan rambut. Pilihan yang sesuai bergantung pada hasil yang diinginkan, keadaan rambut dan sejarah chemical.",
     panels: [
-      { title: "Sesuai untuk", text: "Rambut kerinting atau bergelombang, kasar, tebal dan sukar diurus. Sesuai untuk rambut tidak sensitif dan tidak terdedah dengan chemical lain seperti colour atau bleach." },
-      { title: "Kesan / Manfaat", text: "Rambut kelihatan lurus, berkilat, mudah diurus serta kurang kusut." },
-      { title: "Ketahanan", text: "Permanent lurus sehingga tumbuh rambut baru. Bahagian akar baru perlu touch up mengikut pertumbuhan rambut." },
-    ],
-    time: "Single Service: 11 am - 5.00 pm",
-  },
-  relaxing: {
-    no: "02",
-    title: "Soft Relaxing",
-    cardTitle: "Relaxing",
-    short: "Lurus natural, tidak terlalu tegang.",
-    visual: "relaxing",
-    booking: "Soft Relaxing",
-    intro: "Rawatan kimia untuk melembutkan rambut kerinting atau kasar, menjadikannya lebih lurus dan mudah diurus.",
-    panels: [
-      { title: "Sesuai untuk", text: "Rambut halus, biasa atau tidak terlalu tebal yang ingin kelihatan lebih kemas tanpa kesan terlalu lurus seperti rebonding." },
-      { title: "Kesan / Manfaat", text: "Rambut tampak lurus neutral, mudah diurus, kurang kusut serta lurus semulajadi." },
-      { title: "Ketahanan", text: "Ketahanan sekitar 3–6 bulan bergantung kepada jagaan harian, keadaan rambut dan rutin selepas servis." },
+      { title: "Silky Rebonding", text: "Untuk hasil lurus yang lebih jelas, licin dan kemas. Sesuai dipertimbangkan untuk rambut kerinting atau bergelombang yang sukar diurus, selepas pemeriksaan hairstylist. Bahagian rambut yang telah direbonding kekal lurus; akar baharu tumbuh mengikut tekstur asal dan mungkin memerlukan touch-up." },
+      { title: "Soft Relaxing", text: "Untuk hasil lurus yang lebih natural dan lembut, tanpa kesan terlalu tegang seperti rebonding. Sesuai dipertimbangkan untuk rambut halus atau biasa yang mahu kelihatan lebih kemas. Ketahanan sekitar 3–6 bulan bergantung pada keadaan rambut dan penjagaan harian." },
+      { title: "Mana satu sesuai untuk anda?", text: "Rebonding untuk hasil lebih lurus dan licin; relaxing untuk hasil lebih natural. Hairstylist akan semak tekstur, kekuatan serta sejarah colour atau bleach sebelum mencadangkan servis. Rambut sensitif, rosak atau pernah bleach perlu dinilai dahulu." },
     ],
     time: "Single Service: 11 am - 5.00 pm",
   },
   keratin: {
-    no: "03",
+    no: "02",
     title: "Keratin Treatment",
     cardTitle: "Keratin",
     short: "Anti frizz, lembut & nampak sihat.",
@@ -100,7 +85,7 @@ const services = {
     time: "Single Service: 11 am - 5.00 pm",
   },
   colour: {
-    no: "04",
+    no: "03",
     title: "Hair Colour",
     cardTitle: "Colour",
     short: "Warna cantik tanpa bleach.",
@@ -112,7 +97,7 @@ const services = {
     time: "Subject to consultation",
   },
   treatment: {
-    no: "05",
+    no: "04",
     title: "Light Hair Treatment",
     cardTitle: "Treatment",
     short: "Soft treatment & scalp treatment.",
@@ -127,7 +112,7 @@ const services = {
     time: "Single Service: 11 am - 5.00 pm",
   },
   walkin: {
-    no: "06",
+    no: "05",
     title: "Walk In Services",
     cardTitle: "Walk In",
     short: "Wash, blow, cut & styling.",
@@ -193,8 +178,7 @@ const combos = {
 };
 
 const nav = [
-  ["rebonding", "Rebonding"],
-  ["relaxing", "Relaxing"],
+  ["rebonding", "Rebonding & Relaxing"],
   ["keratin", "Keratin"],
   ["colour", "Colour"],
   ["treatment", "Treatment"],
@@ -360,7 +344,10 @@ function ServicePage({ item, go }) {
         <div className="time-pill"><Clock3 size={17} /> {item.time}</div>
         {item.panels.map((panel) => <InfoPanel key={panel.title} title={panel.title} text={panel.text} />)}
         {item.colours && <div className="colour-board">{item.colours.map((c, i) => <div className={`colour-chip c${i}`} key={c}><span>{c}</span></div>)}</div>}
-        <a className="main-wa" href={bookingLink(item.booking)}><MessageCircle size={18} /> Saya berminat nak buat {item.title}</a>
+        {item.visual === "rebonding" ? <div style={{display: "grid", gap: 12}}>
+          <a className="main-wa" style={{marginTop: 16}} href={bookingLink("Silky Rebonding")}><MessageCircle size={18} /> Pilih Silky Rebonding</a>
+          <a className="main-wa" style={{marginTop: 0}} href={bookingLink("Soft Relaxing")}><MessageCircle size={18} /> Pilih Soft Relaxing</a>
+        </div> : <a className="main-wa" href={bookingLink(item.booking)}><MessageCircle size={18} /> Saya berminat nak buat {item.title}</a>}
       </section>
     </motion.section>
   );
@@ -573,7 +560,8 @@ function BottomBar({ go, page }) {
 }
 
 const bookingChoices = [
-  ...Object.values(services).filter(item => !['treatment', 'walkin'].includes(item.visual)).map(item => item.booking),
+  'Silky Rebonding', 'Soft Relaxing',
+  ...Object.values(services).filter(item => !['rebonding', 'treatment', 'walkin'].includes(item.visual)).map(item => item.booking),
   'Bleach + Colour', 'Highlight + Colour', 'Touch-up Rebonding',
   'Soft Treatment', 'Protein Treatment', 'Scalp Treatment',
   'Hair Cut & Styling', 'Hair Wash', 'Setting Curl', 'Hairdo',
