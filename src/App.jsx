@@ -262,6 +262,11 @@ function Header({ page, go, menuOpen, setMenuOpen }) {
   );
 }
 
+function PaymentLogo({src,name}) {
+  const [failed,setFailed] = useState(false);
+  return failed ? <span style={{fontSize:12,fontWeight:800,color:"#fff"}}>{name}</span> : <img src={src} alt={name} loading="lazy" onError={() => setFailed(true)} />;
+}
+
 function HomePage({ go }) {
   return (
     <motion.section className="page home-page" {...pageMotion}>
@@ -278,13 +283,13 @@ function HomePage({ go }) {
         .home-page .hero p.salon-intro{max-width:none;color:#f4edf2;font-size:13px;line-height:1.6;margin:0}
         .home-page .payment-methods{margin:24px 0}
         .home-page .payment-heading{color:#ff80b8;font-size:11px;letter-spacing:2px;font-weight:800;text-transform:uppercase;margin:0 0 14px}
-        .home-page .payment-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;list-style:none;margin:0;padding:0}
-        .home-page .payment-item{grid-column:span 2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;min-width:0;min-height:92px;padding:13px 5px;border:1px solid rgba(255,255,255,.18);border-radius:16px;background:rgba(17,17,25,.75);color:#fff;text-align:center}
-        .home-page .payment-item:nth-last-child(-n+2){grid-column:span 3}
-        .home-page .payment-symbol{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:rgba(230,80,152,.12);color:#ff80b8}
-        .home-page .payment-item b{color:#fff;font-size:12px;line-height:1.4}
-        .home-page .payment-item.spaylater .payment-symbol{color:#ffbe89;background:rgba(255,126,70,.12)}
-        .home-page .payment-item.qr .payment-symbol{color:#b4d6ff;background:rgba(70,137,255,.12)}
+        .home-page .payment-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px 12px;list-style:none;margin:0;padding:0}
+        .home-page .payment-item{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:8px;min-width:0;padding:0;background:none;border:0;border-radius:0;color:#fff;text-align:center}
+        .home-page .payment-brand{height:48px;width:100%;display:flex;align-items:center;justify-content:center;gap:7px;color:#ff9bc8}
+        .home-page .payment-brand img{display:block;width:100%;max-width:94px;max-height:44px;object-fit:contain}
+        .home-page .payment-brand.cards img{max-width:43px;max-height:30px}
+        .home-page .payment-item b{color:#f4edf2;font-size:12px;line-height:1.4;font-weight:600}
+        .home-page .payment-heading{text-align:center}
         .home-page .hero-actions.only-wa{display:flex;justify-content:center;width:100%;margin:28px auto 8px}
         .home-page .hero-actions.only-wa a{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;max-width:100%;min-height:68px;padding:20px 14px;box-sizing:border-box;margin:0 auto;background:linear-gradient(135deg,#e52f88,#ff79b4);border:1px solid #ff8fc2;border-radius:18px;color:#fff;font-size:19px;font-weight:900;line-height:1.3;text-align:center;text-decoration:none;box-shadow:0 8px 26px rgba(230,80,152,.3)}
         .home-page .hero-actions.only-wa a:focus-visible{outline:3px solid white;outline-offset:5px}
@@ -306,25 +311,26 @@ function HomePage({ go }) {
           .category-menu{padding:18px 18px 20px;background:#17121b}
           .category-menu .section-heading h2{font-size:25px;margin:6px 0 8px;color:white}
           .category-menu p{text-align:center;color:#dbc6d4;font-size:13px;line-height:1.6;margin:0 0 12px}
-          .category-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-          .category-button{min-height:82px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:7px;padding:12px 8px;border:1px solid #fa80b68c;border-radius:20px;background:linear-gradient(140deg,#452039,#251c2d);color:#fff;cursor:pointer;font:inherit;font-size:15px;font-weight:800;text-align:center;line-height:1.4}
+          .category-buttons{display:grid;grid-template-columns:1fr;gap:10px}
+          .category-button{min-height:56px;display:flex;align-items:center;justify-content:flex-start;flex-direction:row;gap:12px;padding:14px 18px;border:1px solid #fa80b68c;border-radius:20px;background:linear-gradient(140deg,#452039,#251c2d);color:#fff;cursor:pointer;font:inherit;font-size:15px;font-weight:800;text-align:center;line-height:1.4}
           .category-button svg{color:#ff98c9}
           .category-button:focus-visible{outline:3px solid #ff98c9;outline-offset:3px}
         `}</style>
         <div className="section-heading center"><span>Our Services</span><h2>Perkhidmatan Kami</h2></div>
         <p>Tekan kategori untuk lihat detail servis dan maklumat lanjut.</p>
-        <div className="category-buttons">{Object.entries(services).map(([id,item]) => <button type="button" key={id} className="category-button" onClick={() => go(id)}><ServiceIcon type={id} /><span>{item.cardTitle}</span></button>)}</div>
+        <div className="category-buttons">{Object.entries(services).map(([id,item]) => <button type="button" key={id} className="category-button" onClick={() => go(id)}><ServiceIcon type={id} /><span style={{flex:1,textAlign:"left"}}>{item.cardTitle}</span><ChevronRight size={18} aria-hidden="true" /></button>)}</div>
       </section>
 
       <section style={{padding:"0 22px 28px",background:"#17121b"}}>
           <section className="payment-methods" aria-label="Kaedah bayaran">
             <h2 className="payment-heading">Payment Methods</h2>
             <ul className="payment-grid">
-              <li className="payment-item"><span className="payment-symbol" aria-hidden="true"><CreditCard size={23} /></span><b>Credit Card</b></li>
-              <li className="payment-item spaylater"><span className="payment-symbol" aria-hidden="true"><CalendarClock size={23} /></span><b>SPayLater</b></li>
-              <li className="payment-item qr"><span className="payment-symbol" aria-hidden="true"><QrCode size={23} /></span><b>QR / TnGo</b></li>
-              <li className="payment-item"><span className="payment-symbol" aria-hidden="true"><ArrowLeftRight size={23} /></span><b>Transfer</b></li>
-              <li className="payment-item"><span className="payment-symbol" aria-hidden="true"><Banknote size={23} /></span><b>Cash</b></li>
+              <li className="payment-item"><div className="payment-brand cards"><PaymentLogo name="Visa" src="https://raw.githubusercontent.com/amychuevonet-droid/evonetdevelopersite/refs/heads/main/VISA.svg" /><PaymentLogo name="Mastercard" src="https://hk1rbd-prod-bucket.s3.ap-northeast-1.amazonaws.com/apilogo/Mastercard.svg" /></div><b>Credit Card</b></li>
+              <li className="payment-item"><div className="payment-brand"><PaymentLogo name="SPayLater" src="https://product.shopeepay.com/static/images/pages/products/branding-guidelines/spl-acc-r-o.svg" /></div><b>SPayLater</b></li>
+              <li className="payment-item"><div className="payment-brand"><PaymentLogo name="Touch ’n Go" src="https://raw.githubusercontent.com/amychuevonet-droid/evonetdevelopersite/refs/heads/main/Malaysia%20Symbol%20Marks/TNG.svg" /></div><b>Touch ’n Go</b></li>
+              <li className="payment-item"><div className="payment-brand"><PaymentLogo name="DuitNow" src="https://cdn.jsdelivr.net/npm/cil-linkpay-logo%401.0.6/logos/linkpayLogo/DuitNow.svg" /></div><b>DuitNow QR</b></li>
+              <li className="payment-item"><div className="payment-brand"><ArrowLeftRight size={34} aria-hidden="true" /></div><b>Transfer</b></li>
+              <li className="payment-item"><div className="payment-brand"><Banknote size={34} aria-hidden="true" /></div><b>Cash</b></li>
             </ul>
           </section>
           <div className="hero-actions only-wa"><a href={bookingLink("booking appointment")}><CalendarDays size={23} aria-hidden="true" /><span>Semak Slot &amp; Booking</span></a></div>
@@ -545,7 +551,7 @@ function LocationCard({ title, text, link }) {
 
 function ServiceIcon({ type }) {
   if (type === "eyelash") return <Eye size={18} />;
-  if (type === "rebonding") return <Scissors size={18} />;
+  if (type === "rebonding") return <Wand2 size={18} />;
   if (type === "relaxing") return <Wand2 size={18} />;
   if (type === "keratin") return <Sparkles size={18} />;
   if (type === "colour") return <Sparkles size={18} />;
