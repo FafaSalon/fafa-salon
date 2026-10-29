@@ -267,11 +267,16 @@ function HomePage({ go }) {
   return (
     <motion.section className="page home-page" {...pageMotion}>
       <style>{`
+        .home-page .hero{min-height:0;height:auto;align-items:flex-start;padding:18px 22px 16px}
         .home-page .hero-content{width:100%;min-width:0}
-        .home-page .hero h1.salon-headline{font-family:"Playfair Display",Georgia,serif;font-size:clamp(30px,9vw,42px);font-weight:800;line-height:1.08;letter-spacing:-1px;margin:20px 0 18px;color:#fff}
+        .home-page .hero-logo-frame{position:relative;width:min(100%,260px);aspect-ratio:3.15;overflow:hidden;margin:0 auto 10px}
+        .home-page .hero-logo-frame .hero-logo{position:absolute;width:100%;max-width:none;height:auto;left:0;top:50%;transform:translateY(-51.2%);margin:0;display:block}
+        .home-page .hero .kicker{display:block;text-align:center;font-size:9px;letter-spacing:2px}
+        .home-page .hero-content{text-align:center}
+        .home-page .hero h1.salon-headline{font-family:"Playfair Display",Georgia,serif;font-size:clamp(27px,7.8vw,34px);font-weight:800;line-height:1.08;letter-spacing:-.5px;margin:10px 0 12px;color:#fff}
         .home-page .salon-headline span,.home-page .salon-headline em{display:block}
         .home-page .salon-headline em{font-style:normal;color:#ff66a9}
-        .home-page .hero p.salon-intro{max-width:none;color:#f4edf2;font-size:14px;line-height:1.8;margin:0 0 24px}
+        .home-page .hero p.salon-intro{max-width:none;color:#f4edf2;font-size:13px;line-height:1.6;margin:0}
         .home-page .payment-methods{margin:24px 0}
         .home-page .payment-heading{color:#ff80b8;font-size:11px;letter-spacing:2px;font-weight:800;text-transform:uppercase;margin:0 0 14px}
         .home-page .payment-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;list-style:none;margin:0;padding:0}
@@ -290,7 +295,7 @@ function HomePage({ go }) {
         <div className="hero-bg" style={{ backgroundImage: `url(${salonToolsBg})` }} />
         <div className="hero-overlay" />
         <motion.div className="hero-content" initial={{ opacity: 0, y: 26 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55 }}>
-          <img className="hero-logo" src="/assets/fafa-logo.png" alt="FAFA Salon Beauty Centre" />
+          <div className="hero-logo-frame"><img className="hero-logo" src="/assets/fafa-logo.png" alt="FAFA Salon Beauty Centre" /></div>
           <span className="kicker">Your Beauty, Our Passion</span>
           <h1 className="salon-headline"><span>SALON PILIHAN</span><span>WANITA DAN</span><em>MUSLIMAH</em></h1>
           <p className="salon-intro">Tampil cantik dan berkeyakinan, dengan ruang menunggu selesa untuk suami &amp; anak, lengkap dengan TV (Netflix &amp; YouTube) serta WiFi percuma!</p>
@@ -299,11 +304,11 @@ function HomePage({ go }) {
 
       <section className="services-section category-menu" aria-label="Pilih kategori servis">
         <style>{`
-          .category-menu{padding:24px 18px 28px;background:#17121b}
-          .category-menu .section-heading h2{font-size:28px;margin-bottom:10px;color:white}
-          .category-menu p{text-align:center;color:#dbc6d4;font-size:13px;line-height:1.6;margin:0 0 18px}
-          .category-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-          .category-button{min-height:104px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;padding:16px 10px;border:1px solid #fa80b68c;border-radius:20px;background:linear-gradient(140deg,#452039,#251c2d);color:#fff;cursor:pointer;font:inherit;font-size:15px;font-weight:800;text-align:center;line-height:1.4}
+          .category-menu{padding:18px 18px 20px;background:#17121b}
+          .category-menu .section-heading h2{font-size:25px;margin:6px 0 8px;color:white}
+          .category-menu p{text-align:center;color:#dbc6d4;font-size:13px;line-height:1.6;margin:0 0 12px}
+          .category-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+          .category-button{min-height:82px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:7px;padding:12px 8px;border:1px solid #fa80b68c;border-radius:20px;background:linear-gradient(140deg,#452039,#251c2d);color:#fff;cursor:pointer;font:inherit;font-size:15px;font-weight:800;text-align:center;line-height:1.4}
           .category-button svg{color:#ff98c9}
           .category-button:focus-visible{outline:3px solid #ff98c9;outline-offset:3px}
         `}</style>
@@ -380,7 +385,7 @@ function ComboSpotlight({ go, service }) {
       .combo-spotlight .combo-label{display:inline-flex;align-items:center;gap:7px;color:#ffd4e8;font-weight:800;font-size:12px;letter-spacing:1px;text-transform:uppercase}
       .combo-spotlight h2,.content-block .combo-spotlight h2{font-family:inherit;font-size:30px;line-height:1.15;margin:12px 0;color:white;font-weight:900}
       .combo-spotlight .combo-pitch{font-size:18px;font-weight:800;line-height:1.5;margin:0 0 8px;color:#ffb7d8}
-      .combo-spotlight .combo-description{font-size:14px;line-height:1.7;color:#f2deea;margin:0 0 18px}
+      .combo-spotlight .combo-description{font-size:14px;line-height:1.7;color:#f2deea;margin:0 0 12px}
       .combo-spotlight .combo-suggestion{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;padding:14px;margin-top:9px;border:1px solid #ffffff40;background:#ffffff0d;border-radius:14px;color:white;font:inherit;font-size:14px;font-weight:700;line-height:1.5;cursor:pointer}
       .combo-spotlight .combo-all{width:100%;display:flex;justify-content:center;align-items:center;gap:8px;margin-top:18px;padding:16px;border:0;border-radius:16px;background:linear-gradient(120deg,#e84d96,#ff7cba);color:#fff;font:inherit;font-size:16px;font-weight:900;cursor:pointer}
       .combo-spotlight button:focus-visible{outline:3px solid #fff;outline-offset:3px}
