@@ -36,7 +36,7 @@ const salonToolsBg = realImages.homepage;
 
 function bookingLink(service) {
   if (service === "pertanyaan salon") return `https://wa.me/${phone}?text=${encodeURIComponent("Hi FAFA Salon, saya nak buat pertanyaan salon.")}`;
-  return `#booking?service=${encodeURIComponent(service)}`;
+  return "#booking";
 }
 
 const services = {
@@ -304,17 +304,11 @@ function HomePage({ go }) {
         </div>
       </section>
 
-      <section className="banner-cta">
-        <div><MessageCircle size={34} /><h2>Nak booking atau tanya dulu?</h2><p>Isi borang untuk semakan slot melalui WhatsApp.</p></div>
-        <a href={bookingLink("booking appointment")}>Isi Borang Booking</a>
-      </section>
-
-      <section className="policy-card">
+      <section className="policy-card" style={{textAlign:"center",display:"flex",justifyContent:"center"}}>
         <a className="tc-link" href={tcLink}>View full T&C</a>
       </section>
 
       <section className="quick-links">
-        <button onClick={() => go("combo")}>Combo Services</button>
         <button onClick={() => go("contact")}>Contact Us</button>
         <button onClick={() => go("location")}>Our Location</button>
       </section>
@@ -340,21 +334,14 @@ function ServicePage({ item, go }) {
         <p className="lead">{item.intro}</p>
         {item.consultation && <div className="keratin-consultation" style={{margin: "20px 0", padding: 0, border: "none", borderRadius: 0, background: "transparent"}}><strong style={{display: "block", marginBottom: 8}}>Konsultasi dahulu</strong><p style={{margin: 0, lineHeight: 1.8}}>{item.consultation}</p></div>}
         <div className="time-pill"><Clock3 size={17} /> {item.time}</div>
-        {item.visual === "colour" ? <ColourCategories item={item} /> : item.panels.map((panel) => <InfoPanel key={panel.title} title={panel.title} text={panel.text} />)}
-        {item.visual === "rebonding" ? <div style={{display: "grid", gap: 12}}>
-          <a className="main-wa" style={{marginTop: 16}} href={bookingLink("Silky Rebonding")}><MessageCircle size={18} /> Pilih Silky Rebonding</a>
-          <a className="main-wa" style={{marginTop: 0}} href={bookingLink("Soft Relaxing")}><MessageCircle size={18} /> Pilih Soft Relaxing</a>
-        </div> : item.visual === "keratin" ? <div style={{display: "grid", gap: 12, marginTop: 16}}>
-          {['Keratin Brazilian Anti Frizz', 'Keratin Brazilian Aqua Repair', 'Keratin Botox Premium'].map(name => <a key={name} className="main-wa" style={{marginTop: 0}} href={bookingLink(name)}><MessageCircle size={18} /> Pilih {name}</a>)}
-        </div> : item.visual === "treatment" ? <div style={{display: "grid", gap: 12, marginTop: 16}}>
-          {["Soft Treatment", "Scalp Treatment", "Soft + Scalp Treatment"].map(name => <a key={name} className="main-wa" style={{marginTop: 0}} href={bookingLink(name)}><MessageCircle size={18} /> Pilih {name}</a>)}
-        </div> : item.visual === "colour" ? null : <a className="main-wa" href={bookingLink(item.booking)}><MessageCircle size={18} /> Saya berminat nak buat {item.title}</a>}
+        <ServiceCategories item={item} />
+        {item.visual === "rebonding" && <div style={{marginTop:22}}><h3 style={{color:"#8b1744",fontSize:18}}>Mana satu sesuai untuk anda?</h3><p className="lead">{item.panels[2].text}</p></div>}
       </section>
     </motion.section>
   );
 }
 
-function ColourCategories({ item }) {
+function ServiceCategories({ item, categories }) {
   const [openCategory, setOpenCategory] = useState(null);
   const colourGroups = [
     { title: "Brown Natural", indices: [0, 4, 5] },
@@ -375,24 +362,25 @@ function ColourCategories({ item }) {
       .colour-category-content .colour-chip{min-height:104px;padding:12px;border-radius:16px;font-size:13px;text-shadow:0 1px 5px #000}
       .colour-category-content .main-wa{margin-top:22px}
     `}</style>
-    {item.panels.map((category, index) => {
+    {(categories || item.panels.filter(panel => panel.title !== "Mana satu sesuai untuk anda?")).map((category, index) => {
       const isOpen = openCategory === category.title;
       return <section className="colour-category" key={category.title}>
         <button type="button" className="colour-category-toggle" aria-expanded={isOpen} aria-controls={`colour-category-${index}`} onClick={() => setOpenCategory(isOpen ? null : category.title)}>
-          <span><strong>{category.title}</strong><small>{isOpen ? "Tutup pilihan warna" : "Tekan untuk lihat pilihan warna & detail"}</small></span>
+          <span><strong>{category.title}</strong><small>{isOpen ? "Tutup detail" : item.visual === "colour" ? "Tekan untuk lihat pilihan warna & detail" : "Tekan untuk lihat detail servis"}</small></span>
           <ChevronRight size={20} aria-hidden="true" style={{flexShrink:0, transform:isOpen ? "rotate(90deg)" : undefined}} />
         </button>
         {isOpen && <div className="colour-category-content" id={`colour-category-${index}`}>
-          <p>{category.text}</p>
-          {index === 0 ? <>
+          {category.text && <p>{category.text}</p>}
+          {category.panels && category.panels.map(panel => <div key={panel.title}><h3>{panel.title}</h3><p style={{marginTop:8}}>{panel.text}</p></div>)}
+          {item.visual === "colour" && (index === 0 ? <>
             <p>Terokai pilihan warna mengikut kategori di bawah. Hasil sebenar bergantung pada warna asal dan keadaan rambut.</p>
             {colourGroups.map(group => <div key={group.title}>
               <h3>{group.title}</h3>
               <div className="colour-board">{group.indices.map(i => <div className={`colour-chip c${i}`} key={item.colours[i]}><span>{item.colours[i]}</span></div>)}</div>
             </div>)}
             <p style={{marginTop:16,fontSize:12}}>Paparan tona ini sebagai rujukan sahaja. Sahkan pilihan warna dengan hairstylist.</p>
-          </> : <><h3>Pilihan Warna {category.title}</h3><p style={{marginTop:10}}>Pilihan tona warna akan ditentukan bersama hairstylist selepas semakan keadaan rambut dan hasil yang diinginkan. Boleh nyatakan warna pilihan dalam nota booking.</p></>}
-          <a className="main-wa" href={bookingLink(category.title)}><MessageCircle size={18} /> Pilih {category.title}</a>
+          </> : <><h3>Pilihan Warna {category.title}</h3><p style={{marginTop:10}}>Pilihan tona warna akan ditentukan bersama hairstylist selepas semakan keadaan rambut dan hasil yang diinginkan. Boleh nyatakan warna pilihan dalam nota booking.</p></>)}
+          <a className="main-wa" href={bookingLink(category.booking || category.title)}><MessageCircle size={18} /> Saya berminat nak buat {category.title}</a>
         </div>}
       </section>;
     })}
@@ -422,34 +410,7 @@ function ComboPage({ go }) {
           <h2>Pilihan Combo</h2>
         </div>
 
-        <div className="service-grid">
-          {Object.keys(combos).map((id) => (
-            <motion.div
-              key={id}
-              className="service-card combo-card"
-              initial={{ opacity: 0, y: 26 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-            >
-              <button className="image-button" onClick={() => go(id)}>
-                <ServiceVisual type={combos[id].visual} compact />
-              </button>
-              <div className="card-body">
-                <div className="icon-badge">
-                  <Sparkles size={18} />
-                </div>
-                <h3>{combos[id].title}</h3>
-                <p>{combos[id].short}</p>
-                <a href={bookingLink(combos[id].booking)}>
-                  <MessageCircle size={16} /> Pilih {combos[id].title}
-                </a>
-                <button className="detail-btn" onClick={() => go(id)}>
-                  Lihat detail <ChevronRight size={16} />
-                </button>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+        <ServiceCategories item={{visual:"combo"}} categories={Object.values(combos).map(combo => ({title:combo.title,text:combo.short,panels:combo.panels,booking:combo.booking}))} />
       </section>
     </motion.section>
   );
@@ -475,13 +436,7 @@ function ComboDetailPage({ item, go }) {
         <h2>{item.title}</h2>
         <p className="lead">Sila WhatsApp untuk semakan slot dan consultation.</p>
 
-        {item.panels.map((panel) => (
-          <InfoPanel key={panel.title} title={panel.title} text={panel.text} />
-        ))}
-
-        <a className="main-wa" href={bookingLink(item.booking)}>
-          <MessageCircle size={18} /> Saya berminat nak buat {item.title}
-        </a>
+        <ServiceCategories item={{visual:"combo"}} categories={[{title:item.title,panels:item.panels,booking:item.booking}]} />
       </section>
     </motion.section>
   );
@@ -595,9 +550,7 @@ function malaysiaToday() {
   return `${part('year')}-${part('month')}-${part('day')}`;
 }
 function initialBookingServices() {
-  const requested = new URLSearchParams(window.location.hash.split('?')[1] || '').get('service');
-  const mapped = { 'Light Hair Treatment': 'Soft Treatment', 'Hair Colour': 'Colour No Bleach' }[requested] || requested?.replace(/^Combo /, '');
-  return bookingChoices.includes(mapped) ? [mapped] : [];
+  return [];
 }
 function BookingPage({ go }) {
   const [selected, setSelected] = useState(initialBookingServices);
