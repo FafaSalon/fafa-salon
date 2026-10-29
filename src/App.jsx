@@ -271,6 +271,21 @@ function HomePage({ go }) {
         .home-page .hero-actions.only-wa a:focus-visible{outline:3px solid white;outline-offset:5px}
         .home-page .hero-actions.only-wa a:hover{filter:brightness(1.08)}
       `}</style>
+      <section className="services-section category-menu" aria-label="Pilih kategori servis">
+        <style>{`
+          .category-menu{padding:24px 18px 28px;background:#17121b}
+          .category-menu .section-heading h2{font-size:28px;margin-bottom:10px;color:white}
+          .category-menu p{text-align:center;color:#dbc6d4;font-size:13px;line-height:1.6;margin:0 0 18px}
+          .category-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+          .category-button{min-height:104px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;padding:16px 10px;border:1px solid #fa80b68c;border-radius:20px;background:linear-gradient(140deg,#452039,#251c2d);color:#fff;cursor:pointer;font:inherit;font-size:15px;font-weight:800;text-align:center;line-height:1.4}
+          .category-button svg{color:#ff98c9}
+          .category-button:focus-visible{outline:3px solid #ff98c9;outline-offset:3px}
+        `}</style>
+        <div className="section-heading center"><span>Our Services</span><h2>Perkhidmatan Kami</h2></div>
+        <p>Tekan kategori untuk lihat pilihan single service dan combo.</p>
+        <div className="category-buttons">{Object.entries(services).map(([id,item]) => <button type="button" key={id} className="category-button" onClick={() => go(id)}><ServiceIcon type={id} /><span>{item.cardTitle}</span></button>)}</div>
+      </section>
+
       <section className="hero">
         <div className="hero-bg" style={{ backgroundImage: `url(${salonToolsBg})` }} />
         <div className="hero-overlay" />
@@ -291,25 +306,6 @@ function HomePage({ go }) {
           </section>
           <div className="hero-actions only-wa"><a href={bookingLink("booking appointment")}><CalendarDays size={23} aria-hidden="true" /><span>Semak Slot &amp; Booking</span></a></div>
         </motion.div>
-      </section>
-
-      <section className="services-section">
-        <div className="section-heading center"><span>Our Services</span><h2>Perkhidmatan Kami</h2></div>
-        <ComboSpotlight go={go} />
-        <div className="service-grid">
-          {Object.keys(services).map((id) => (
-            <motion.div key={id} className="service-card" initial={{ opacity: 0, y: 26 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-              <button className="image-button" onClick={() => go(id)}><ServiceVisual type={services[id].visual} compact /></button>
-              <div className="card-body">
-                <div className="icon-badge"><ServiceIcon type={id} /></div>
-                <h3>{services[id].cardTitle}</h3>
-                <p>{services[id].short}</p>
-                <a href={bookingLink(services[id].booking)}><MessageCircle size={16} /> Saya berminat nak buat {services[id].cardTitle}</a>
-                <button className="detail-btn" onClick={() => go(id)}>Lihat detail <ChevronRight size={16} /></button>
-              </div>
-            </motion.div>
-          ))}
-        </div>
       </section>
 
       <section className="policy-card" style={{textAlign:"center",display:"flex",justifyContent:"center"}}>
@@ -342,9 +338,10 @@ function ServicePage({ item, go }) {
         <h2>{item.title}</h2>
         <p className="lead">{item.intro}</p>
         <div className="time-pill"><Clock3 size={17} /> {item.time}</div>
-        <ComboSpotlight go={go} service={item.visual} />
+        <h3 style={{color:"#8b1744",marginTop:24}}>Single Services</h3>
         <ServiceCategories item={item} />
         {["rebonding", "keratin"].includes(item.visual) && <div style={{marginTop:22}}><h3 style={{color:"#8b1744",fontSize:18}}>Mana satu sesuai untuk anda?</h3>{item.visual === "rebonding" ? <p className="lead">{item.panels[2].text}</p> : <><p className="lead"><strong>Keratin Brazilian Anti Frizz</strong> — untuk rambut frizzy dan kembang yang mahu nampak lebih kemas dengan sedikit pelurusan.</p><p className="lead"><strong>Keratin Brazilian Aqua Repair</strong> — untuk rambut kering atau ada sejarah colour dan bleach yang memerlukan fokus penjagaan.</p><p className="lead"><strong>Keratin Botox Premium</strong> — untuk rambut lebih rapi, lembut dan mudah diurus dengan gabungan Anti-Frizz &amp; Repair serta kesan pelurusan yang lebih ketara.</p><p className="lead">Pilihan yang sesuai bergantung pada keadaan dan sejarah rambut. Hasil sebenar berbeza bagi setiap pelanggan.</p></>}</div>}
+        <div style={{marginTop:28}}><ComboSpotlight go={go} service={item.visual} /></div>
       </section>
     </motion.section>
   );
