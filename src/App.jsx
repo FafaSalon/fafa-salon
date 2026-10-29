@@ -504,9 +504,10 @@ function ComboDetailPage({ item, go }) {
       <section className="content-block">
         <span className="kicker">Combo Detail</span>
         <h2>{item.title}</h2>
-        <p className="lead">Sila WhatsApp untuk semakan slot dan consultation.</p>
-
-        <ServiceCategories item={{visual:"combo"}} categories={[{title:item.title,panels:item.panels,booking:item.booking}]} />
+        <p className="lead">{item.short}</p>
+        {item.panels.map(panel => <InfoPanel key={panel.title} title={panel.title} text={panel.text} />)}
+        {/Colour/.test(item.title) && <section style={{marginTop:24}}><h3 style={{color:"#8b1744"}}>Pilihan Warna Colour No Bleach</h3><NoBleachPalette /></section>}
+        <a className="main-wa" href={bookingLink(item.booking)}><MessageCircle size={18} /> Saya berminat nak buat {item.title}</a>
       </section>
     </motion.section>
   );
@@ -773,7 +774,6 @@ function BookingPage({ go }) {
                 <p className="booking-note" style={{marginTop: 10}}>Pilih paras rambut yang diinginkan selepas dipotong. Hairstylist akan sahkan potongan semasa konsultasi.</p>
               </div>}
             </div>}
-            <p className="booking-notice" style={{marginTop: 18, marginBottom: 0}}><strong>Hair Cut &amp; Hair Wash</strong><br />Untuk walk-in sahaja dan tidak memerlukan booking. Sila WhatsApp 30 minit sebelum datang untuk semakan kekosongan.</p>
           </fieldset>
           <fieldset>
             <legend>02 / CAWANGAN & WAKTU</legend>
