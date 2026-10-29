@@ -524,8 +524,14 @@ function ContactPage() {
           <img className="contact-logo" src="/assets/fafa-logo.png" alt="FAFA Salon Beauty Centre" />
           <span className="kicker white">Contact Us</span>
           <h1>017 - 846 0827</h1>
-          <p>For other enquiries please WhatsApp us.</p>
-          <a className="main-wa" target="_blank" rel="noopener noreferrer" href={bookingLink("pertanyaan salon")}><MessageCircle size={18} /> Click Here For WhatsApp</a>
+          <div className="contact-notice" style={{margin:"18px 0",padding:"18px",border:"1px solid #85516d",borderRadius:18,background:"rgba(20,14,24,.9)",color:"#fff",textAlign:"left",fontSize:14,lineHeight:1.8}}>
+            <strong style={{display:"block",color:"#ff9bcb",marginBottom:8}}>Makluman Servis Walk-in</strong>
+            <p style={{margin:"0 0 12px",color:"#f4eaf0"}}>Hair Cut, Hair Wash dan Eyelash disediakan secara walk-in sahaja. Tempahan awal bagi servis ini tidak diterima.</p>
+            <p style={{margin:"0 0 12px",color:"#f4eaf0"}}>Sila rujuk detail servis sebelum menghubungi kami. Permintaan tempahan awal untuk servis walk-in mungkin tidak mendapat maklum balas.</p>
+            <div style={{display:"flex",flexWrap:"wrap",gap:16,marginBottom:14}}><a href="#haircut" style={{color:"#ff9bcb",textDecoration:"underline"}}>Detail Hair Cut &amp; Hair Wash</a><a href="#eyelash" style={{color:"#ff9bcb",textDecoration:"underline"}}>Detail Eyelash</a></div>
+            <p style={{margin:0,color:"#f4eaf0"}}>Untuk pertanyaan selain tempahan servis walk-in, sila tunggu maklum balas daripada admin. Kami akan membalas secepat mungkin. Terima kasih atas kesabaran dan kerjasama anda.</p>
+          </div>
+          <a className="main-wa" target="_blank" rel="noopener noreferrer" href={bookingLink("pertanyaan salon")}><MessageCircle size={18} /> Hubungi Kami di WhatsApp</a>
         </div>
       </div>
     </motion.section>
