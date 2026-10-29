@@ -569,7 +569,7 @@ const bookingChoices = [
   'Lain-lain / Perlukan nasihat',
 ];
 const lengthChoices = ['1 — Sebahu', '2 — Ketiak–atas bra line', '3 — Bawah bra line–atas pinggang', '4 — Bawah pinggang'];
-const hairCheckNote = 'Hairstylist akan memeriksa paras sebenar dan ketebalan rambut. Harga mungkin berubah selepas pemeriksaan.';
+const hairCheckNote = 'Hairstylist akan memeriksa paras dan ketebalan rambut sebenar.';
 function malaysiaToday() {
   const parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Kuala_Lumpur', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
   const part = type => parts.find(p => p.type === type).value;
@@ -584,8 +584,7 @@ function BookingPage({ go }) {
   const [selected, setSelected] = useState(initialBookingServices);
   const [form, setForm] = useState({ name: '', phone: '', branch: '', date: '', time: '', length: '', thickness: '', notes: '' });
   const [error, setError] = useState('');
-  const [prepared, setPrepared] = useState(false);
-  const update = (key, value) => { setForm(prev => ({ ...prev, [key]: value })); setPrepared(false); };
+  const update = (key, value) => { setForm(prev => ({ ...prev, [key]: value })); };
   const today = malaysiaToday();
   const walkInOnly = selected.length > 0 && selected.every(item => ['Hair Cut & Styling', 'Hair Wash'].includes(item));
   const isCombo = selected.some(item => item.startsWith('Combo ')) || (selected.length > 1 && !walkInOnly);
@@ -597,7 +596,7 @@ function BookingPage({ go }) {
   }
   const toggle = item => {
     const next = selected.includes(item) ? selected.filter(value => value !== item) : [...selected, item];
-    setSelected(next); setError(''); setPrepared(false);
+    setSelected(next); setError('');
     const cutWash = next.length > 0 && next.every(value => ['Hair Cut & Styling', 'Hair Wash'].includes(value));
     setForm(prev => ({ ...prev, time: '', date: cutWash ? today : prev.date }));
   };
@@ -619,7 +618,7 @@ function BookingPage({ go }) {
     if (!node.reportValidity()) { setError('Sila lengkapkan semua ruangan wajib dan tandakan persetujuan.'); return false; }
     if (form.date < today || (walkInOnly && form.date !== today)) { setError('Sila pilih tarikh yang sah. Cut / Wash untuk semakan hari yang sama sahaja.'); return false; }
     if (!times.includes(form.time)) { setError('Sila pilih semula masa mengikut servis.'); return false; }
-    setError(''); setPrepared(true); return true;
+    setError(''); return true;
   };
   return (
     <motion.section className="page booking-page" {...pageMotion}>
@@ -693,11 +692,9 @@ function BookingPage({ go }) {
             </div>
           </fieldset>
           <div className="booking-notice"><strong>Semak dahulu, baru booking.</strong><br />Harga akan diberikan oleh admin berdasarkan servis dan keadaan rambut. Deposit RM30 seorang hanya dibuat selepas harga dan slot disahkan. Borang ini belum mengesahkan tempahan.</div>
-          <label className="booking-consent"><input type="checkbox" required /><span>Saya faham slot tertakluk pada kekosongan, harga mungkin berubah selepas pemeriksaan rambut dan bersetuju menghantar maklumat ini kepada FAFA Salon melalui WhatsApp.</span></label>
+          <label className="booking-consent"><input type="checkbox" required /><span>Saya Faham slot tertakluk kepada kekosongan dan bersetuju menghantar maklumat ini kepada Fafa Salon.</span></label>
           <p className="booking-error" role="alert">{error}</p>
           <a data-booking-send className="booking-send" href={href} target="_blank" rel="noopener noreferrer" onClick={event => { if (!validate(event.currentTarget)) event.preventDefault(); }}><MessageCircle size={18} /> Hantar detail ke WhatsApp ↗</a>
-          <p className="booking-note">WhatsApp dibuka dengan detail anda. Tekan Send dalam WhatsApp untuk menghantar. Jika tidak terbuka dalam aplikasi, cuba buka website ini di Safari atau Chrome.</p>
-          {prepared && <div><p className="booking-note">Jika WhatsApp tidak terbuka, anda boleh salin mesej di bawah dan hantar ke 0178460827.</p><textarea className="booking-copy" readOnly aria-label="Mesej untuk disalin" value={message} onFocus={event => event.target.select()} /></div>}
         </form>
       </div>
     </motion.section>
