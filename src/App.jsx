@@ -707,15 +707,15 @@ function BookingPage({ go }) {
         .booking-page form{display:grid;gap:24px;min-width:0}
         .booking-page fieldset{border:0;margin:0;padding:0;min-width:0}
         .booking-page legend{font-size:12px;color:#ff98c7;font-weight:800;letter-spacing:1px;padding:0 0 12px}
-        .booking-page .booking-services{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:start}
+        .booking-page .booking-services{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;align-items:start}
         .booking-page .booking-group-title{color:#ff98c7;font:700 14px system-ui;margin:22px 0 12px}
         .booking-page .booking-service-item{min-width:0}
         .booking-page .booking-choice{height:100%}
-        .booking-page .booking-other{grid-column:1/-1;width:min(100%,280px);justify-self:center;margin-top:5px}
+        .booking-page .booking-other{grid-column:1/-1;width:100%;justify-self:center;margin-top:5px}
         .booking-page .booking-other .booking-choice{justify-content:center;text-align:center}
         .booking-page .booking-addons{margin-top:7px;padding:11px 9px;background:#353038;border:1px solid #68616d;border-radius:12px;display:grid;gap:10px;color:#f6f4f7;font-size:12px;line-height:1.5}
-        .booking-page .booking-cut-card{margin-top:22px;padding:16px;border-radius:16px;background:#34343a;border:1px solid #68616d}
-        .booking-page .booking-cut-card.active{border-color:#ff7ab8;background:#353038}
+        .booking-page .booking-cut-card{margin-top:22px;padding:16px;border-radius:16px;background:linear-gradient(140deg,#452039,#251c2d);border:1px solid #fa80b68c}
+        .booking-page .booking-cut-card.active{border-color:#ff9bcd;background:linear-gradient(140deg,#65304f,#3e2539)}
         .booking-page .booking-cut-toggle{gap:12px;align-items:flex-start;font-size:14px}
         .booking-page .booking-cut-toggle strong{display:block;font-size:15px;color:#f6f4f7}
         .booking-page .booking-cut-toggle small{display:block;color:#cbc4d0;font-weight:400;line-height:1.6;margin-top:4px}
@@ -723,9 +723,11 @@ function BookingPage({ go }) {
         .booking-page .booking-cut-target label.booking-field{display:grid;gap:10px}
         .booking-page .booking-addon-title{color:#ff98c7;font-size:11px;font-weight:700}
         .booking-page .booking-addons label{display:flex;gap:7px;align-items:flex-start;cursor:pointer}
-        .booking-page .booking-choice{display:flex;align-items:flex-start;gap:7px;background:#39393f;border:1px solid #6e6875;border-radius:12px;padding:12px 9px;font-size:12px;line-height:1.5;cursor:pointer;color:#f6f4f7;overflow-wrap:anywhere}
-        .booking-page .booking-choice.selected{border-color:#ff7ab8;background:#513346}
-        .booking-page input[type=checkbox]{accent-color:#b92167;width:17px;height:17px;flex-shrink:0;margin:2px 0}
+        .booking-page .booking-choice{display:flex;align-items:center;gap:12px;min-height:60px;background:linear-gradient(140deg,#452039,#251c2d);border:1px solid #fa80b68c;border-radius:18px;padding:15px 16px;font-size:14px;font-weight:700;line-height:1.5;cursor:pointer;color:#fff;overflow-wrap:anywhere;transition:background .15s,border-color .15s,box-shadow .15s}
+        .booking-page .booking-choice.selected{border-color:#ff9bcd;background:linear-gradient(140deg,#65304f,#3e2539);box-shadow:inset 0 0 0 1px #ff9bcd}
+        .booking-page .booking-choice:focus-within{outline:3px solid #ffd1e8;outline-offset:3px}
+        .booking-page .booking-choice:hover{border-color:#ffc0df}
+        .booking-page input[type=checkbox]{accent-color:#df3987;width:23px;height:23px;flex-shrink:0;margin:0;color-scheme:light;cursor:pointer}
         .booking-page .booking-fields{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;min-width:0}
         .booking-page .booking-field{display:grid;grid-template-columns:minmax(0,1fr);gap:9px;font-size:14px;font-weight:600;line-height:1.5;color:#f6f4f7;min-width:0}
         .booking-page input:not([type=checkbox]),.booking-page select,.booking-page textarea{width:100%;max-width:100%;min-width:0;background:#39393f;border:1px solid #6e6875;border-radius:12px;padding:13px 12px;color:#f6f4f7;font:16px system-ui;box-sizing:border-box;color-scheme:dark;line-height:24px;-webkit-text-fill-color:#f6f4f7;opacity:1}
