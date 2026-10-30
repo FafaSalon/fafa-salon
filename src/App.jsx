@@ -258,6 +258,50 @@ export default function App() {
         .colour-category-content{animation:fafa-detail-in .25s ease-out}
         @keyframes fafa-detail-in{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
         @media(prefers-reduced-motion:reduce){.category-accent,.colour-category-content{animation:none}.colour-category-toggle svg{transition:none}}
+        .site-shell .category-intro{padding:20px 20px 18px}
+        .site-shell .category-mark{width:34px;height:34px;margin-bottom:12px;border-radius:11px}
+        .site-shell .category-eyebrow{font-size:9px;letter-spacing:1.3px;margin-bottom:7px}
+        .site-shell .category-intro h1{font-size:clamp(24px,6vw,28px);font-weight:700;letter-spacing:-.45px;margin-bottom:8px;line-height:1.25}
+        .site-shell .category-intro p{font-size:12px;line-height:1.6;letter-spacing:.05px}
+        .site-shell .category-accent{margin-top:13px}
+        .site-shell .service-page .content-block,.site-shell .combo-page .services-section{padding:16px 18px 24px}
+        .site-shell .service-page .lead,.site-shell .service-page .content-block>p{font-size:12px;line-height:1.65;letter-spacing:.05px}
+        .site-shell .service-page .content-block>h3{font-size:14px;line-height:1.4;letter-spacing:.1px}
+        .site-shell .service-page .time-pill{font-size:11px;padding:8px 10px;margin:10px 0}
+        .site-shell .service-page .colour-category,.site-shell .combo-page .colour-category{margin-top:8px;border-radius:12px;background:linear-gradient(145deg,#fff,#fdf9fc);box-shadow:0 3px 10px #7e49630b,inset 0 1px 0 #fff}
+        .site-shell .service-page .colour-category-toggle,.site-shell .combo-page .colour-category-toggle{padding:11px 13px;gap:9px;background:linear-gradient(135deg,#ffffffed,#fbf6f9);min-height:50px}
+        .site-shell .service-page .colour-category-toggle strong,.site-shell .combo-page .colour-category-toggle strong{font-size:14px;line-height:1.4;font-weight:650;letter-spacing:.02px}
+        .site-shell .colour-category-toggle small{font-size:11px;line-height:1.45;letter-spacing:.05px}
+        .site-shell .colour-category-content{padding:13px}
+        .site-shell .colour-category-content p{font-size:12px;line-height:1.65;margin-bottom:10px}
+        .site-shell .colour-category-content h3{font-size:13px;line-height:1.4;margin-top:15px}
+        .site-shell .service-page .info-panel{padding:13px;margin-top:9px}
+        .site-shell .service-page .info-panel h3{font-size:13px}
+        .site-shell .service-page .info-panel p{font-size:12px;line-height:1.65}
+        .site-shell .service-page .main-wa,.site-shell .combo-page .main-wa{font-size:12px;padding:12px;margin-top:14px;line-height:1.5}
+        .site-shell .minimal-combo-link{font-size:13px;padding:12px 13px}
+        .site-shell .home-page .category-button{font-size:14px;min-height:50px;padding:12px 15px;gap:10px;letter-spacing:.05px}
+        .site-shell .booking-page .content-block{padding:20px 18px 28px}
+        .site-shell .booking-page h2{font-size:25px;line-height:1.25;letter-spacing:-.4px;margin:8px 0}
+        .site-shell .booking-page .lead{font-size:12px;line-height:1.65;margin:8px 0 16px}
+        .site-shell .booking-page form{gap:16px}
+        .site-shell .booking-page legend{font-size:10px;letter-spacing:.8px;padding-bottom:9px}
+        .site-shell .booking-page .booking-group-title{font-size:12px !important;line-height:1.4;letter-spacing:.1px;margin:14px 0 9px}
+        .site-shell .booking-page .booking-services{gap:7px}
+        .site-shell .booking-page .booking-choice{min-height:48px;padding:9px;font-size:11.5px;line-height:1.4;letter-spacing:.02px;border-radius:10px;background:linear-gradient(140deg,#fff,#f2eff4);border-color:#e2dce6;box-shadow:0 3px 10px #00000018,inset 0 1px 0 #ffffffb0}
+        .site-shell .booking-page .booking-choice.selected{background:linear-gradient(140deg,#fff3f8,#f8dfeb);border-color:#c8769e;box-shadow:0 3px 12px #c34f8420,inset 0 0 0 1px #e6b3cc}
+        .site-shell .booking-page .booking-choice:active{transform:scale(.99)}
+        .site-shell .booking-page .booking-fields{gap:11px}
+        .site-shell .booking-page .booking-field{gap:6px;font-size:12px;line-height:1.45;font-weight:500;letter-spacing:.05px}
+        .site-shell .booking-page input:not([type=checkbox]):not([type=radio]),.site-shell .booking-page select{height:44px;min-height:44px;max-height:44px;padding:9px 11px;box-shadow:0 3px 10px #00000016,inset 0 1px 0 #ffffffb0}
+        .site-shell .booking-page textarea{min-height:78px;padding:9px 11px;box-shadow:0 3px 10px #00000016}
+        .site-shell .booking-page .booking-note,.site-shell .booking-page .booking-consent,.site-shell .booking-page .booking-error{font-size:11px;line-height:1.65;letter-spacing:.04px}
+        .site-shell .booking-page .booking-cut-card{margin-top:14px;padding:12px;border-radius:12px;gap:8px;box-shadow:0 3px 12px #00000018}
+        .site-shell .booking-page .booking-cut-toggle strong{font-size:12px}
+        .site-shell .booking-page .booking-cut-toggle small{font-size:11px;line-height:1.5}
+        .site-shell .booking-page .booking-keratin summary{min-height:48px;padding:9px;font-size:11.5px}
+        .site-shell .booking-page .booking-keratin-options .booking-choice{min-height:42px}
+        .site-shell .booking-page .booking-send{padding:13px 12px;font-size:13px;border-radius:12px}
         .service-page .back-btn,.category-home-back{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;min-height:36px;padding:0;border:1px solid #ffffff50;border-radius:10px;background:#211820d9;color:#fff;cursor:pointer}
         .service-page .back-btn,.category-home-back,.booking-page .booking-back{display:none !important}
         .floating-home-back{position:fixed;z-index:70;bottom:calc(18px + env(safe-area-inset-bottom,0px));left:max(16px,calc(50% - 195px));display:flex;align-items:center;justify-content:center;width:42px;height:42px;padding:0;border:1px solid #d774a090;border-radius:14px;background:#30212bd9;color:#ffd4e6;box-shadow:0 4px 18px #df57934d,0 0 0 3px #dc76a212;backdrop-filter:blur(12px);cursor:pointer}
