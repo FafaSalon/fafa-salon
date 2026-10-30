@@ -673,17 +673,19 @@ function ServiceVisual({ type, compact = false }) {
 }
 
 function BottomBar({ go, page }) {
+  if (page === "booking") return null;
   return <>
     <style>{`
       .site-shell .page{padding-bottom:185px}
       .site-shell .bottom-bar{grid-template-columns:1fr 1fr;gap:8px;bottom:calc(10px + env(safe-area-inset-bottom,0px));padding:10px;border-radius:24px}
       .site-shell .bottom-bar button,.site-shell .bottom-bar a{min-height:44px;padding:11px 10px;font-size:13px}
-      .site-shell .bottom-bar .bottom-price{grid-column:1/-1;min-height:56px;font-size:19px;font-weight:900;border-radius:16px;background:linear-gradient(135deg,#c92f79,#ff7ab8);color:#fff;text-align:center}
+      .site-shell .bottom-bar .bottom-walkin{background:#fff;color:#111119}
+      .site-shell .bottom-bar .bottom-price{grid-column:1/-1;min-height:48px;font-size:16px;font-weight:800;border-radius:16px;background:linear-gradient(135deg,#c92f79,#ff7ab8);color:#fff;text-align:center}
     `}</style>
     <div className="bottom-bar">
       <button onClick={() => go("home")}><Home size={16} /> Home</button>
-      <a href="#walkin"><MessageCircle size={16} /> Walk-in</a>
-      <a className="bottom-price" href="#booking"><CalendarDays size={21} /> Cek Harga</a>
+      <a className="bottom-walkin" href="#walkin"><MessageCircle size={16} /> Walk-in</a>
+      <a className="bottom-price" href="#booking"><CalendarDays size={18} /> Cek Harga</a>
     </div>
   </>;
 }
@@ -797,7 +799,7 @@ function BookingPage({ go }) {
   return (
     <motion.section className="page booking-page" {...pageMotion}>
       <style>{`
-        .booking-page{background:#09090c !important;color:#f6f4f7 !important;min-height:100vh;padding-bottom:110px;color-scheme:dark;isolation:isolate;overflow-x:clip}
+        .booking-page{background:#09090c !important;color:#f6f4f7 !important;min-height:100vh;padding-bottom:30px;color-scheme:dark;isolation:isolate;overflow-x:clip}
         .booking-page,.booking-page *{box-sizing:border-box}
         .booking-page .content-block{padding:26px 20px 36px;background:#09090c;color:#f6f4f7;width:100%;min-width:0}
         .booking-page h2,.booking-page strong{color:#f6f4f7}
@@ -806,7 +808,7 @@ function BookingPage({ go }) {
         .booking-page input::placeholder,.booking-page textarea::placeholder{color:#716b76;opacity:1}
         .booking-page select option{color:#27222b;background:#fff}
         .booking-page h2{font-size:30px;line-height:1.2;margin:12px 0}
-        .booking-page .booking-back{display:flex;align-items:center;gap:7px;background:transparent;color:#ff98c7;padding:0;margin:0 0 24px}
+        .booking-page .booking-back{display:flex;align-items:center;gap:6px;background:#201820;border:1px solid #694354;border-radius:10px;color:#ffb4d6;padding:8px 11px;margin:0 0 18px;font-size:12px;min-height:36px;width:fit-content}
         .booking-page form{display:grid;gap:12px;min-width:0}
         .booking-page fieldset{border:0;margin:0;padding:0;min-width:0}
         .booking-page legend{font-size:12px;color:#ff98c7;font-weight:800;letter-spacing:1px;padding:0 0 12px}
@@ -858,7 +860,7 @@ function BookingPage({ go }) {
         .booking-page .booking-cut-card .booking-note{color:#62586a}
       `}</style>
       <div className="content-block">
-        <button className="booking-back" onClick={() => go('home')}><ArrowLeft size={16} /> Kembali ke Home</button>
+        <button className="booking-back" onClick={() => go('home')}><ArrowLeft size={15} /> Home</button>
         <span className="kicker">Booking / Semak Slot</span>
         <h2>{adviceOnly ? "Tanya Kami" : priceOnly ? "Cek Harga Dahulu" : "Jom rancang hair day anda"}</h2>
         <p className="lead">{adviceOnly ? "Nyatakan soalan atau masalah rambut anda untuk mendapatkan nasihat daripada kami." : priceOnly ? "Pilih servis dan lengkapkan maklumat rambut. Admin akan berikan harga melalui WhatsApp." : "Pilih servis dan waktu pilihan. Admin akan semak kekosongan serta berikan harga melalui WhatsApp."}</p>
