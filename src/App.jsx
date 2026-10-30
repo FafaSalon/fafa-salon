@@ -784,6 +784,10 @@ function BookingPage({ go }) {
                 <p className="booking-note" style={{marginTop: 10}}>Pilih paras rambut yang diinginkan selepas dipotong. Hairstylist akan sahkan potongan semasa konsultasi.</p>
               </div>}
             </div>}
+            <div className="booking-fields" style={{marginTop:20}}>
+              <label className="booking-field">Panjang rambut sekarang{hasCut ? " (sebelum potong)" : ""} *<select required value={form.length} onChange={event => update('length', event.target.value)}><option value="">Pilih paras rambut</option>{lengthChoices.map(item => <option key={item}>{item}</option>)}</select></label>
+              <p className="booking-note">{hairCheckNote}</p>
+            </div>
           </fieldset>
           <fieldset>
             <legend>02 / CAWANGAN & WAKTU</legend>
@@ -799,9 +803,7 @@ function BookingPage({ go }) {
             <div className="booking-fields">
               <label className="booking-field">Nama penuh *<input required maxLength={100} autoComplete="name" value={form.name} onChange={event => update('name', event.target.value)} placeholder="Nama anda" /></label>
               <label className="booking-field">No. telefon / WhatsApp *<input required type="tel" minLength={9} maxLength={20} autoComplete="tel" value={form.phone} onChange={event => update('phone', event.target.value)} placeholder="Contoh: 0123456789" /></label>
-              <label className="booking-field">Panjang rambut sekarang{hasCut ? " (sebelum potong)" : ""} *<select required value={form.length} onChange={event => update('length', event.target.value)}><option value="">Pilih paras rambut</option>{lengthChoices.map(item => <option key={item}>{item}</option>)}</select></label>
-              <p className="booking-note">{hairCheckNote}</p>
-              <label className="booking-field">Nota tambahan<textarea maxLength={1000} value={form.notes} onChange={event => update('notes', event.target.value)} placeholder="Sejarah colour / bleach, keadaan rambut atau permintaan khas." /></label>
+              <label className="booking-field">Nota tambahan<textarea maxLength={1000} value={form.notes} onChange={event => update('notes', event.target.value)} placeholder="Contoh: Warna pilihan — Ash Brown; pernah colour / bleach; rambut sensitif, kering atau rosak. Nyatakan juga sebarang permintaan khas." /></label>
             </div>
           </fieldset>
           <label className="booking-consent"><input type="checkbox" required /><span>Saya faham slot tertakluk kepada kekosongan dan bersetuju menghantar maklumat kepada FAFA Salon. Deposit RM30 akan dibuat selepas harga dan slot disahkan. Borang ini belum mengesahkan tempahan.</span></label>
