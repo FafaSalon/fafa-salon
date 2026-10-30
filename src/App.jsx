@@ -536,7 +536,7 @@ function ReviewsPage() {
         <MapPin size={22} style={{color:"#ff9bcb"}} aria-hidden="true" />
         <h2 style={{fontSize:21,color:"#fff",margin:"10px 0 6px"}}>FAFA Salon {branch.name}</h2>
         <p style={{fontSize:13,lineHeight:1.7,color:"#e0cbd8",margin:0}}>Lihat ulasan dan pengalaman pelanggan cawangan {branch.name}.</p>
-        <a className="main-wa" href={branch.link} target="_blank" rel="noopener noreferrer" style={{textAlign:"center",marginTop:16}}>Lihat Review {branch.name} <ChevronRight size={18} /></a>
+        <a className="main-wa" href={branch.link} target={branch.name === "Selayang Batu Caves" ? "_self" : "_blank"} rel="noopener noreferrer" style={{textAlign:"center",marginTop:16}}>Lihat Review {branch.name} <ChevronRight size={18} /></a>
       </section>)}
     </div>
   </motion.section>;
