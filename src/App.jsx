@@ -299,7 +299,7 @@ function HomePage({ go }) {
         .home-page .payment-methods{margin:12px 0 20px;padding:22px 16px;background:#fff;border-radius:20px;color:#231a22}
         .home-page .payment-heading{color:#ff80b8;font-size:11px;letter-spacing:2px;font-weight:800;text-transform:uppercase;margin:0 0 14px}
         .home-page .payment-marquee{width:100%;min-width:0;overflow:hidden;border-radius:8px}
-        .home-page .payment-track{display:flex;width:max-content;animation:fafa-payments 36s linear infinite;will-change:transform}
+        .home-page .payment-track{display:flex;width:max-content;animation:fafa-payments 24s linear infinite;will-change:transform}
         .home-page .payment-grid{display:flex;flex-wrap:nowrap;gap:24px;list-style:none;margin:0;padding:0 24px 0 0;flex-shrink:0}
         .home-page .payment-grid .payment-item{width:116px;flex:0 0 116px}
         .home-page .payment-marquee:hover .payment-track,.home-page .payment-marquee:focus .payment-track{animation-play-state:paused}
@@ -354,7 +354,6 @@ function HomePage({ go }) {
               <li className="payment-item"><div className="payment-brand"><span style={{fontWeight:800,fontSize:18,color:"#352a33"}}>RM</span></div><b>Cash</b></li>
             </PaymentMarquee>
           </section>
-          <div className="hero-actions only-wa"><a href={bookingLink("booking appointment")}><CalendarDays size={23} aria-hidden="true" /><span>Cek Harga</span></a></div>
       </section>
 
       <section className="quick-links">
@@ -674,7 +673,19 @@ function ServiceVisual({ type, compact = false }) {
 }
 
 function BottomBar({ go, page }) {
-  return <div className="bottom-bar"><button onClick={() => go("home")}><Home size={16} /> Home</button><a href="#walkin"><MessageCircle size={16} /> Walk-in</a></div>;
+  return <>
+    <style>{`
+      .site-shell .page{padding-bottom:185px}
+      .site-shell .bottom-bar{grid-template-columns:1fr 1fr;gap:8px;bottom:calc(10px + env(safe-area-inset-bottom,0px));padding:10px;border-radius:24px}
+      .site-shell .bottom-bar button,.site-shell .bottom-bar a{min-height:44px;padding:11px 10px;font-size:13px}
+      .site-shell .bottom-bar .bottom-price{grid-column:1/-1;min-height:56px;font-size:19px;font-weight:900;border-radius:16px;background:linear-gradient(135deg,#c92f79,#ff7ab8);color:#fff;text-align:center}
+    `}</style>
+    <div className="bottom-bar">
+      <button onClick={() => go("home")}><Home size={16} /> Home</button>
+      <a href="#walkin"><MessageCircle size={16} /> Walk-in</a>
+      <a className="bottom-price" href="#booking"><CalendarDays size={21} /> Cek Harga</a>
+    </div>
+  </>;
 }
 
 const comboBookingChoices = Object.values(combos).map(item => item.booking);
