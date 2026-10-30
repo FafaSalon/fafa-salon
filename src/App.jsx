@@ -219,6 +219,21 @@ export default function App() {
 
   return (
     <main className="site-shell">
+      <style>{`
+        .service-page .back-btn,.category-home-back{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;min-height:36px;padding:0;border:1px solid #ffffff50;border-radius:10px;background:#211820d9;color:#fff;cursor:pointer}
+        .category-home-back{margin:16px 20px 10px}
+        .service-page .content-block{padding:20px 20px 28px}
+        .service-page .content-block h2{margin-top:8px;margin-bottom:12px}
+        .service-page .content-block .lead{margin-top:10px;margin-bottom:12px}
+        .service-page .time-pill{margin:12px 0}
+        .service-page .colour-category{margin-top:10px;border-radius:16px}
+        .service-page .colour-category-toggle{padding:14px 16px;gap:10px}
+        .service-page .colour-category-toggle strong{font-size:16px}
+        .service-page .colour-category-toggle small{margin-top:3px}
+        .service-page .colour-category-content{padding:16px}
+        .service-page .info-panel{margin-top:12px;padding:16px}
+        .service-page .content-block .combo-spotlight{margin-top:14px;padding:18px 16px;border-radius:18px}
+      `}</style>
       <div className="phone-frame">
         <Header page={page} go={go} menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
         <AnimatePresence mode="wait" onExitComplete={() => window.scrollTo({top:0,behavior:"instant"})}>
@@ -373,7 +388,7 @@ function ServicePage({ item, go }) {
       <section className="service-cover">
         <ServiceVisual type={item.visual} />
         <div className="cover-overlay">
-          <button className="back-btn" onClick={() => go("home")}><ArrowLeft size={17} /> Home</button>
+          <button className="back-btn" aria-label="Kembali ke halaman utama" onClick={() => go("home")}><ArrowLeft size={17} /></button>
           <span className="service-no">{item.no}</span>
           <h1>{item.title}</h1>
           <p>{item.short}</p>
@@ -384,10 +399,10 @@ function ServicePage({ item, go }) {
         <h2>{item.title}</h2>
         <p className="lead">{item.intro}</p>
         <div className="time-pill"><Clock3 size={17} /> {item.time}</div>
-        <h3 style={{color:"#8b1744",marginTop:24}}>{item.walkinOnly ? "Walk-in sahaja • Tak perlu booking" : "Single Services"}</h3>
+        <h3 style={{color:"#8b1744",marginTop:16}}>{item.walkinOnly ? "Walk-in sahaja • Tak perlu booking" : "Single Services"}</h3>
         <ServiceCategories item={item} />
         {!item.walkinOnly && <p className="lead" style={{marginTop:20}}>Hairstylist akan cek keadaan rambut dan cadangkan servis yang sesuai.</p>}
-        {!item.walkinOnly && <div style={{marginTop:28}}><ComboSpotlight go={go} service={item.visual} /></div>}
+        {!item.walkinOnly && <div style={{marginTop:16}}><ComboSpotlight go={go} service={item.visual} /></div>}
       </section>
     </motion.section>
   );
@@ -485,6 +500,7 @@ function InfoPanel({ title, text }) {
 function ComboPage({ go }) {
   return (
     <motion.section className="page combo-page" {...pageMotion}>
+      <button className="category-home-back" aria-label="Kembali ke halaman utama" onClick={() => go("home")}><ArrowLeft size={17} /></button>
       <section className="combo-hero">
         <div className="combo-hero-bg" />
         <div className="combo-hero-content">
@@ -513,8 +529,8 @@ function ComboDetailPage({ item, go }) {
       <section className="service-cover">
         <ServiceVisual type={item.visual} />
         <div className="cover-overlay">
-          <button className="back-btn" onClick={() => go("combo")}>
-            <ArrowLeft size={17} /> Combo
+          <button className="back-btn" aria-label="Kembali ke halaman utama" onClick={() => go("home")}>
+            <ArrowLeft size={17} />
           </button>
           <span className="service-no">{item.no}</span>
           <h1>{item.title}</h1>
@@ -673,7 +689,7 @@ function ServiceVisual({ type, compact = false }) {
 }
 
 function BottomBar({ go, page }) {
-  if (page === "booking") return null;
+  if (page === "booking" || page === "combo" || services[page] || combos[page]) return null;
   return <>
     <style>{`
       .site-shell .page{padding-bottom:185px}
@@ -860,7 +876,7 @@ function BookingPage({ go }) {
         .booking-page .booking-cut-card .booking-note{color:#62586a}
       `}</style>
       <div className="content-block">
-        <button className="booking-back" onClick={() => go('home')}><ArrowLeft size={15} /> Home</button>
+        <button className="booking-back" aria-label="Kembali ke halaman utama" onClick={() => go('home')}><ArrowLeft size={17} /></button>
         <span className="kicker">Booking / Semak Slot</span>
         <h2>{adviceOnly ? "Tanya Kami" : priceOnly ? "Cek Harga Dahulu" : "Jom rancang hair day anda"}</h2>
         <p className="lead">{adviceOnly ? "Nyatakan soalan atau masalah rambut anda untuk mendapatkan nasihat daripada kami." : priceOnly ? "Pilih servis dan lengkapkan maklumat rambut. Admin akan berikan harga melalui WhatsApp." : "Pilih servis dan waktu pilihan. Admin akan semak kekosongan serta berikan harga melalui WhatsApp."}</p>
