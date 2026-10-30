@@ -667,13 +667,16 @@ function BookingPage({ go }) {
   const dateLabel = form.date ? new Date(`${form.date}T12:00:00`).toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
   const message = [
     'Hi FAFA Salon! Saya nak semak harga & kekosongan slot.', '',
-    `Nama: ${form.name.trim()}`, `No. telefon: ${form.phone.trim()}`,
-    `Cawangan: ${form.branch}`, `Servis: ${selected.join(' + ')}`,
+    `Nama: ${form.name.trim()}`,
+    `No. telefon: ${form.phone.trim()}`,
+    `Cawangan: ${form.branch}`,
+    `Tarikh pilihan: ${dateLabel}`,
+    `Masa pilihan: ${form.time}`, '',
+    `Servis: ${selected.join(' + ')}`,
     ...(hasCut ? [`Add-on Hair Cut: potong ke paras ${form.cutLength}`] : []),
-    `Tarikh pilihan: ${dateLabel}`, `Masa pilihan: ${form.time}`,
-    `Panjang rambut sekarang${hasCut ? " (sebelum potong)" : ""}: ${form.length}`,
-    `Nota: ${form.notes.trim() || '-'}`, '', hairCheckNote, '',
-    'Mohon admin berikan harga dan sahkan slot. Saya faham tempahan belum disahkan dan deposit RM30 seorang hanya dibayar selepas pengesahan admin.',
+    `Panjang rambut${hasCut ? " (sebelum potong)" : ""}: ${form.length}`,
+    `Nota: ${form.notes.trim() || '-'}`, '',
+    'Saya faham tempahan belum disahkan dan deposit RM30 seorang hanya dibayar selepas pengesahan admin.',
   ].join('\n');
   const href = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
   const validate = element => {
