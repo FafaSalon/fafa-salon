@@ -799,7 +799,7 @@ function BookingPage({ go }) {
               <div className="booking-services">{singleBookingChoices.map(renderChoice)}{renderChoice(otherBookingChoice)}</div>
             </>}
             {canAddCut && <div className={`booking-addons booking-cut-card ${hasCut ? 'active' : ''}`}>
-              <label className="booking-cut-toggle"><input type="checkbox" checked={wantCut} onChange={event => { const checked = event.target.checked; setWantCut(checked); if (!checked) update('cutLength', ''); }} /><span><strong>Add-on Hair Cut</strong><small>Tambah potongan rambut untuk servis pilihan anda.</small></span></label>
+              <label className="booking-cut-toggle"><input type="checkbox" checked={wantCut} onChange={event => { const checked = event.target.checked; setWantCut(checked); if (!checked) update('cutLength', ''); }} /><span><strong>Add-on Hair Cut</strong><small>Tick jika mahu potong rambut. Nyatakan gaya potongan yang diinginkan dalam Nota tambahan.</small></span></label>
               {hasCut && <div className="booking-cut-target">
                 <label className="booking-field">Nak potong ke paras mana? *<select required value={form.cutLength} onChange={event => update('cutLength', event.target.value)}><option value="">Pilih paras selepas dipotong</option>{lengthChoices.map(item => <option key={item}>{item}</option>)}</select></label>
                 <p className="booking-note" style={{marginTop: 10}}>Pilih paras rambut yang diinginkan selepas dipotong. Hairstylist akan sahkan potongan semasa konsultasi.</p>
@@ -823,11 +823,11 @@ function BookingPage({ go }) {
                   const active = form.date === date;
                   return <button key={date} type="button" className={`booking-date-button ${active ? 'selected' : ''}`} aria-pressed={active} aria-label={`${day}, ${label}`} onClick={() => {update('date',date);setError('');}}><span>{day}</span><strong>{label}</strong><span aria-hidden="true">{active ? '✓' : '○'}</span></button>;
                 })}</div>
-                <p className="booking-note" style={{margin:0}}>Pilih satu tarikh di atas. Hanya 5 hari terdekat dibuka untuk booking.</p>
+                <p className="booking-note" style={{margin:0}}>Pilih satu tarikh di atas.</p>
               </div>
               <label className="booking-field">Masa pilihan *<select value={form.time} required onChange={event => update('time', event.target.value)}><option value="">Pilih masa</option>{times.map(time => <option key={time}>{time}</option>)}</select></label>
             </div>
-            <p className="booking-note">Booking dibuka untuk esok hingga 5 hari selepas tarikh semasa. {earlyCutoff && "Slot terakhir untuk servis pilihan anda ialah 3:30 PM. "}Slot tertakluk pada kekosongan. Admin akan sahkan waktu mengikut servis dan jadual cawangan.</p>
+            <p className="booking-note">{earlyCutoff && "Slot terakhir untuk servis pilihan anda ialah 3:30 PM. "}Slot tertakluk pada kekosongan. Admin akan sahkan waktu mengikut servis dan jadual cawangan.</p>
           </fieldset>
           <fieldset>
             <legend>03 / MAKLUMAT ANDA</legend>
