@@ -343,7 +343,7 @@ function HomePage({ go }) {
       </section>
 
       <section className="quick-links">
-        <button onClick={() => go("reviews")}>Review</button>
+        <button onClick={() => go("reviews")} style={{display:"flex",alignItems:"center",justifyContent:"center",flexWrap:"wrap",gap:10}}><span>Google Review</span><span aria-label="5 bintang" style={{color:"#f9c74f",fontSize:17,letterSpacing:2}}>★★★★★</span></button>
         <button onClick={() => go("contact")}>Contact Us</button>
         <button onClick={() => go("location")}>Our Location</button>
         <style>{`.quick-links button,.quick-links .footer-tc{font-family:inherit;font-size:14px;font-weight:900;line-height:1.4}.quick-links .footer-tc{display:flex;align-items:center;justify-content:center;padding:16px;border-radius:18px;background:#171722;border:1px solid rgba(255,255,255,.12);color:white;text-align:center;text-decoration:none}`}</style>
@@ -525,7 +525,7 @@ function ComboDetailPage({ item, go }) {
 function ReviewsPage() {
   const branches = [
     {name:"Setapak KL", link:"https://www.google.com/searchviewer/10?output=search&svid=CCYSGioYOhYweDA6MHhjZjFiNzVhNTVjYTY0ZjVkGAo&hl=en-GB&gl=MY#sv=CAESzQEKuQEStgEKd0FERGJXZVloYTE2eVJHQnhscm9iYzhSalhUYkFFaGpVSFU5NTdXZ2g4M2JnVEhHeUxuSkkyWUJxSXhRWWllMllQcGV2TEF3UlNBb1p6ZGdTVFFyMnB0d3dzVXd2QXhXMGR6eDBxdWc0T2dna3d3Y1p5djIyWkdREhdzanprYXZQUUMtR1lzZU1QdUtLSXNBWRoiQUhOMEU3Rm5TN3NiOGRPS3g3REFoTExXSTN6eGlSNGpOURIEODA1MRoBMyoAMAA4AUAAGAAg6pDb2wFKAhAB"},
-    {name:"Selayang Batu Caves", link:"https://www.google.com/search?q=fafa+beauty&rlz=1C1VDKB_enMY1163MY1163&oq=fafa+beau&gs_lcrp=EgZjaHJvbWUqDQgBEAAYiwMYgAQY-AUyBggAEEUYOTINCAEQABiLAxiABBj4BTIKCAIQABiLAxiABDIKCAMQABiLAxiABDILCAQQABgWGB4YiwMyCwgFEAAYFhgeGIsDMgsIBhAAGBYYHhiLAzIGCAcQRRg80gEIMjk5NGoxajeoAgCwAgA&sourceid=chrome&source=chrome.ob&ie=UTF-8#sv=CAESzQEKuQEStgEKd0FERGJXZVlSLXNIeTlYT3kzZzh2bXFoREowTjUxbEFSeVc1U3FYY1I3bVVBOGNBNDF0dEFKSThtRG9GMjdXdE5NVXdvMmttdHpUczIxbzVMdmFMRDA1UEhFbTVRZHpzVlpYRzV2TW1DU2tvXzJMS09oMDFWZzNvEhc5MFBrYXJHa0o3T1h3Y3NQXzdlTHdRSRoiQUhOMEU3Rl9kWnJKdDA0emVSOVhfUkk5Ymw2MmtGcklnURIEODA1MRoBMyoAMAA4AUAAGAAg18m7vwVKAhAB"},
+    {name:"Selayang Batu Caves", link:"https://www.google.com/searchviewer/10?output=search&kgmid=%2Fg%2F11xp0flcln&hl=en-GB&gl=MY#sv=CAESzQEKuQEStgEKd0FERGJXZVlSLXNIeTlYT3kzZzh2bXFoREowTjUxbEFSeVc1U3FYY1I3bVVBOGNBNDF0dEFKSThtRG9GMjdXdE5NVXdvMmttdHpUczIxbzVMdmFMRDA1UEhFbTVRZHpzVlpYRzV2TW1DU2tvXzJMS09oMDFWZzNvEhc5MFBrYXJHa0o3T1h3Y3NQXzdlTHdRSRoiQUhOMEU3Rl9kWnJKdDA0emVSOVhfUkk5Ymw2MmtGcklnURIEODA1MRoBMyoAMAA4AUAAGAAg18m7vwVKAhAB"},
   ];
   return <motion.section className="page reviews-page" {...pageMotion}>
     <div className="content-block" style={{background:"#121015",color:"#fff",minHeight:"75vh",paddingBottom:120}}>
