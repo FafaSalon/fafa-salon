@@ -306,7 +306,7 @@ function HomePage({ go }) {
           <div className="hero-logo-frame"><img className="hero-logo" src="/assets/fafa-logo.png" alt="FAFA Salon Beauty Centre" /></div>
           <span className="kicker">Your Beauty, Our Passion</span>
           <h1 className="salon-headline"><span>SALON PILIHAN</span><span>WANITA DAN</span><em>MUSLIMAH</em></h1>
-          <p className="salon-intro">Tampil cantik dan berkeyakinan, dengan ruang menunggu selesa untuk suami &amp; anak, lengkap dengan TV (Netflix &amp; YouTube) serta WiFi percuma!</p>
+          <p className="salon-intro">Tampil cantik dan berkeyakinan dalam suasana selesa. Ruang servis diasingkan daripada ruang menunggu demi menjaga privasi wanita dan muslimah. Ruang menunggu turut dilengkapi TV (Netflix &amp; YouTube) serta WiFi percuma!</p>
         </motion.div>
       </section>
 
