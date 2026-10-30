@@ -293,6 +293,9 @@ export default function App() {
         .site-shell .booking-page .booking-choice:active{transform:scale(.99)}
         .site-shell .booking-page .booking-fields{gap:11px}
         .site-shell .booking-page .booking-field{gap:6px;font-size:12px;line-height:1.45;font-weight:500;letter-spacing:.05px}
+        .site-shell .booking-page input:not([type=checkbox]):not([type=radio]),.site-shell .booking-page select,.site-shell .booking-page textarea{font-size:12px;line-height:1.5;letter-spacing:.05px;font-weight:400}
+        .site-shell .booking-page input::placeholder,.site-shell .booking-page textarea::placeholder{font-size:12px;line-height:1.5;letter-spacing:.05px}
+
         .site-shell .booking-page input:not([type=checkbox]):not([type=radio]),.site-shell .booking-page select{height:44px;min-height:44px;max-height:44px;padding:9px 11px;box-shadow:0 3px 10px #00000016,inset 0 1px 0 #ffffffb0}
         .site-shell .booking-page textarea{min-height:78px;padding:9px 11px;box-shadow:0 3px 10px #00000016}
         .site-shell .booking-page .booking-note,.site-shell .booking-page .booking-consent,.site-shell .booking-page .booking-error{font-size:11px;line-height:1.65;letter-spacing:.04px}
