@@ -267,6 +267,10 @@ function PaymentLogo({src,name}) {
   return failed ? <span style={{fontSize:12,fontWeight:800,color:"#352a33"}}>{name}</span> : <img src={src} alt={name} loading="lazy" onError={() => setFailed(true)} />;
 }
 
+function PromoNote() {
+  return <p style={{fontSize:11,lineHeight:1.5,fontWeight:400,margin:"8px 0 0",opacity:.75}}>Harga promo terkini tertakluk pada terma dan syarat.</p>;
+}
+
 function HomePage({ go }) {
   return (
     <motion.section className="page home-page" {...pageMotion}>
@@ -318,7 +322,7 @@ function HomePage({ go }) {
         `}</style>
         <div className="section-heading center"><span>Our Services</span><h2>Perkhidmatan Kami</h2></div>
         <p>Tekan kategori untuk lihat detail servis dan maklumat lanjut.</p>
-        <div className="category-buttons">{Object.entries(services).map(([id,item]) => <button type="button" key={id} className="category-button" onClick={() => go(id)}><ServiceIcon type={id} /><span style={{flex:1,textAlign:"left"}}>{item.cardTitle}</span><ChevronRight size={18} aria-hidden="true" /></button>)}</div>
+        <div className="category-buttons">{Object.entries(services).map(([id,item]) => <div key={id}><button type="button" style={{width:"100%"}} className="category-button" onClick={() => go(id)}><ServiceIcon type={id} /><span style={{flex:1,textAlign:"left"}}>{item.cardTitle}</span><ChevronRight size={18} aria-hidden="true" /></button><PromoNote /></div>)}</div>
       </section>
 
       <section style={{padding:"0 22px 28px",background:"#17121b"}}>
@@ -449,6 +453,7 @@ function ServiceCategories({ item, categories }) {
           </> : <><h3>Pilihan Warna {category.title}</h3><p style={{marginTop:10}}>Pilihan tona warna akan ditentukan bersama hairstylist selepas semakan keadaan rambut dan hasil yang diinginkan. Boleh nyatakan warna pilihan dalam nota booking.</p></>)}
           {item.visual === "combo" && /Colour/.test(category.title) && <><h3>Pilihan Warna Colour No Bleach</h3><NoBleachPalette /></>}
           {!item.walkinOnly && <a className="main-wa" href={bookingLink(category.booking || category.title)}><MessageCircle size={18} /> Saya berminat nak buat {category.title}</a>}
+          <PromoNote />
         </div>}
       </section>;
     })}
@@ -507,6 +512,7 @@ function ComboDetailPage({ item, go }) {
         {item.panels.map(panel => <InfoPanel key={panel.title} title={panel.title} text={panel.text} />)}
         {/Colour/.test(item.title) && <section style={{marginTop:24}}><h3 style={{color:"#8b1744"}}>Pilihan Warna Colour No Bleach</h3><NoBleachPalette /></section>}
         <a className="main-wa" href={bookingLink(item.booking)}><MessageCircle size={18} /> Saya berminat nak buat {item.title}</a>
+        <PromoNote />
       </section>
     </motion.section>
   );
@@ -660,7 +666,7 @@ function BookingPage({ go }) {
     const timer = setInterval(() => setToday(malaysiaToday()), 60000);
     return () => clearInterval(timer);
   }, []);
-  const availableDates = Array.from({length:5}, (_, index) => bookingDateOffset(today, index + 1));
+  const availableDates = Array.from({length:6}, (_, index) => bookingDateOffset(today, index));
   const isCombo = selected.some(item => comboBookingChoices.includes(item)) || selected.length > 1;
   const earlyCutoff = isCombo || selected.some(item => ["Highlight + Colour", "Bleach + Colour"].includes(item));
   const end = earlyCutoff ? 15.5 : 17;
@@ -693,10 +699,10 @@ function BookingPage({ go }) {
   const validate = element => {
     const node = element.closest('form');
     if (!selected.length) { setError('Sila pilih sekurang-kurangnya satu servis.'); node.querySelector('input[type=checkbox]').focus(); return false; }
-    if (!form.date) { setError('Sila pilih satu tarikh booking.'); node.querySelector('.booking-date-button')?.focus(); return false; }
+    if (!form.date) { setError('Sila pilih satu tarikh booking.'); node.querySelector('[name=bookingDate]')?.focus(); return false; }
     if (!node.reportValidity()) { setError('Sila lengkapkan semua ruangan wajib dan tandakan persetujuan.'); return false; }
     const currentDay = malaysiaToday();
-    if (form.date < bookingDateOffset(currentDay, 1) || form.date > bookingDateOffset(currentDay, 5)) { setError('Sila pilih tarikh esok hingga 5 hari selepas tarikh semasa.'); return false; }
+    if (form.date < currentDay || form.date > bookingDateOffset(currentDay, 5)) { setError('Sila pilih tarikh hari ini hingga 5 hari berikutnya.'); return false; }
     if (!times.includes(form.time)) { setError('Sila pilih semula masa mengikut servis.'); return false; }
     setError(''); return true;
   };
@@ -764,11 +770,6 @@ function BookingPage({ go }) {
         .booking-page details{color:#ff98c7 !important}
         .booking-page .booking-cut-card .booking-field{color:#27222b}
         .booking-page .booking-cut-card .booking-note{color:#62586a}
-        .booking-page .booking-date-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-        .booking-page .booking-date-button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-height:98px;padding:12px 6px;border:1px solid #d9d3dc;border-radius:16px;background:#f7f6f8;color:#27222b;font:600 13px system-ui;cursor:pointer}
-        .booking-page .booking-date-button strong{color:#27222b;font-size:16px}
-        .booking-page .booking-date-button.selected{background:#fce5ef;border:2px solid #e33e8a;color:#8d1e52}
-        .booking-page .booking-date-button:focus-visible{outline:3px solid #ff98c7;outline-offset:3px}
       `}</style>
       <div className="content-block">
         <button className="booking-back" onClick={() => go('home')}><ArrowLeft size={16} /> Kembali ke Home</button>
@@ -814,17 +815,7 @@ function BookingPage({ go }) {
             <legend>02 / CAWANGAN & WAKTU</legend>
             <div className="booking-fields">
               <label className="booking-field">Cawangan *<select value={form.branch} required onChange={event => update('branch', event.target.value)}><option value="">Pilih cawangan</option><option>Setapak, Kuala Lumpur</option><option>Selayang, Batu Caves</option></select></label>
-              <div className="booking-field">
-                <span id="booking-date-label">Tarikh pilihan *</span>
-                <div className="booking-date-options" role="group" aria-labelledby="booking-date-label">{availableDates.map(date => {
-                  const value = new Date(`${date}T12:00:00Z`);
-                  const day = value.toLocaleDateString('ms-MY',{weekday:'short',timeZone:'Asia/Kuala_Lumpur'});
-                  const label = value.toLocaleDateString('ms-MY',{day:'numeric',month:'short',timeZone:'Asia/Kuala_Lumpur'});
-                  const active = form.date === date;
-                  return <button key={date} type="button" className={`booking-date-button ${active ? 'selected' : ''}`} aria-pressed={active} aria-label={`${day}, ${label}`} onClick={() => {update('date',date);setError('');}}><span>{day}</span><strong>{label}</strong><span aria-hidden="true">{active ? '✓' : '○'}</span></button>;
-                })}</div>
-                <p className="booking-note" style={{margin:0}}>Pilih satu tarikh di atas.</p>
-              </div>
+              <label className="booking-field">Tarikh pilihan *<select name="bookingDate" required value={form.date} onChange={event => {update('date',event.target.value);setError('');}}><option value="">Pilih tarikh</option>{availableDates.map(date => <option key={date} value={date}>{new Date(`${date}T12:00:00Z`).toLocaleDateString('ms-MY',{weekday:'short',day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Kuala_Lumpur'})}</option>)}</select></label>
               <label className="booking-field">Masa pilihan *<select value={form.time} required onChange={event => update('time', event.target.value)}><option value="">Pilih masa</option>{times.map(time => <option key={time}>{time}</option>)}</select></label>
             </div>
             <p className="booking-note">{earlyCutoff && "Slot terakhir untuk servis pilihan anda ialah 3:30 PM. "}Slot tertakluk pada kekosongan. Admin akan sahkan waktu mengikut servis dan jadual cawangan.</p>
