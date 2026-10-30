@@ -47,7 +47,7 @@ const services = {
     cardTitle: "Rebonding atau Relaxing",
     short: "Dua pilihan pelurusan untuk rambut lebih kemas dan mudah diurus.",
     visual: "rebonding",
-    booking: "Rebonding / Relaxing",
+    booking: "Silky Rebonding / Soft Relaxing",
     intro: "Kedua-dua servis membantu meluruskan dan mengemaskan rambut. Pilihan yang sesuai bergantung pada hasil yang diinginkan, keadaan rambut dan sejarah chemical.",
     panels: [
       { title: "Silky Rebonding", text: "Untuk hasil lurus yang lebih jelas, licin dan kemas. Sesuai dipertimbangkan untuk rambut kerinting atau bergelombang yang sukar diurus, selepas pemeriksaan hairstylist. Bahagian rambut yang telah direbonding kekal lurus; akar baharu tumbuh mengikut tekstur asal dan mungkin memerlukan touch-up. Pelurusan menggunakan proses kimia untuk mengubah bentuk rambut. Hasil lebih lurus berbanding rawatan keratin; kesesuaian pada rambut yang pernah colour atau bleach perlu diperiksa dahulu." },
@@ -122,10 +122,10 @@ const services = {
 const combos = {
   combo_rebonding_keratin: {
     no: "C01",
-    title: "Rebonding / Relaxing + Keratin Brazilian",
+    title: "Silky Rebonding / Soft Relaxing + Keratin Brazilian",
     short: "Lurus lebih kemas + bantu kurangkan frizz.",
     visual: "comboStraight",
-    booking: "Rebonding / Relaxing + Keratin Brazilian",
+    booking: "Silky Rebonding / Soft Relaxing + Keratin Brazilian",
     panels: [
       { title: "Apa yang digabungkan", text: "Rebonding atau relaxing untuk pelurusan, bersama Keratin Brazilian untuk membantu rambut kelihatan lebih rapi dan kurang frizz. Jenis pelurusan serta keratin dipilih selepas pemeriksaan rambut." },
       { title: "Sebelum memilih", text: "Maklumkan sejarah colour, bleach dan chemical. Gabungan hanya diteruskan jika keadaan rambut sesuai; hasil dan susunan proses ditentukan oleh hairstylist." },
@@ -135,10 +135,10 @@ const combos = {
   },
   combo_rebonding_colour: {
     no: "C02",
-    title: "Rebonding / Relaxing + Colour",
+    title: "Silky Rebonding / Soft Relaxing + Colour",
     short: "Kemas + warna lebih menyerlah.",
     visual: "comboColour",
-    booking: "Rebonding / Relaxing + Colour",
+    booking: "Silky Rebonding / Soft Relaxing + Colour",
     panels: [
       { title: "Apa yang digabungkan", text: "Rebonding atau relaxing bersama Colour No Bleach. Pelurusan memberi bentuk lebih kemas, manakala colour menambah tona pada rambut. Pilihan warna rujukan ada di bawah." },
       { title: "Had pilihan colour", text: "Pilihan warna ini merujuk kepada Colour No Bleach. Bleach dan highlight tidak dianggap termasuk dalam combo ini. Sebarang proses tambahan perlu dibincangkan dahulu; kesesuaian gabungan bergantung pada keadaan rambut." },
@@ -685,7 +685,7 @@ function BookingPage({ go }) {
     `Masa pilihan: ${form.time}`, '',
     `Servis: ${selected.join(' + ')}`,
     ...(hasCut ? [`Add-on Hair Cut: potong ke paras ${form.cutLength}`] : []),
-    `Panjang rambut${hasCut ? " (sebelum potong)" : ""}: ${form.length}`,
+    ...(!hasCut ? [`Panjang rambut: ${form.length}`] : []),
     `Nota: ${form.notes.trim() || '-'}`, '',
     'Saya faham tempahan belum disahkan dan deposit RM30 seorang hanya dibayar selepas pengesahan admin.',
   ].join('\n');
@@ -805,10 +805,10 @@ function BookingPage({ go }) {
                 <p className="booking-note" style={{marginTop: 10}}>Pilih paras rambut yang diinginkan selepas dipotong. Hairstylist akan sahkan potongan semasa konsultasi.</p>
               </div>}
             </div>}
-            <div className="booking-fields" style={{marginTop:20}}>
-              <label className="booking-field">Panjang rambut sekarang{hasCut ? " (sebelum potong)" : ""} *<select required value={form.length} onChange={event => update('length', event.target.value)}><option value="">Pilih paras rambut</option>{lengthChoices.map(item => <option key={item}>{item}</option>)}</select></label>
+            {!hasCut && <div className="booking-fields" style={{marginTop:20}}>
+              <label className="booking-field">Panjang rambut sekarang *<select required value={form.length} onChange={event => update('length', event.target.value)}><option value="">Pilih paras rambut</option>{lengthChoices.map(item => <option key={item}>{item}</option>)}</select></label>
               <p className="booking-note">{hairCheckNote}</p>
-            </div>
+            </div>}
           </fieldset>
           <fieldset>
             <legend>02 / CAWANGAN & WAKTU</legend>
