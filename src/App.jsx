@@ -610,7 +610,7 @@ function ServiceVisual({ type, compact = false }) {
 function BottomBar({ go, page }) {
   const current = services[page] || combos[page];
   const href = "#booking";
-  return <div className="bottom-bar"><button onClick={() => go("home")}><Home size={16} /> Home</button>{!current?.walkinOnly && <a href={href}><MessageCircle size={16} /> Book Now</a>}</div>;
+  return <div className="bottom-bar"><button onClick={() => go("home")}><Home size={16} /> Home</button>{!current?.walkinOnly && <a href={href}><MessageCircle size={16} /> Semak Harga &amp; Tempah</a>}</div>;
 }
 
 const comboBookingChoices = Object.values(combos).map(item => item.booking);
@@ -694,41 +694,41 @@ function BookingPage({ go }) {
   return (
     <motion.section className="page booking-page" {...pageMotion}>
       <style>{`
-        .booking-page{background:#090910 !important;color:#fff !important;min-height:100vh;padding-bottom:110px;color-scheme:dark;isolation:isolate;overflow-x:clip}
+        .booking-page{background:#e7e7eb !important;color:#25232b !important;min-height:100vh;padding-bottom:110px;color-scheme:light;isolation:isolate;overflow-x:clip}
         .booking-page,.booking-page *{box-sizing:border-box}
-        .booking-page .content-block{padding:26px 20px 36px;background:radial-gradient(ellipse at top right,rgba(230,80,152,.12),transparent 440px),#090910;color:#fff;width:100%;min-width:0}
-        .booking-page h2,.booking-page strong{color:#fff}
-        .booking-page .lead{color:#e1d5df;font-size:14px;line-height:1.8}
-        .booking-page .kicker{color:#ff80b8}
-        .booking-page input::placeholder,.booking-page textarea::placeholder{color:#b7a9b7;opacity:1}
-        .booking-page select option{color:#fff;background:#1a1a25}
+        .booking-page .content-block{padding:26px 20px 36px;background:#e7e7eb;color:#25232b;width:100%;min-width:0}
+        .booking-page h2,.booking-page strong{color:#25232b}
+        .booking-page .lead{color:#54515b;font-size:14px;line-height:1.8}
+        .booking-page .kicker{color:#9d245d}
+        .booking-page input::placeholder,.booking-page textarea::placeholder{color:#74717c;opacity:1}
+        .booking-page select option{color:#25232b;background:#f7f7f9}
         .booking-page h2{font-size:30px;line-height:1.2;margin:12px 0}
-        .booking-page .booking-back{display:flex;align-items:center;gap:7px;background:transparent;color:#ff80b8;padding:0;margin:0 0 24px}
+        .booking-page .booking-back{display:flex;align-items:center;gap:7px;background:transparent;color:#9d245d;padding:0;margin:0 0 24px}
         .booking-page form{display:grid;gap:24px;min-width:0}
         .booking-page fieldset{border:0;margin:0;padding:0;min-width:0}
-        .booking-page legend{font-size:12px;color:#ff80b8;font-weight:800;letter-spacing:1px;padding:0 0 12px}
+        .booking-page legend{font-size:12px;color:#9d245d;font-weight:800;letter-spacing:1px;padding:0 0 12px}
         .booking-page .booking-services{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:start}
-        .booking-page .booking-group-title{color:#ff80b8;font:700 14px system-ui;margin:22px 0 12px}
+        .booking-page .booking-group-title{color:#9d245d;font:700 14px system-ui;margin:22px 0 12px}
         .booking-page .booking-service-item{min-width:0}
         .booking-page .booking-choice{height:100%}
         .booking-page .booking-other{grid-column:1/-1;width:min(100%,280px);justify-self:center;margin-top:5px}
         .booking-page .booking-other .booking-choice{justify-content:center;text-align:center}
-        .booking-page .booking-addons{margin-top:7px;padding:11px 9px;background:#291b27;border:1px solid #714361;border-radius:12px;display:grid;gap:10px;color:#fff;font-size:12px;line-height:1.5}
-        .booking-page .booking-cut-card{margin-top:22px;padding:16px;border-radius:16px;background:#1b1420;border:1px solid #714361}
-        .booking-page .booking-cut-card.active{border-color:#ff79b4;background:#291b27}
+        .booking-page .booking-addons{margin-top:7px;padding:11px 9px;background:#e3dce2;border:1px solid #aaa1ab;border-radius:12px;display:grid;gap:10px;color:#25232b;font-size:12px;line-height:1.5}
+        .booking-page .booking-cut-card{margin-top:22px;padding:16px;border-radius:16px;background:#ededf0;border:1px solid #aaa1ab}
+        .booking-page .booking-cut-card.active{border-color:#bd3373;background:#e3dce2}
         .booking-page .booking-cut-toggle{gap:12px;align-items:flex-start;font-size:14px}
-        .booking-page .booking-cut-toggle strong{display:block;font-size:15px;color:#fff}
-        .booking-page .booking-cut-toggle small{display:block;color:#d1c4ce;font-weight:400;line-height:1.6;margin-top:4px}
-        .booking-page .booking-cut-target{border-top:1px solid #714361;margin-top:8px;padding-top:18px}
+        .booking-page .booking-cut-toggle strong{display:block;font-size:15px;color:#25232b}
+        .booking-page .booking-cut-toggle small{display:block;color:#5f5965;font-weight:400;line-height:1.6;margin-top:4px}
+        .booking-page .booking-cut-target{border-top:1px solid #aaa1ab;margin-top:8px;padding-top:18px}
         .booking-page .booking-cut-target label.booking-field{display:grid;gap:10px}
-        .booking-page .booking-addon-title{color:#ff99c9;font-size:11px;font-weight:700}
+        .booking-page .booking-addon-title{color:#9d245d;font-size:11px;font-weight:700}
         .booking-page .booking-addons label{display:flex;gap:7px;align-items:flex-start;cursor:pointer}
-        .booking-page .booking-choice{display:flex;align-items:flex-start;gap:7px;background:#1a1a25;border:1px solid #453343;border-radius:12px;padding:12px 9px;font-size:12px;line-height:1.5;cursor:pointer;color:#f4eaf0;overflow-wrap:anywhere}
-        .booking-page .booking-choice.selected{border-color:#ff79b4;background:#3d2033}
-        .booking-page input[type=checkbox]{accent-color:#e65098;width:17px;height:17px;flex-shrink:0;margin:2px 0}
+        .booking-page .booking-choice{display:flex;align-items:flex-start;gap:7px;background:#f7f7f9;border:1px solid #b8b5bf;border-radius:12px;padding:12px 9px;font-size:12px;line-height:1.5;cursor:pointer;color:#25232b;overflow-wrap:anywhere}
+        .booking-page .booking-choice.selected{border-color:#bd3373;background:#f7dce9}
+        .booking-page input[type=checkbox]{accent-color:#b92167;width:17px;height:17px;flex-shrink:0;margin:2px 0}
         .booking-page .booking-fields{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;min-width:0}
-        .booking-page .booking-field{display:grid;grid-template-columns:minmax(0,1fr);gap:9px;font-size:14px;font-weight:600;line-height:1.5;color:#fff;min-width:0}
-        .booking-page input:not([type=checkbox]),.booking-page select,.booking-page textarea{width:100%;max-width:100%;min-width:0;background:#1a1a25;border:1px solid #453343;border-radius:12px;padding:13px 12px;color:#fff;font:16px system-ui;box-sizing:border-box;color-scheme:dark;line-height:24px;-webkit-text-fill-color:#fff;opacity:1}
+        .booking-page .booking-field{display:grid;grid-template-columns:minmax(0,1fr);gap:9px;font-size:14px;font-weight:600;line-height:1.5;color:#25232b;min-width:0}
+        .booking-page input:not([type=checkbox]),.booking-page select,.booking-page textarea{width:100%;max-width:100%;min-width:0;background:#f7f7f9;border:1px solid #b8b5bf;border-radius:12px;padding:13px 12px;color:#25232b;font:16px system-ui;box-sizing:border-box;color-scheme:light;line-height:24px;-webkit-text-fill-color:#25232b;opacity:1}
         .booking-page input:not([type=checkbox]),.booking-page select{height:52px;min-height:52px;max-height:52px;margin:0}
         .booking-page input[type=date]{display:block;appearance:none;-webkit-appearance:none;inline-size:100%;min-inline-size:0;max-inline-size:100%;text-align:left;padding:13px 12px;overflow:hidden}
         .booking-page input[type=date]::-webkit-date-and-time-value{text-align:left;min-height:24px;margin:0}
@@ -736,14 +736,15 @@ function BookingPage({ go }) {
         .booking-page input[type=date]::-webkit-calendar-picker-indicator{margin:0;padding:0;flex-shrink:0}
         .booking-page textarea{min-height:110px;resize:vertical;font-weight:400}
         .booking-page .booking-fields input,.booking-page .booking-fields select{font-weight:400}
-        .booking-page input:focus-visible,.booking-page select:focus-visible,.booking-page textarea:focus-visible,.booking-page a:focus-visible{outline:2px solid #ff79b4;outline-offset:3px}
-        .booking-page .booking-note{font-size:13px;line-height:1.8;color:#e1d5df;margin:10px 0 0}
-        .booking-page .booking-notice{background:#291b27;border:1px solid #714361;border-radius:16px;padding:16px;font-size:13px;line-height:1.8;color:#f0deea}
-        .booking-page .booking-consent{display:flex;gap:10px;font-size:13px;line-height:1.7;color:#e9dce5}
-        .booking-page .booking-error{color:#ff9bbf;font-size:13px;line-height:1.6;margin:0}
-        .booking-page .booking-send{display:flex;align-items:center;justify-content:center;gap:9px;background:linear-gradient(135deg,#e65098,#ff79b4);padding:17px 12px;border-radius:14px;color:#fff;text-decoration:none;font-weight:800;font-size:14px;text-align:center}
+        .booking-page input:focus-visible,.booking-page select:focus-visible,.booking-page textarea:focus-visible,.booking-page a:focus-visible{outline:2px solid #bd3373;outline-offset:3px}
+        .booking-page .booking-note{font-size:13px;line-height:1.8;color:#54515b;margin:10px 0 0}
+        .booking-page .booking-notice{background:#e3dce2;border:1px solid #aaa1ab;border-radius:16px;padding:16px;font-size:13px;line-height:1.8;color:#39343e}
+        .booking-page .booking-consent{display:flex;gap:10px;font-size:13px;line-height:1.7;color:#39343e}
+        .booking-page .booking-error{color:#a31c48;font-size:13px;line-height:1.6;margin:0}
+        .booking-page .booking-send{display:flex;align-items:center;justify-content:center;gap:9px;background:linear-gradient(135deg,#b92167,#bd3373);padding:17px 12px;border-radius:14px;color:#fff;text-decoration:none;font-weight:800;font-size:14px;text-align:center}
         .booking-page .booking-copy{width:100%;font-size:13px;min-height:200px}
-        .booking-page .booking-fallback{background:transparent;color:#ff80b8;border:1px solid #714361;border-radius:12px;padding:12px;font-size:13px;width:100%;cursor:pointer}
+        .booking-page .booking-fallback{background:transparent;color:#9d245d;border:1px solid #aaa1ab;border-radius:12px;padding:12px;font-size:13px;width:100%;cursor:pointer}
+        .booking-page details{color:#9d245d !important}
       `}</style>
       <div className="content-block">
         <button className="booking-back" onClick={() => go('home')}><ArrowLeft size={16} /> Kembali ke Home</button>
