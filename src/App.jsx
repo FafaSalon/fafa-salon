@@ -525,7 +525,7 @@ function ComboDetailPage({ item, go }) {
 function ReviewsPage() {
   const branches = [
     {name:"Setapak KL", link:"https://www.google.com/searchviewer/10?output=search&svid=CCYSGioYOhYweDA6MHhjZjFiNzVhNTVjYTY0ZjVkGAo&hl=en-GB&gl=MY#sv=CAESzQEKuQEStgEKd0FERGJXZVloYTE2eVJHQnhscm9iYzhSalhUYkFFaGpVSFU5NTdXZ2g4M2JnVEhHeUxuSkkyWUJxSXhRWWllMllQcGV2TEF3UlNBb1p6ZGdTVFFyMnB0d3dzVXd2QXhXMGR6eDBxdWc0T2dna3d3Y1p5djIyWkdREhdzanprYXZQUUMtR1lzZU1QdUtLSXNBWRoiQUhOMEU3Rm5TN3NiOGRPS3g3REFoTExXSTN6eGlSNGpOURIEODA1MRoBMyoAMAA4AUAAGAAg6pDb2wFKAhAB"},
-    {name:"Selayang Batu Caves", link:"https://www.google.com/search?sca_esv=c55da69dae0261d8&hl=en-GB&gl=MY&output=search&kgmid=%2Fg%2F11xp0flcln&q=Fafa%20Salon%20Beauty%20(Selayang)%20-%20Salon%20Wanita%20%26%20Muslimah&shem=epsd1%2Cltae%2Crimspwouoe&shndl=30&source=sh%2Fx%2Floc%2Fact%2Fm4%2F3#lkt=LocalPoiReviews"},
+    {name:"Selayang Batu Caves", link:"https://www.google.com/search?q=fafa+beauty&rlz=1C1VDKB_enMY1163MY1163&oq=fafa+beau&gs_lcrp=EgZjaHJvbWUqDQgBEAAYiwMYgAQY-AUyBggAEEUYOTINCAEQABiLAxiABBj4BTIKCAIQABiLAxiABDIKCAMQABiLAxiABDILCAQQABgWGB4YiwMyCwgFEAAYFhgeGIsDMgsIBhAAGBYYHhiLAzIGCAcQRRg80gEIMjk5NGoxajeoAgCwAgA&sourceid=chrome&source=chrome.ob&ie=UTF-8#sv=CAESzQEKuQEStgEKd0FERGJXZVlSLXNIeTlYT3kzZzh2bXFoREowTjUxbEFSeVc1U3FYY1I3bVVBOGNBNDF0dEFKSThtRG9GMjdXdE5NVXdvMmttdHpUczIxbzVMdmFMRDA1UEhFbTVRZHpzVlpYRzV2TW1DU2tvXzJMS09oMDFWZzNvEhc5MFBrYXJHa0o3T1h3Y3NQXzdlTHdRSRoiQUhOMEU3Rl9kWnJKdDA0emVSOVhfUkk5Ymw2MmtGcklnURIEODA1MRoBMyoAMAA4AUAAGAAg18m7vwVKAhAB"},
   ];
   return <motion.section className="page reviews-page" {...pageMotion}>
     <div className="content-block" style={{background:"#121015",color:"#fff",minHeight:"75vh",paddingBottom:120}}>
