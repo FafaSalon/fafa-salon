@@ -727,7 +727,7 @@ function BookingPage({ go }) {
     });
     return () => cancelAnimationFrame(frame);
   }, []);
-  const [form, setForm] = useState({ name: '', phone: '', branch: '', date: '', time: '', length: '', cutLength: '', notes: '' });
+  const [form, setForm] = useState({ name: '', phone: '', branch: '', date: '', time: '', length: '', cutLength: '', notes: '', bleachStyle: '', highlightStyle: '' });
   const [error, setError] = useState('');
   const [adviceNotes, setAdviceNotes] = useState('');
   const adviceOnly = selected.includes(otherBookingChoice);
@@ -752,7 +752,7 @@ function BookingPage({ go }) {
     const next = item === otherBookingChoice ? (selected.includes(item) ? [] : [item]) : (selected.includes(item) ? selected.filter(value => value !== item) : [...selected.filter(value => value !== otherBookingChoice), item]);
     setSelected(next); setError('');
     if (!next.some(allowsCut)) { setWantCut(false); setForm(prev => ({...prev, cutLength: ''})); }
-    setForm(prev => ({ ...prev, time: '' }));
+    setForm(prev => ({ ...prev, time: '', bleachStyle: next.includes('Bleach + Colour') ? prev.bleachStyle : '', highlightStyle: next.includes('Highlight + Colour') ? prev.highlightStyle : '' }));
   };
   const dateLabel = form.date ? new Date(`${form.date}T12:00:00`).toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
   const message = [
@@ -760,7 +760,7 @@ function BookingPage({ go }) {
     `Nama: ${form.name.trim()}`,
     `No. telefon: ${form.phone.trim()}`,
     ...(!priceOnly ? [`Cawangan: ${form.branch}`, `Tarikh pilihan: ${dateLabel}`, `Masa pilihan: ${form.time}`] : []), '',
-    `Servis: ${selected.join(' + ')}`,
+    `Servis: ${selected.map(item => item === 'Bleach + Colour' && form.bleachStyle ? `${item} (${form.bleachStyle})` : item === 'Highlight + Colour' && form.highlightStyle ? `${item} (${form.highlightStyle})` : item).join(' + ')}`,
     ...(hasCut ? [`Add-on Hair Cut: potong ke paras ${form.cutLength}`] : []),
     ...(!hasCut ? [`Panjang rambut: ${form.length}`] : []),
     `Nota: ${form.notes.trim() || '-'}`, '',
@@ -785,7 +785,13 @@ function BookingPage({ go }) {
   const renderChoice = item => (
     <div className={`booking-service-item ${item === otherBookingChoice ? 'booking-other' : ''}`} key={item}>
       <label className={`booking-choice ${selected.includes(item) ? 'selected' : ''}`}><input type="checkbox" checked={selected.includes(item)} onChange={() => toggle(item)} /><span>{item}</span></label>
-
+      {selected.includes(item) && ['Bleach + Colour', 'Highlight + Colour'].includes(item) && <div className="booking-style-options">
+        <span className="booking-style-title">Pilihan gaya</span>
+        {(item === 'Bleach + Colour' ? ['Bleach + Colour Biasa', 'Peek-a-boo'] : ['Chunky Highlight', 'Highlight Colour', 'Balayage Highlight']).map(style => {
+          const field = item === 'Bleach + Colour' ? 'bleachStyle' : 'highlightStyle';
+          return <label key={style}><input type="radio" name={field} checked={form[field] === style} onChange={() => update(field, style)} /><span>{style}</span></label>;
+        })}
+      </div>}
     </div>
   );
   return (
@@ -801,13 +807,17 @@ function BookingPage({ go }) {
         .booking-page select option{color:#27222b;background:#fff}
         .booking-page h2{font-size:30px;line-height:1.2;margin:12px 0}
         .booking-page .booking-back{display:flex;align-items:center;gap:7px;background:transparent;color:#ff98c7;padding:0;margin:0 0 24px}
-        .booking-page form{display:grid;gap:24px;min-width:0}
+        .booking-page form{display:grid;gap:12px;min-width:0}
         .booking-page fieldset{border:0;margin:0;padding:0;min-width:0}
         .booking-page legend{font-size:12px;color:#ff98c7;font-weight:800;letter-spacing:1px;padding:0 0 12px}
         .booking-page .booking-services{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:stretch}
+        .booking-page .booking-style-options{padding:10px 8px;background:#fce5ef;border-radius:0 0 12px 12px;color:#27222b;display:grid;gap:3px;margin-top:4px}
+        .booking-page .booking-style-title{font-size:11px;font-weight:700;color:#8b1744;margin-bottom:2px}
+        .booking-page .booking-style-options label{display:flex;align-items:center;gap:7px;min-height:36px;font-size:12px;line-height:1.4;cursor:pointer}
+        .booking-page .booking-style-options input[type=radio]{width:17px;height:17px;min-height:0;max-height:none;padding:0;margin:0;flex:0 0 17px;accent-color:#df3987}
         .booking-page .booking-group-title{color:#ff98c7;font:700 14px system-ui;margin:22px 0 12px}
         .booking-page .booking-service-item{min-width:0}
-        .booking-page .booking-choice{height:100%}
+        .booking-page .booking-choice{height:auto}
         .booking-page .booking-other{grid-column:1/-1;width:min(100%,280px);justify-self:center;margin-top:5px}
         .booking-page .booking-other .booking-choice{justify-content:center;text-align:center}
         .booking-page .booking-addons{margin-top:7px;padding:11px 9px;background:#f7f6f8;border:1px solid #d9d3dc;border-radius:12px;display:grid;gap:10px;color:#27222b;font-size:12px;line-height:1.5}
@@ -820,20 +830,20 @@ function BookingPage({ go }) {
         .booking-page .booking-cut-target label.booking-field{display:grid;gap:10px}
         .booking-page .booking-addon-title{color:#ff98c7;font-size:11px;font-weight:700}
         .booking-page .booking-addons label{display:flex;gap:7px;align-items:flex-start;cursor:pointer}
-        .booking-page .booking-choice{display:flex;align-items:center;gap:12px;min-height:80px;background:#f7f6f8;border:1px solid #d9d3dc;border-radius:18px;padding:13px 10px;font-size:13px;font-weight:700;line-height:1.5;cursor:pointer;color:#27222b;overflow-wrap:anywhere;transition:background .15s,border-color .15s,box-shadow .15s}
+        .booking-page .booking-choice{display:flex;align-items:center;gap:8px;min-height:56px;background:#f7f6f8;border:1px solid #d9d3dc;border-radius:12px;padding:10px;font-size:12px;font-weight:600;line-height:1.4;cursor:pointer;color:#27222b;overflow-wrap:anywhere;transition:background .15s,border-color .15s,box-shadow .15s}
         .booking-page .booking-choice.selected{border-color:#e33e8a;background:#fce5ef;box-shadow:inset 0 0 0 1px #ff9bcd}
         .booking-page .booking-choice:focus-within{outline:3px solid #ffd1e8;outline-offset:3px}
         .booking-page .booking-choice:hover{border-color:#ffc0df}
-        .booking-page input[type=checkbox]{accent-color:#df3987;width:23px;height:23px;flex-shrink:0;margin:0;color-scheme:light;cursor:pointer}
-        .booking-page .booking-fields{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;min-width:0}
+        .booking-page input[type=checkbox]{accent-color:#df3987;width:18px;height:18px;flex-shrink:0;margin:0;color-scheme:light;cursor:pointer}
+        .booking-page .booking-fields{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;min-width:0}
         .booking-page .booking-field{display:grid;grid-template-columns:minmax(0,1fr);gap:9px;font-size:14px;font-weight:600;line-height:1.5;color:#f6f4f7;min-width:0}
-        .booking-page input:not([type=checkbox]),.booking-page select,.booking-page textarea{width:100%;max-width:100%;min-width:0;background:#f7f6f8;border:1px solid #d9d3dc;border-radius:12px;padding:13px 12px;color:#27222b;font:16px system-ui;box-sizing:border-box;color-scheme:light;line-height:24px;-webkit-text-fill-color:#27222b;opacity:1}
-        .booking-page input:not([type=checkbox]),.booking-page select{height:52px;min-height:52px;max-height:52px;margin:0}
+        .booking-page input:not([type=checkbox]),.booking-page select,.booking-page textarea{width:100%;max-width:100%;min-width:0;background:#f7f6f8;border:1px solid #d9d3dc;border-radius:10px;padding:10px 12px;color:#27222b;font:16px system-ui;box-sizing:border-box;color-scheme:light;line-height:24px;-webkit-text-fill-color:#27222b;opacity:1}
+        .booking-page input:not([type=checkbox]),.booking-page select{height:46px;min-height:46px;max-height:46px;margin:0}
         .booking-page input[type=date]{display:block;appearance:none;-webkit-appearance:none;inline-size:100%;min-inline-size:0;max-inline-size:100%;text-align:left;padding:13px 12px;overflow:hidden}
         .booking-page input[type=date]::-webkit-date-and-time-value{text-align:left;min-height:24px;margin:0}
         .booking-page input[type=date]::-webkit-datetime-edit{padding:0;display:inline-flex;line-height:24px}
         .booking-page input[type=date]::-webkit-calendar-picker-indicator{margin:0;padding:0;flex-shrink:0}
-        .booking-page textarea{min-height:110px;resize:vertical;font-weight:400}
+        .booking-page textarea{min-height:88px;resize:vertical;font-weight:400}
         .booking-page .booking-fields input,.booking-page .booking-fields select{font-weight:400}
         .booking-page input:focus-visible,.booking-page select:focus-visible,.booking-page textarea:focus-visible,.booking-page a:focus-visible{outline:2px solid #ff7ab8;outline-offset:3px}
         .booking-page .booking-note{font-size:13px;line-height:1.8;color:#d0ccd4;margin:10px 0 0}
