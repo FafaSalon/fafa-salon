@@ -523,16 +523,24 @@ function ComboDetailPage({ item, go }) {
 
 
 function ReviewsPage() {
-    const branches = [
-    {
-      name: "Setapak KL",
-      link: "https://www.google.com/searchviewer/10?output=search&svid=CCYSGioYOhYweDA6MHhjZjFiNzVhNTVjYTY0ZjVkGAo&hl=en-GB&gl=MY#sv=CAESzQEKuQEStgEKd0FERGJXZVloYTE2eVJHQnhscm9iYzhSalhUYkFFaGpVSFU5NTdXZ2g4M2JnVEhHeUxuSkkyWUJxSXhRWWllMllQcGV2TEF3UlNBb1p6ZGdTVFFyMnB0d3dzVXd2QXhXMGR6eDBxdWc0T2dna3d3Y1p5djIyWkdREhdzanprYXZQUUMtR1lzZU1QdUtLSXNBWRoiQUhOMEU3Rm5TN3NiOGRPS3g3REFoTExXSTN6eGlSNGpOURIEODA1MRoBMyoAMAA4AUAAGAAg6pDb2wFKAhAB"
-    },
-    {
-      name: "Selayang Batu Caves",
-      link: "https://www.google.com/search?sca_esv=c55da69dae0261d8&hl=en-GB&gl=MY&output=search&kgmid=%2Fg%2F11xp0flcln&q=Fafa%20Salon%20Beauty%20(Selayang)%20-%20Salon%20Wanita%20%26%20Muslimah&shem=epsd1%2Cltae%2Crimspwouoe&shndl=30&source=sh%2Fx%2Floc%2Fact%2Fm4%2F3"
-    },
+  const branches = [
+    {name:"Setapak KL", link:"https://www.google.com/searchviewer/10?output=search&svid=CCYSGioYOhYweDA6MHhjZjFiNzVhNTVjYTY0ZjVkGAo&hl=en-GB&gl=MY#sv=CAESzQEKuQEStgEKd0FERGJXZVloYTE2eVJHQnhscm9iYzhSalhUYkFFaGpVSFU5NTdXZ2g4M2JnVEhHeUxuSkkyWUJxSXhRWWllMllQcGV2TEF3UlNBb1p6ZGdTVFFyMnB0d3dzVXd2QXhXMGR6eDBxdWc0T2dna3d3Y1p5djIyWkdREhdzanprYXZQUUMtR1lzZU1QdUtLSXNBWRoiQUhOMEU3Rm5TN3NiOGRPS3g3REFoTExXSTN6eGlSNGpOURIEODA1MRoBMyoAMAA4AUAAGAAg6pDb2wFKAhAB"},
+    {name:"Selayang Batu Caves", link:"https://www.google.com/search?sca_esv=c55da69dae0261d8&hl=en-GB&gl=MY&output=search&kgmid=%2Fg%2F11xp0flcln&q=Fafa%20Salon%20Beauty%20(Selayang)%20-%20Salon%20Wanita%20%26%20Muslimah&shem=epsd1%2Cltae%2Crimspwouoe&shndl=30&source=sh%2Fx%2Floc%2Fact%2Fm4%2F3"},
   ];
+  return <motion.section className="page reviews-page" {...pageMotion}>
+    <div className="content-block" style={{background:"#121015",color:"#fff",minHeight:"75vh",paddingBottom:120}}>
+      <span className="kicker">Review Pelanggan</span>
+      <h1 style={{fontSize:29,margin:"12px 0",color:"#fff"}}>Pengalaman Pelanggan Kami</h1>
+      <p style={{fontSize:14,lineHeight:1.8,color:"#e0cbd8",marginBottom:22}}>Pilih cawangan untuk melihat ulasan pelanggan di Google Maps. Selepas pautan dibuka, tekan bahagian Ulasan / Reviews.</p>
+      {branches.map(branch => <section key={branch.name} style={{padding:20,borderRadius:20,border:"1px solid #85516d",background:"#241923",marginBottom:16}}>
+        <MapPin size={22} style={{color:"#ff9bcb"}} aria-hidden="true" />
+        <h2 style={{fontSize:21,color:"#fff",margin:"10px 0 6px"}}>FAFA Salon {branch.name}</h2>
+        <p style={{fontSize:13,lineHeight:1.7,color:"#e0cbd8",margin:0}}>Lihat ulasan dan pengalaman pelanggan cawangan {branch.name}.</p>
+        <a className="main-wa" href={branch.link} target="_blank" rel="noopener noreferrer" style={{textAlign:"center",marginTop:16}}>Lihat Review {branch.name} <ChevronRight size={18} /></a>
+      </section>)}
+    </div>
+  </motion.section>;
+}
 
 function WalkInPage() {
   return (
