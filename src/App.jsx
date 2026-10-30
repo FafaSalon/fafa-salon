@@ -339,7 +339,6 @@ function HomePage({ go }) {
       <section className="quick-links">
         <button onClick={() => go("contact")}>Contact Us</button>
         <button onClick={() => go("location")}>Our Location</button>
-        <a className="footer-tc" href={tcLink}>View Full T&amp;C</a>
         <style>{`.quick-links button,.quick-links .footer-tc{font-family:inherit;font-size:14px;font-weight:900;line-height:1.4}.quick-links .footer-tc{display:flex;align-items:center;justify-content:center;padding:16px;border-radius:18px;background:#171722;border:1px solid rgba(255,255,255,.12);color:white;text-align:center;text-decoration:none}`}</style>
       </section>
     </motion.section>
