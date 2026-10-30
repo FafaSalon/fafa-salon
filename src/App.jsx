@@ -191,7 +191,7 @@ const pageMotion = {
 
 function pageFromHash() {
   const target = window.location.hash.slice(1).split('?')[0];
-  return ['home', 'booking', 'contact', 'location', 'combo', ...Object.keys(services), ...Object.keys(combos)].includes(target) ? target : 'home';
+  return ['home', 'booking', 'contact', 'location', 'walkin', 'combo', ...Object.keys(services), ...Object.keys(combos)].includes(target) ? target : 'home';
 }
 
 export default function App() {
@@ -225,6 +225,7 @@ export default function App() {
           {page === "booking" && <BookingPage key="booking" go={go} />}
           {page === "home" && <HomePage key="home" go={go} />}
           {page === "contact" && <ContactPage key="contact" />}
+          {page === "walkin" && <WalkInPage key="walkin" />}
           {page === "location" && <LocationPage key="location" />}
           {page === "combo" && <ComboPage key="combo" go={go} />}
           {currentCombo && <ComboDetailPage key={page} item={currentCombo} go={go} />}
@@ -519,6 +520,29 @@ function ComboDetailPage({ item, go }) {
 }
 
 
+function WalkInPage() {
+  return (
+    <motion.section className="page walkin-page" {...pageMotion}>
+      <div className="content-block" style={{background:"#121015",color:"#fff",minHeight:"75vh",paddingBottom:120}}>
+        <span className="kicker">Maklumat Walk-in</span>
+        <h1 style={{fontSize:30,margin:"12px 0 22px",color:"#fff"}}>Sebelum Datang ke Salon</h1>
+        <div style={{padding:20,borderRadius:20,border:"1px solid #85516d",background:"#241923",lineHeight:1.8,fontSize:14}}>
+          <h2 style={{fontSize:19,color:"#ff9bcb",margin:"0 0 10px"}}>Harga Normal untuk Walk-in</h2>
+          <p style={{color:"#f4eaf0",margin:"0 0 12px"}}>Harga promo yang dipaparkan tidak terpakai untuk walk-in. Servis walk-in dikenakan harga normal. Sila dapatkan harga terus di salon.</p>
+          <p style={{color:"#f4eaf0",margin:0}}>Untuk menikmati harga promo terkini, semak harga dan kekosongan slot terlebih dahulu. Deposit dibayar selepas harga dan slot disahkan oleh admin.</p>
+          <a className="main-wa" href="#booking" style={{marginTop:18,textAlign:"center"}}><CalendarDays size={18} /> Semak Slot &amp; Harga Promo</a>
+        </div>
+        <div style={{padding:20,borderRadius:20,border:"1px solid #85516d",background:"#241923",lineHeight:1.8,fontSize:14,marginTop:18}}>
+          <h2 style={{fontSize:19,color:"#ff9bcb",margin:"0 0 10px"}}>Hair Cut, Hair Wash &amp; Eyelash</h2>
+          <p style={{color:"#f4eaf0",margin:0}}>Servis ini disediakan secara walk-in sahaja dan tertakluk pada terma dan syarat. Hubungi kami pada hari yang sama untuk pertanyaan sebelum datang.</p>
+          <a className="main-wa" href="#contact" style={{marginTop:18,textAlign:"center"}}><MessageCircle size={18} /> Contact Us — Cut, Wash &amp; Eyelash</a>
+        </div>
+        <p style={{fontSize:13,lineHeight:1.8,color:"#e0cbd8",padding:"16px 4px",margin:0}}>Semua servis walk-in bergantung pada kekosongan slot. Pelanggan mungkin perlu menunggu giliran, atau servis tidak dapat diterima jika slot penuh.</p>
+      </div>
+    </motion.section>
+  );
+}
+
 function ContactPage() {
   return (
     <motion.section className="page contact-page" {...pageMotion}>
@@ -614,8 +638,8 @@ function ServiceVisual({ type, compact = false }) {
 
 function BottomBar({ go, page }) {
   const current = services[page] || combos[page];
-  const href = "#booking";
-  return <div className="bottom-bar"><button onClick={() => go("home")}><Home size={16} /> Home</button>{!current?.walkinOnly && <a href={href}><MessageCircle size={16} /> Semak Harga &amp; Tempah</a>}</div>;
+  const href = page === "home" ? "#walkin" : "#booking";
+  return <div className="bottom-bar"><button onClick={() => go("home")}><Home size={16} /> Home</button>{!current?.walkinOnly && <a href={href}><MessageCircle size={16} /> {page === "home" ? "Walk-in" : "Semak Harga & Tempah"}</a>}</div>;
 }
 
 const comboBookingChoices = Object.values(combos).map(item => item.booking);
