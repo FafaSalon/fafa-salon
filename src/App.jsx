@@ -191,7 +191,7 @@ const pageMotion = {
 
 function pageFromHash() {
   const target = window.location.hash.slice(1).split('?')[0];
-  return ['home', 'booking', 'contact', 'location', 'walkin', 'combo', ...Object.keys(services), ...Object.keys(combos)].includes(target) ? target : 'home';
+  return ['home', 'booking', 'contact', 'location', 'walkin', 'reviews', 'combo', ...Object.keys(services), ...Object.keys(combos)].includes(target) ? target : 'home';
 }
 
 export default function App() {
@@ -226,6 +226,7 @@ export default function App() {
           {page === "home" && <HomePage key="home" go={go} />}
           {page === "contact" && <ContactPage key="contact" />}
           {page === "walkin" && <WalkInPage key="walkin" />}
+          {page === "reviews" && <ReviewsPage key="reviews" />}
           {page === "location" && <LocationPage key="location" />}
           {page === "combo" && <ComboPage key="combo" go={go} />}
           {currentCombo && <ComboDetailPage key={page} item={currentCombo} go={go} />}
@@ -342,6 +343,7 @@ function HomePage({ go }) {
       </section>
 
       <section className="quick-links">
+        <button onClick={() => go("reviews")}>Review</button>
         <button onClick={() => go("contact")}>Contact Us</button>
         <button onClick={() => go("location")}>Our Location</button>
         <style>{`.quick-links button,.quick-links .footer-tc{font-family:inherit;font-size:14px;font-weight:900;line-height:1.4}.quick-links .footer-tc{display:flex;align-items:center;justify-content:center;padding:16px;border-radius:18px;background:#171722;border:1px solid rgba(255,255,255,.12);color:white;text-align:center;text-decoration:none}`}</style>
@@ -519,6 +521,26 @@ function ComboDetailPage({ item, go }) {
   );
 }
 
+
+function ReviewsPage() {
+  const branches = [
+    {name:"Setapak KL", link:"https://maps.app.goo.gl/ykZWpN2WaiSx8cFM7"},
+    {name:"Selayang Batu Caves", link:"https://www.google.com/maps/search/Fafa+Salon+Beauty+Selayang+Salon+Wanita+Muslimah"},
+  ];
+  return <motion.section className="page reviews-page" {...pageMotion}>
+    <div className="content-block" style={{background:"#121015",color:"#fff",minHeight:"75vh",paddingBottom:120}}>
+      <span className="kicker">Review Pelanggan</span>
+      <h1 style={{fontSize:29,margin:"12px 0",color:"#fff"}}>Pengalaman Pelanggan Kami</h1>
+      <p style={{fontSize:14,lineHeight:1.8,color:"#e0cbd8",marginBottom:22}}>Pilih cawangan untuk melihat ulasan pelanggan di Google Maps. Selepas pautan dibuka, tekan bahagian Ulasan / Reviews.</p>
+      {branches.map(branch => <section key={branch.name} style={{padding:20,borderRadius:20,border:"1px solid #85516d",background:"#241923",marginBottom:16}}>
+        <MapPin size={22} style={{color:"#ff9bcb"}} aria-hidden="true" />
+        <h2 style={{fontSize:21,color:"#fff",margin:"10px 0 6px"}}>FAFA Salon {branch.name}</h2>
+        <p style={{fontSize:13,lineHeight:1.7,color:"#e0cbd8",margin:0}}>Lihat ulasan dan pengalaman pelanggan cawangan {branch.name}.</p>
+        <a className="main-wa" href={branch.link} target="_blank" rel="noopener noreferrer" style={{textAlign:"center",marginTop:16}}>Lihat Review {branch.name} <ChevronRight size={18} /></a>
+      </section>)}
+    </div>
+  </motion.section>;
+}
 
 function WalkInPage() {
   return (
