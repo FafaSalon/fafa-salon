@@ -691,6 +691,7 @@ function initialBookingServices() {
 function BookingPage({ go }) {
   const [selected, setSelected] = useState(initialBookingServices);
   const [wantCut, setWantCut] = useState(false);
+  const [priceOnly, setPriceOnly] = useState(false);
   useLayoutEffect(() => {
     if (!initialBookingServices().length) return;
     const frame = requestAnimationFrame(() => {
@@ -729,17 +730,15 @@ function BookingPage({ go }) {
   };
   const dateLabel = form.date ? new Date(`${form.date}T12:00:00`).toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
   const message = [
-    'Hi FAFA Salon! Saya nak semak harga & kekosongan slot.', '',
+    priceOnly ? 'Hi FAFA Salon! Saya nak tahu harga sahaja dahulu. Saya belum pasti bila nak buat servis dan belum mahu menempah slot.' : 'Hi FAFA Salon! Saya nak semak harga & kekosongan slot.', '',
     `Nama: ${form.name.trim()}`,
     `No. telefon: ${form.phone.trim()}`,
-    `Cawangan: ${form.branch}`,
-    `Tarikh pilihan: ${dateLabel}`,
-    `Masa pilihan: ${form.time}`, '',
+    ...(!priceOnly ? [`Cawangan: ${form.branch}`, `Tarikh pilihan: ${dateLabel}`, `Masa pilihan: ${form.time}`] : []), '',
     `Servis: ${selected.join(' + ')}`,
     ...(hasCut ? [`Add-on Hair Cut: potong ke paras ${form.cutLength}`] : []),
     ...(!hasCut ? [`Panjang rambut: ${form.length}`] : []),
     `Nota: ${form.notes.trim() || '-'}`, '',
-    'Saya faham tempahan belum disahkan dan deposit RM30 seorang hanya dibayar selepas pengesahan admin.',
+    priceOnly ? 'Ini ialah pertanyaan harga sahaja, bukan tempahan slot.' : 'Saya faham tempahan belum disahkan dan deposit RM30 seorang hanya dibayar selepas pengesahan admin.',
   ].join('\n');
   const adviceMessage = `Hi FAFA Salon! Saya ingin mendapatkan nasihat.\n\nSoalan / masalah rambut:\n${adviceNotes.trim()}`;
   const href = `https://wa.me/${phone}?text=${encodeURIComponent(adviceOnly ? adviceMessage : message)}`;
@@ -750,11 +749,11 @@ function BookingPage({ go }) {
       setError(''); return true;
     }
     if (!selected.length) { setError('Sila pilih sekurang-kurangnya satu servis.'); node.querySelector('input[type=checkbox]').focus(); return false; }
-    if (!form.date) { setError('Sila pilih satu tarikh booking.'); node.querySelector('[name=bookingDate]')?.focus(); return false; }
+    if (!priceOnly && !form.date) { setError('Sila pilih satu tarikh booking.'); node.querySelector('[name=bookingDate]')?.focus(); return false; }
     if (!node.reportValidity()) { setError('Sila lengkapkan semua ruangan wajib dan tandakan persetujuan.'); return false; }
     const currentDay = malaysiaToday();
-    if (form.date < currentDay || form.date > bookingDateOffset(currentDay, 5)) { setError('Sila pilih tarikh hari ini hingga 5 hari berikutnya.'); return false; }
-    if (!times.includes(form.time)) { setError('Sila pilih semula masa mengikut servis.'); return false; }
+    if (!priceOnly && (form.date < currentDay || form.date > bookingDateOffset(currentDay, 5))) { setError('Sila pilih tarikh hari ini hingga 5 hari berikutnya.'); return false; }
+    if (!priceOnly && !times.includes(form.time)) { setError('Sila pilih semula masa mengikut servis.'); return false; }
     setError(''); return true;
   };
   const renderChoice = item => (
@@ -825,8 +824,8 @@ function BookingPage({ go }) {
       <div className="content-block">
         <button className="booking-back" onClick={() => go('home')}><ArrowLeft size={16} /> Kembali ke Home</button>
         <span className="kicker">Booking / Semak Slot</span>
-        <h2>{adviceOnly ? "Tanya Kami" : "Jom rancang hair day anda"}</h2>
-        <p className="lead">{adviceOnly ? "Nyatakan soalan atau masalah rambut anda untuk mendapatkan nasihat daripada kami." : "Pilih servis dan waktu pilihan. Admin akan semak kekosongan serta berikan harga melalui WhatsApp."}</p>
+        <h2>{adviceOnly ? "Tanya Kami" : priceOnly ? "Cek Harga Dahulu" : "Jom rancang hair day anda"}</h2>
+        <p className="lead">{adviceOnly ? "Nyatakan soalan atau masalah rambut anda untuk mendapatkan nasihat daripada kami." : priceOnly ? "Pilih servis dan lengkapkan maklumat rambut. Admin akan berikan harga melalui WhatsApp." : "Pilih servis dan waktu pilihan. Admin akan semak kekosongan serta berikan harga melalui WhatsApp."}</p>
         <form onSubmit={event => { event.preventDefault(); event.currentTarget.querySelector('[data-booking-send]').click(); }}>
           <fieldset>
             <legend>01 / PILIH SERVIS ANDA</legend>
@@ -863,7 +862,11 @@ function BookingPage({ go }) {
             </div>}
           </fieldset>
           {adviceOnly ? <label className="booking-field">Soalan / masalah rambut *<textarea name="adviceNotes" required maxLength={1000} value={adviceNotes} onChange={event => {setAdviceNotes(event.target.value);setError('');}} placeholder="Contoh: Rambut saya pernah bleach dan kini kering. Servis apa yang sesuai?" /></label> : <>
-          <fieldset>
+          <label className={`booking-choice ${priceOnly ? 'selected' : ''}`} style={{minHeight:0,padding:16}}>
+            <input type="checkbox" checked={priceOnly} onChange={event => {setPriceOnly(event.target.checked);setForm(prev => ({...prev,branch:'',date:'',time:''}));setError('');}} />
+            <span>Nak tahu harga dahulu, belum pasti tarikh<small style={{display:'block',fontWeight:400,fontSize:12,lineHeight:1.6,marginTop:5,color:'#62586a'}}>Tick jika mahu semak harga sahaja tanpa memilih cawangan, tarikh atau masa.</small></span>
+          </label>
+          {!priceOnly && <fieldset>
             <legend>02 / CAWANGAN & WAKTU</legend>
             <div className="booking-fields">
               <label className="booking-field">Cawangan *<select value={form.branch} required onChange={event => update('branch', event.target.value)}><option value="">Pilih cawangan</option><option>Setapak, Kuala Lumpur</option><option>Selayang, Batu Caves</option></select></label>
@@ -871,16 +874,16 @@ function BookingPage({ go }) {
               <label className="booking-field">Masa pilihan *<select value={form.time} required onChange={event => update('time', event.target.value)}><option value="">Pilih masa</option>{times.map(time => <option key={time}>{time}</option>)}</select></label>
             </div>
             <p className="booking-note">{earlyCutoff && "Slot terakhir untuk servis pilihan anda ialah 3:30 PM. "}Slot tertakluk pada kekosongan. Admin akan sahkan waktu mengikut servis dan jadual cawangan.</p>
-          </fieldset>
+          </fieldset>}
           <fieldset>
-            <legend>03 / MAKLUMAT ANDA</legend>
+            <legend>{priceOnly ? '02' : '03'} / MAKLUMAT ANDA</legend>
             <div className="booking-fields">
               <label className="booking-field">Nama penuh *<input required maxLength={100} autoComplete="name" value={form.name} onChange={event => update('name', event.target.value)} placeholder="Nama anda" /></label>
               <label className="booking-field">No. telefon / WhatsApp *<input required type="tel" minLength={9} maxLength={20} autoComplete="tel" value={form.phone} onChange={event => update('phone', event.target.value)} placeholder="Contoh: 0123456789" /></label>
               <label className="booking-field">Nota tambahan<textarea maxLength={1000} value={form.notes} onChange={event => update('notes', event.target.value)} placeholder="Contoh: Warna pilihan — Ash Brown; pernah colour / bleach; rambut sensitif, kering atau rosak. Nyatakan juga sebarang permintaan khas." /></label>
             </div>
           </fieldset>
-          <label className="booking-consent"><input type="checkbox" required /><span>Saya faham slot tertakluk kepada kekosongan dan bersetuju menghantar maklumat kepada FAFA Salon. Deposit RM30 akan dibuat selepas harga dan slot disahkan. Borang ini belum mengesahkan tempahan.</span></label>
+          <label className="booking-consent"><input type="checkbox" required /><span>{priceOnly ? 'Saya bersetuju menghantar maklumat ini kepada FAFA Salon untuk semakan harga sahaja. Ini bukan tempahan slot.' : 'Saya faham slot tertakluk kepada kekosongan dan bersetuju menghantar maklumat kepada FAFA Salon. Deposit RM30 akan dibuat selepas harga dan slot disahkan. Borang ini belum mengesahkan tempahan.'}</span></label>
           </>}
           <p className="booking-error" role="alert">{error}</p>
           <a data-booking-send className="booking-send" href={href} target="_blank" rel="noopener noreferrer" onClick={event => { if (!validate(event.currentTarget)) event.preventDefault(); }}><MessageCircle size={18} /> {adviceOnly ? "Tanya Kami" : "Hantar detail ke WhatsApp ↗"}</a>
