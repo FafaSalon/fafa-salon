@@ -339,7 +339,7 @@ function HomePage({ go }) {
               <li className="payment-item"><div className="payment-brand"><span style={{fontWeight:800,fontSize:18,color:"#352a33"}}>RM</span></div><b>Cash</b></li>
             </ul>
           </section>
-          <div className="hero-actions only-wa"><a href={bookingLink("booking appointment")}><CalendarDays size={23} aria-hidden="true" /><span>Semak Slot &amp; Booking</span></a></div>
+          <div className="hero-actions only-wa"><a href={bookingLink("booking appointment")}><CalendarDays size={23} aria-hidden="true" /><span>Cek Harga</span></a></div>
       </section>
 
       <section className="quick-links">
