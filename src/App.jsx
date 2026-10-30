@@ -322,7 +322,7 @@ function HomePage({ go }) {
         `}</style>
         <div className="section-heading center"><span>Our Services</span><h2>Perkhidmatan Kami</h2></div>
         <p>Tekan kategori untuk lihat detail servis dan maklumat lanjut.</p>
-        <div className="category-buttons">{Object.entries(services).map(([id,item]) => <div key={id}><button type="button" style={{width:"100%"}} className="category-button" onClick={() => go(id)}><ServiceIcon type={id} /><span style={{flex:1,textAlign:"left"}}>{item.cardTitle}</span><ChevronRight size={18} aria-hidden="true" /></button><PromoNote /></div>)}</div>
+        <div className="category-buttons">{Object.entries(services).map(([id,item]) => <div key={id}><button type="button" style={{width:"100%"}} className="category-button" onClick={() => go(id)}><ServiceIcon type={id} /><span style={{flex:1,textAlign:"left"}}>{item.cardTitle}</span><ChevronRight size={18} aria-hidden="true" /></button></div>)}</div>
       </section>
 
       <section style={{padding:"0 22px 28px",background:"#17121b"}}>
