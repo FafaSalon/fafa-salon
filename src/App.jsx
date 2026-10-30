@@ -525,7 +525,7 @@ function ComboDetailPage({ item, go }) {
 function ReviewsPage() {
   const branches = [
     {name:"Setapak KL", link:"https://www.google.com/searchviewer/10?output=search&svid=CCYSGioYOhYweDA6MHhjZjFiNzVhNTVjYTY0ZjVkGAo&hl=en-GB&gl=MY#sv=CAESzQEKuQEStgEKd0FERGJXZVloYTE2eVJHQnhscm9iYzhSalhUYkFFaGpVSFU5NTdXZ2g4M2JnVEhHeUxuSkkyWUJxSXhRWWllMllQcGV2TEF3UlNBb1p6ZGdTVFFyMnB0d3dzVXd2QXhXMGR6eDBxdWc0T2dna3d3Y1p5djIyWkdREhdzanprYXZQUUMtR1lzZU1QdUtLSXNBWRoiQUhOMEU3Rm5TN3NiOGRPS3g3REFoTExXSTN6eGlSNGpOURIEODA1MRoBMyoAMAA4AUAAGAAg6pDb2wFKAhAB"},
-    {name:"Selayang Batu Caves", link:"https://www.google.com/search?sca_esv=c55da69dae0261d8&hl=en-GB&gl=MY&output=search&kgmid=%2Fg%2F11xp0flcln&q=Fafa%20Salon%20Beauty%20(Selayang)%20-%20Salon%20Wanita%20%26%20Muslimah&shem=epsd1%2Cltae%2Crimspwouoe&shndl=30&source=sh%2Fx%2Floc%2Fact%2Fm4%2F3"},
+    {name:"Selayang Batu Caves", link:"https://www.google.com/search?sca_esv=c55da69dae0261d8&hl=en-GB&gl=MY&output=search&kgmid=%2Fg%2F11xp0flcln&q=Fafa%20Salon%20Beauty%20(Selayang)%20-%20Salon%20Wanita%20%26%20Muslimah&shem=epsd1%2Cltae%2Crimspwouoe&shndl=30&source=sh%2Fx%2Floc%2Fact%2Fm4%2F3#lkt=LocalPoiReviews"},
   ];
   return <motion.section className="page reviews-page" {...pageMotion}>
     <div className="content-block" style={{background:"#121015",color:"#fff",minHeight:"75vh",paddingBottom:120}}>
@@ -595,7 +595,7 @@ function LocationPage() {
       <div className="content-block">
         <span className="kicker">Our Location</span>
         <h2>FAFA Salon Branches</h2>
-        <LocationCard title="Setapak KL" text="Fafa Salon Beauty (Setapak) - Salon Wanita & Muslimah KL" link="https://maps.app.goo.gl/ykZWpN2WaiSx8cFM7" />
+        <LocationCard title="Setapak KL" text="Fafa Salon Beauty (Setapak) - Salon Wanita & Muslimah KL" link="https://www.google.com/maps?cid=14923651143306727261" />
         <LocationCard title="Selayang Batu Caves" text="Fafa Salon Beauty (Selayang) - Salon Wanita & Muslimah" link="https://www.google.com/maps/search/Fafa+Salon+Beauty+Selayang+Salon+Wanita+Muslimah" />
         <div className="location-card muted"><MapPin size={18} /><div><h3>Cheras</h3><p>Coming Soon</p></div></div>
       </div>
@@ -659,9 +659,7 @@ function ServiceVisual({ type, compact = false }) {
 }
 
 function BottomBar({ go, page }) {
-  const current = services[page] || combos[page];
-  const href = page === "home" ? "#walkin" : "#booking";
-  return <div className="bottom-bar"><button onClick={() => go("home")}><Home size={16} /> Home</button>{!current?.walkinOnly && <a href={href}><MessageCircle size={16} /> {page === "home" ? "Walk-in" : "Semak Harga & Tempah"}</a>}</div>;
+  return <div className="bottom-bar"><button onClick={() => go("home")}><Home size={16} /> Home</button><a href="#walkin"><MessageCircle size={16} /> Walk-in</a></div>;
 }
 
 const comboBookingChoices = Object.values(combos).map(item => item.booking);
