@@ -524,8 +524,8 @@ function ComboDetailPage({ item, go }) {
 
 function ReviewsPage() {
   const branches = [
-    {name:"Setapak KL", link:"https://maps.app.goo.gl/ykZWpN2WaiSx8cFM7"},
-    {name:"Selayang Batu Caves", link:"https://www.google.com/maps/search/Fafa+Salon+Beauty+Selayang+Salon+Wanita+Muslimah"},
+    {name:"Setapak KL", link:"https://tinyurl.com/Review-Fafa-Salon-Setapak"},
+    {name:"Selayang Batu Caves", link:"https://tinyurl.com/Review-Fafa-Salon-Selayang"},
   ];
   return <motion.section className="page reviews-page" {...pageMotion}>
     <div className="content-block" style={{background:"#121015",color:"#fff",minHeight:"75vh",paddingBottom:120}}>
