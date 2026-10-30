@@ -660,8 +660,7 @@ function BookingPage({ go }) {
     const timer = setInterval(() => setToday(malaysiaToday()), 60000);
     return () => clearInterval(timer);
   }, []);
-  const firstBookingDate = bookingDateOffset(today, 1);
-  const lastBookingDate = bookingDateOffset(today, 5);
+  const availableDates = Array.from({length:5}, (_, index) => bookingDateOffset(today, index + 1));
   const isCombo = selected.some(item => comboBookingChoices.includes(item)) || selected.length > 1;
   const earlyCutoff = isCombo || selected.some(item => ["Highlight + Colour", "Bleach + Colour"].includes(item));
   const end = earlyCutoff ? 15.5 : 17;
@@ -694,6 +693,7 @@ function BookingPage({ go }) {
   const validate = element => {
     const node = element.closest('form');
     if (!selected.length) { setError('Sila pilih sekurang-kurangnya satu servis.'); node.querySelector('input[type=checkbox]').focus(); return false; }
+    if (!form.date) { setError('Sila pilih satu tarikh booking.'); node.querySelector('.booking-date-button')?.focus(); return false; }
     if (!node.reportValidity()) { setError('Sila lengkapkan semua ruangan wajib dan tandakan persetujuan.'); return false; }
     const currentDay = malaysiaToday();
     if (form.date < bookingDateOffset(currentDay, 1) || form.date > bookingDateOffset(currentDay, 5)) { setError('Sila pilih tarikh esok hingga 5 hari selepas tarikh semasa.'); return false; }
@@ -764,6 +764,11 @@ function BookingPage({ go }) {
         .booking-page details{color:#ff98c7 !important}
         .booking-page .booking-cut-card .booking-field{color:#27222b}
         .booking-page .booking-cut-card .booking-note{color:#62586a}
+        .booking-page .booking-date-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+        .booking-page .booking-date-button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-height:98px;padding:12px 6px;border:1px solid #d9d3dc;border-radius:16px;background:#f7f6f8;color:#27222b;font:600 13px system-ui;cursor:pointer}
+        .booking-page .booking-date-button strong{color:#27222b;font-size:16px}
+        .booking-page .booking-date-button.selected{background:#fce5ef;border:2px solid #e33e8a;color:#8d1e52}
+        .booking-page .booking-date-button:focus-visible{outline:3px solid #ff98c7;outline-offset:3px}
       `}</style>
       <div className="content-block">
         <button className="booking-back" onClick={() => go('home')}><ArrowLeft size={16} /> Kembali ke Home</button>
@@ -809,7 +814,17 @@ function BookingPage({ go }) {
             <legend>02 / CAWANGAN & WAKTU</legend>
             <div className="booking-fields">
               <label className="booking-field">Cawangan *<select value={form.branch} required onChange={event => update('branch', event.target.value)}><option value="">Pilih cawangan</option><option>Setapak, Kuala Lumpur</option><option>Selayang, Batu Caves</option></select></label>
-              <label className="booking-field">Tarikh pilihan *<input type="date" required min={firstBookingDate} max={lastBookingDate} value={form.date} onChange={event => update('date', event.target.value)} /></label>
+              <div className="booking-field">
+                <span id="booking-date-label">Tarikh pilihan *</span>
+                <div className="booking-date-options" role="group" aria-labelledby="booking-date-label">{availableDates.map(date => {
+                  const value = new Date(`${date}T12:00:00Z`);
+                  const day = value.toLocaleDateString('ms-MY',{weekday:'short',timeZone:'Asia/Kuala_Lumpur'});
+                  const label = value.toLocaleDateString('ms-MY',{day:'numeric',month:'short',timeZone:'Asia/Kuala_Lumpur'});
+                  const active = form.date === date;
+                  return <button key={date} type="button" className={`booking-date-button ${active ? 'selected' : ''}`} aria-pressed={active} aria-label={`${day}, ${label}`} onClick={() => {update('date',date);setError('');}}><span>{day}</span><strong>{label}</strong><span aria-hidden="true">{active ? '✓' : '○'}</span></button>;
+                })}</div>
+                <p className="booking-note" style={{margin:0}}>Pilih satu tarikh di atas. Hanya 5 hari terdekat dibuka untuk booking.</p>
+              </div>
               <label className="booking-field">Masa pilihan *<select value={form.time} required onChange={event => update('time', event.target.value)}><option value="">Pilih masa</option>{times.map(time => <option key={time}>{time}</option>)}</select></label>
             </div>
             <p className="booking-note">Booking dibuka untuk esok hingga 5 hari selepas tarikh semasa. {earlyCutoff && "Slot terakhir untuk servis pilihan anda ialah 3:30 PM. "}Slot tertakluk pada kekosongan. Admin akan sahkan waktu mengikut servis dan jadual cawangan.</p>
