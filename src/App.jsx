@@ -629,6 +629,11 @@ function malaysiaToday() {
   const part = type => parts.find(p => p.type === type).value;
   return `${part('year')}-${part('month')}-${part('day')}`;
 }
+function bookingDateOffset(date, days) {
+  const value = new Date(`${date}T00:00:00Z`);
+  value.setUTCDate(value.getUTCDate() + days);
+  return value.toISOString().slice(0,10);
+}
 function initialBookingServices() {
   const requested = new URLSearchParams(window.location.hash.split('?')[1] || '').get('service');
   return bookingChoices.includes(requested) ? [requested] : [];
@@ -650,9 +655,16 @@ function BookingPage({ go }) {
   const update = (key, value) => { setForm(prev => ({ ...prev, [key]: value })); };
   const canAddCut = selected.some(allowsCut);
   const hasCut = canAddCut && wantCut;
-  const today = malaysiaToday();
+  const [today, setToday] = useState(malaysiaToday);
+  useEffect(() => {
+    const timer = setInterval(() => setToday(malaysiaToday()), 60000);
+    return () => clearInterval(timer);
+  }, []);
+  const firstBookingDate = bookingDateOffset(today, 1);
+  const lastBookingDate = bookingDateOffset(today, 5);
   const isCombo = selected.some(item => comboBookingChoices.includes(item)) || selected.length > 1;
-  const end = isCombo ? 15.5 : 17;
+  const earlyCutoff = isCombo || selected.some(item => ["Highlight + Colour", "Bleach + Colour"].includes(item));
+  const end = earlyCutoff ? 15.5 : 17;
   const times = [];
   for (let value = 11; value <= end; value += 0.5) {
     const hour = Math.floor(value);
@@ -683,7 +695,8 @@ function BookingPage({ go }) {
     const node = element.closest('form');
     if (!selected.length) { setError('Sila pilih sekurang-kurangnya satu servis.'); node.querySelector('input[type=checkbox]').focus(); return false; }
     if (!node.reportValidity()) { setError('Sila lengkapkan semua ruangan wajib dan tandakan persetujuan.'); return false; }
-    if (form.date < today) { setError('Sila pilih tarikh hari ini atau selepasnya.'); return false; }
+    const currentDay = malaysiaToday();
+    if (form.date < bookingDateOffset(currentDay, 1) || form.date > bookingDateOffset(currentDay, 5)) { setError('Sila pilih tarikh esok hingga 5 hari selepas tarikh semasa.'); return false; }
     if (!times.includes(form.time)) { setError('Sila pilih semula masa mengikut servis.'); return false; }
     setError(''); return true;
   };
@@ -796,10 +809,10 @@ function BookingPage({ go }) {
             <legend>02 / CAWANGAN & WAKTU</legend>
             <div className="booking-fields">
               <label className="booking-field">Cawangan *<select value={form.branch} required onChange={event => update('branch', event.target.value)}><option value="">Pilih cawangan</option><option>Setapak, Kuala Lumpur</option><option>Selayang, Batu Caves</option></select></label>
-              <label className="booking-field">Tarikh pilihan *<input type="date" required min={today} value={form.date} onChange={event => update('date', event.target.value)} /></label>
+              <label className="booking-field">Tarikh pilihan *<input type="date" required min={firstBookingDate} max={lastBookingDate} value={form.date} onChange={event => update('date', event.target.value)} /></label>
               <label className="booking-field">Masa pilihan *<select value={form.time} required onChange={event => update('time', event.target.value)}><option value="">Pilih masa</option>{times.map(time => <option key={time}>{time}</option>)}</select></label>
             </div>
-            <p className="booking-note">Slot tertakluk pada kekosongan. Admin akan sahkan waktu mengikut servis dan jadual cawangan.</p>
+            <p className="booking-note">Booking dibuka untuk esok hingga 5 hari selepas tarikh semasa. {earlyCutoff && "Slot terakhir untuk servis pilihan anda ialah 3:30 PM. "}Slot tertakluk pada kekosongan. Admin akan sahkan waktu mengikut servis dan jadual cawangan.</p>
           </fieldset>
           <fieldset>
             <legend>03 / MAKLUMAT ANDA</legend>
