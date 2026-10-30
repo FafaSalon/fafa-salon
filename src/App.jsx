@@ -221,7 +221,10 @@ export default function App() {
     <main className="site-shell">
       <style>{`
         .service-page .back-btn,.category-home-back{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;min-height:36px;padding:0;border:1px solid #ffffff50;border-radius:10px;background:#211820d9;color:#fff;cursor:pointer}
-        .category-home-back{margin:16px 20px 10px}
+        .service-page .back-btn,.category-home-back,.booking-page .booking-back{display:none !important}
+        .floating-home-back{position:fixed;z-index:70;bottom:calc(18px + env(safe-area-inset-bottom,0px));left:max(16px,calc(50% - 195px));display:flex;align-items:center;justify-content:center;width:42px;height:42px;padding:0;border:1px solid #d774a090;border-radius:14px;background:#30212bd9;color:#ffd4e6;box-shadow:0 4px 18px #df57934d,0 0 0 3px #dc76a212;backdrop-filter:blur(12px);cursor:pointer}
+        .floating-home-back:focus-visible{outline:2px solid #ef9ac0;outline-offset:4px}
+        .site-shell .booking-page{padding-bottom:80px}
         .service-page .content-block{padding:20px 20px 28px}
         .service-page .content-block h2{margin-top:8px;margin-bottom:12px}
         .service-page .content-block .lead{margin-top:10px;margin-bottom:12px}
@@ -247,6 +250,7 @@ export default function App() {
           {currentCombo && <ComboDetailPage key={page} item={currentCombo} go={go} />}
           {current && <ServicePage key={page} item={current} go={go} />}
         </AnimatePresence>
+        {(['booking','combo','contact'].includes(page) || current || currentCombo) && <button className="floating-home-back" aria-label="Kembali ke halaman utama" onClick={() => go('home')}><ArrowLeft size={20} /></button>}
         <BottomBar go={go} page={page} />
       </div>
     </main>
@@ -596,27 +600,11 @@ function WalkInPage() {
 }
 
 function ContactPage() {
-  return (
-    <motion.section className="page contact-page" {...pageMotion}>
-      <div className="full-visual">
-        <div className="full-salon-bg" />
-        <div className="full-overlay" />
-        <div className="full-content">
-          <img className="contact-logo" src="/assets/fafa-logo.png" alt="FAFA Salon Beauty Centre" />
-          <span className="kicker white">Contact Us</span>
-          <h1>017 - 846 0827</h1>
-          <div className="contact-notice" style={{margin:"18px 0",padding:"18px",border:"1px solid #85516d",borderRadius:18,background:"rgba(20,14,24,.9)",color:"#fff",textAlign:"left",fontSize:14,lineHeight:1.8}}>
-            <strong style={{display:"block",color:"#ff9bcb",marginBottom:8}}>Makluman Servis Walk-in</strong>
-            <p style={{margin:"0 0 12px",color:"#f4eaf0"}}>Hair Cut, Hair Wash dan Eyelash disediakan secara walk-in sahaja. Tempahan awal bagi servis ini tidak diterima.</p>
-            <p style={{margin:"0 0 12px",color:"#f4eaf0"}}>Sila rujuk detail servis sebelum menghubungi kami. Permintaan tempahan awal untuk servis walk-in mungkin tidak mendapat maklum balas.</p>
-            <div style={{display:"flex",flexWrap:"wrap",gap:16,marginBottom:14}}><a href="#haircut" style={{color:"#ff9bcb",textDecoration:"underline"}}>Detail Hair Cut &amp; Hair Wash</a><a href="#eyelash" style={{color:"#ff9bcb",textDecoration:"underline"}}>Detail Eyelash</a></div>
-            <p style={{margin:0,color:"#f4eaf0"}}>Untuk pertanyaan selain tempahan servis walk-in, sila tunggu maklum balas daripada admin. Kami akan membalas secepat mungkin. Terima kasih atas kesabaran dan kerjasama anda.</p>
-          </div>
-          <a className="main-wa" target="_blank" rel="noopener noreferrer" href={bookingLink("pertanyaan salon")}><MessageCircle size={18} /> Hubungi Kami di WhatsApp</a>
-        </div>
-      </div>
-    </motion.section>
-  );
+  return <motion.section className="page contact-page" {...pageMotion}>
+    <div style={{minHeight:'70vh',padding:'48px 22px 100px',display:'flex',alignItems:'center',justifyContent:'center',background:'radial-gradient(ellipse at center,#35222f 0%,#121015 70%)'}}>
+      <a href={bookingLink(otherBookingChoice)} style={{display:'flex',alignItems:'center',justifyContent:'center',gap:10,width:'100%',maxWidth:350,padding:'18px 20px',borderRadius:18,border:'1px solid #e78bb6',background:'linear-gradient(135deg,#71344f,#9c4a71)',color:'#fff',boxShadow:'0 8px 30px #e75b9d40,0 0 0 4px #dc76a210',fontSize:15,fontWeight:700,lineHeight:1.6,textAlign:'center',textDecoration:'none'}}>Untuk pertanyaan lain, boleh klik sini <ChevronRight size={19} aria-hidden="true" /></a>
+    </div>
+  </motion.section>;
 }
 
 function LocationPage() {
@@ -689,7 +677,7 @@ function ServiceVisual({ type, compact = false }) {
 }
 
 function BottomBar({ go, page }) {
-  if (page === "booking" || page === "combo" || services[page] || combos[page]) return null;
+  if (page === "booking" || page === "combo" || page === "contact" || services[page] || combos[page]) return null;
   return <>
     <style>{`
       .site-shell .page{padding-bottom:185px}
