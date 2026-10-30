@@ -220,6 +220,25 @@ export default function App() {
   return (
     <main className="site-shell">
       <style>{`
+
+        .category-intro{position:relative;padding:26px 22px 24px;background:linear-gradient(135deg,#fdf7fa,#f4eaf0);color:#302330;overflow:hidden}
+        .category-mark{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border:1px solid #ddb5c8;border-radius:13px;color:#9c3d68;margin-bottom:16px;background:#ffffffb0}
+        .category-mark svg{width:22px;height:22px}
+        .category-eyebrow{display:block;font-size:10px;letter-spacing:1.8px;font-weight:700;color:#94677e;margin-bottom:9px}
+        .category-intro h1{font-family:inherit;font-size:clamp(26px,7vw,34px);font-weight:750;line-height:1.2;letter-spacing:-.7px;margin:0 0 10px;color:#302330}
+        .category-intro p{font-size:13px;line-height:1.7;margin:0;max-width:340px;color:#776271}
+        .category-accent{width:48px;height:3px;background:#bb7496;border-radius:4px;margin-top:18px;animation:fafa-accent .6s ease-out both;transform-origin:left}
+        @keyframes fafa-accent{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+        .service-page,.combo-page{background:#fcfafc}
+        .service-page .content-block,.combo-page .services-section{background:#fcfafc}
+        .service-page .colour-category,.combo-page .colour-category{border:1px solid #eadce4;box-shadow:none;border-radius:14px;transition:border-color .2s,box-shadow .2s}
+        .service-page .colour-category:focus-within,.combo-page .colour-category:focus-within{border-color:#bd789a;box-shadow:0 4px 16px #994a7310}
+        .service-page .colour-category-toggle,.combo-page .colour-category-toggle{background:#fff;color:#49323f;padding:14px 16px}
+        .service-page .colour-category-toggle[aria-expanded=true],.combo-page .colour-category-toggle[aria-expanded=true]{background:#f8edf3}
+        .colour-category-toggle svg{transition:transform .22s}
+        .colour-category-content{animation:fafa-detail-in .25s ease-out}
+        @keyframes fafa-detail-in{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+        @media(prefers-reduced-motion:reduce){.category-accent,.colour-category-content{animation:none}.colour-category-toggle svg{transition:none}}
         .service-page .back-btn,.category-home-back{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;min-height:36px;padding:0;border:1px solid #ffffff50;border-radius:10px;background:#211820d9;color:#fff;cursor:pointer}
         .service-page .back-btn,.category-home-back,.booking-page .booking-back{display:none !important}
         .floating-home-back{position:fixed;z-index:70;bottom:calc(18px + env(safe-area-inset-bottom,0px));left:max(16px,calc(50% - 195px));display:flex;align-items:center;justify-content:center;width:42px;height:42px;padding:0;border:1px solid #d774a090;border-radius:14px;background:#30212bd9;color:#ffd4e6;box-shadow:0 4px 18px #df57934d,0 0 0 3px #dc76a212;backdrop-filter:blur(12px);cursor:pointer}
@@ -385,22 +404,22 @@ function HomePage({ go }) {
   );
 }
 
+function CategoryHeader({ item }) {
+  return <header className="category-intro">
+    <motion.div className="category-mark" initial={{opacity:0,scale:.85}} animate={{opacity:1,scale:1}} transition={{duration:.35}}><ServiceIcon type={item.visual} /></motion.div>
+    <span className="category-eyebrow">FAFA SALON · {item.visual?.startsWith('combo') ? 'COMBO SERVICES' : 'OUR SERVICES'}</span>
+    <h1>{item.title}</h1>
+    <p>{item.short}</p>
+    <div className="category-accent" aria-hidden="true" />
+  </header>;
+}
+
 function ServicePage({ item, go }) {
   useLayoutEffect(() => { window.scrollTo({top:0,behavior:"instant"}); }, [item.title]);
   return (
     <motion.section className="page service-page" {...pageMotion}>
-      <section className="service-cover">
-        <ServiceVisual type={item.visual} />
-        <div className="cover-overlay">
-          <button className="back-btn" aria-label="Kembali ke halaman utama" onClick={() => go("home")}><ArrowLeft size={17} /></button>
-          <span className="service-no">{item.no}</span>
-          <h1>{item.title}</h1>
-          <p>{item.short}</p>
-        </div>
-      </section>
+      <CategoryHeader item={item} />
       <section className="content-block">
-        <span className="kicker">Exclusive Detail</span>
-        <h2>{item.title}</h2>
         <p className="lead">{item.intro}</p>
         <div className="time-pill"><Clock3 size={17} /> {item.time}</div>
         <h3 style={{color:"#8b1744",marginTop:16}}>{item.walkinOnly ? "Walk-in sahaja • Tak perlu booking" : "Single Services"}</h3>
@@ -505,14 +524,7 @@ function ComboPage({ go }) {
   return (
     <motion.section className="page combo-page" {...pageMotion}>
       <button className="category-home-back" aria-label="Kembali ke halaman utama" onClick={() => go("home")}><ArrowLeft size={17} /></button>
-      <section className="combo-hero">
-        <div className="combo-hero-bg" />
-        <div className="combo-hero-content">
-          <span className="kicker">Combo Services</span>
-          <h1>Combo<br />Jimat</h1>
-          
-        </div>
-      </section>
+      <CategoryHeader item={{title:"Combo Services",short:"Gabungkan servis pilihan untuk rambut lebih kemas dan mudah diurus.",visual:"combo"}} />
 
       <section className="services-section">
         <div className="section-heading center">
@@ -530,22 +542,9 @@ function ComboDetailPage({ item, go }) {
   useLayoutEffect(() => { window.scrollTo({top:0,behavior:"instant"}); }, [item.title]);
   return (
     <motion.section className="page service-page combo-detail-page" {...pageMotion}>
-      <section className="service-cover">
-        <ServiceVisual type={item.visual} />
-        <div className="cover-overlay">
-          <button className="back-btn" aria-label="Kembali ke halaman utama" onClick={() => go("home")}>
-            <ArrowLeft size={17} />
-          </button>
-          <span className="service-no">{item.no}</span>
-          <h1>{item.title}</h1>
-          <p>{item.short}</p>
-        </div>
-      </section>
+      <CategoryHeader item={item} />
 
       <section className="content-block">
-        <span className="kicker">Combo Detail</span>
-        <h2>{item.title}</h2>
-        <p className="lead">{item.short}</p>
         {item.panels.map(panel => <InfoPanel key={panel.title} title={panel.title} text={panel.text} />)}
         {/Colour/.test(item.title) && <section style={{marginTop:24}}><h3 style={{color:"#8b1744"}}>Pilihan Warna Colour No Bleach</h3><NoBleachPalette /></section>}
         <a className="main-wa" href={bookingLink(item.booking)}><MessageCircle size={18} /> Saya berminat nak buat {item.title}</a>
@@ -701,6 +700,7 @@ const singleBookingChoices = [
   'Colour No Bleach', 'Bleach + Colour', 'Highlight + Colour',
   'Soft Treatment', 'Scalp Treatment',
 ];
+const keratinBookingChoices = singleBookingChoices.filter(item => item.startsWith('Keratin '));
 const otherBookingChoice = 'Lain-lain / Perlukan nasihat';
 const bookingChoices = [...comboBookingChoices, ...singleBookingChoices, otherBookingChoice];
 function allowsCut(service) { return service !== otherBookingChoice; }
@@ -800,6 +800,10 @@ function BookingPage({ go }) {
       </div>}
     </div>
   );
+  const renderKeratin = () => <details className="booking-keratin" open={selected.some(item => keratinBookingChoices.includes(item)) || undefined}>
+    <summary><Sparkles size={16} /><span>Keratin<small>Pilih jenis keratin</small></span><ChevronRight size={16} /></summary>
+    <div className="booking-keratin-options">{keratinBookingChoices.map(renderChoice)}</div>
+  </details>;
   return (
     <motion.section className="page booking-page" {...pageMotion}>
       <style>{`
@@ -859,6 +863,15 @@ function BookingPage({ go }) {
         .booking-page .booking-send{display:flex;align-items:center;justify-content:center;gap:9px;background:linear-gradient(135deg,#b92167,#ff7ab8);padding:17px 12px;border-radius:14px;color:#fff;text-decoration:none;font-weight:800;font-size:14px;text-align:center}
         .booking-page .booking-copy{width:100%;font-size:13px;min-height:200px}
         .booking-page .booking-fallback{background:transparent;color:#ff98c7;border:1px solid #68616d;border-radius:12px;padding:12px;font-size:13px;width:100%;cursor:pointer}
+        .booking-page .booking-keratin{border:1px solid #d9d3dc;border-radius:12px;background:#f7f6f8;color:#27222b !important;align-self:start}
+        .booking-page .booking-keratin summary{list-style:none;display:flex;align-items:center;gap:8px;padding:10px;min-height:56px;cursor:pointer;font-size:12px;font-weight:600;color:#27222b}
+        .booking-page .booking-keratin summary::-webkit-details-marker{display:none}
+        .booking-page .booking-keratin summary>span{flex:1}
+        .booking-page .booking-keratin summary small{display:block;font-size:10px;font-weight:400;color:#776775;margin-top:3px}
+        .booking-page .booking-keratin[open]{grid-column:1/-1;border-color:#cf86a7;background:#fce5ef}
+        .booking-page .booking-keratin[open] summary>svg:last-child{transform:rotate(90deg)}
+        .booking-page .booking-keratin-options{display:grid;gap:6px;padding:0 8px 8px}
+        .booking-page .booking-keratin-options .booking-choice{min-height:44px;background:#fff}
         .booking-page details{color:#ff98c7 !important}
         .booking-page .booking-cut-card .booking-field{color:#27222b}
         .booking-page .booking-cut-card .booking-note{color:#62586a}
@@ -875,21 +888,21 @@ function BookingPage({ go }) {
               <div id="booking-selected-services" aria-live="polite" style={{scrollMarginTop:90}}>
                 <h3 className="booking-group-title" style={{fontSize:18,marginTop:0}}>Servis pilihan anda ✓</h3>
                 <p className="booking-note" style={{margin:'0 0 12px'}}>Servis di bawah sudah ditick. Semak pilihan anda, kemudian terus isi detail di bawah.</p>
-                <div className="booking-services">{selected.map(renderChoice)}</div>
+                <div className="booking-services">{selected.filter(item => !keratinBookingChoices.includes(item)).map(renderChoice)}{selected.some(item => keratinBookingChoices.includes(item)) && renderKeratin()}</div>
               </div>
               <details style={{margin:'16px 0',color:'#ff99c9'}}>
                 <summary style={{cursor:'pointer',padding:'10px 0',fontWeight:700}}>Tambah atau pilih servis lain</summary>
                 <h3 className="booking-group-title">Combo Services</h3>
                 <div className="booking-services">{comboBookingChoices.filter(item => !selected.includes(item)).map(renderChoice)}</div>
                 <h3 className="booking-group-title">Single Services</h3>
-                <div className="booking-services">{singleBookingChoices.filter(item => !selected.includes(item)).map(renderChoice)}{!selected.includes(otherBookingChoice) && renderChoice(otherBookingChoice)}</div>
+                <div className="booking-services">{singleBookingChoices.filter(item => !selected.includes(item) && !keratinBookingChoices.includes(item)).map(renderChoice)}{!selected.some(item => keratinBookingChoices.includes(item)) && renderKeratin()}{!selected.includes(otherBookingChoice) && renderChoice(otherBookingChoice)}</div>
               </details>
             </> : <>
               <p className="booking-note" style={{margin:'0 0 12px'}}>Boleh pilih lebih daripada satu servis.</p>
               <h3 className="booking-group-title">Combo Services</h3>
               <div className="booking-services">{comboBookingChoices.map(renderChoice)}</div>
               <h3 className="booking-group-title">Single Services</h3>
-              <div className="booking-services">{singleBookingChoices.map(renderChoice)}{renderChoice(otherBookingChoice)}</div>
+              <div className="booking-services">{singleBookingChoices.filter(item => !keratinBookingChoices.includes(item)).map(renderChoice)}{renderKeratin()}{renderChoice(otherBookingChoice)}</div>
             </>}
             {canAddCut && <div className={`booking-addons booking-cut-card ${hasCut ? 'active' : ''}`}>
               <label className="booking-cut-toggle"><input type="checkbox" checked={wantCut} onChange={event => { const checked = event.target.checked; setWantCut(checked); if (!checked) update('cutLength', ''); }} /><span><strong>Add-on Hair Cut</strong><small>Tick jika mahu potong rambut. Nyatakan gaya potongan yang diinginkan dalam Nota tambahan.</small></span></label>
