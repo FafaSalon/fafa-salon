@@ -229,6 +229,25 @@ export default function App() {
         .category-intro p{font-size:13px;line-height:1.7;margin:0;max-width:340px;color:#776271}
         .category-accent{width:48px;height:3px;background:#bb7496;border-radius:4px;margin-top:18px;animation:fafa-accent .6s ease-out both;transform-origin:left}
         @keyframes fafa-accent{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+        .minimal-combo-link{display:flex;align-items:center;gap:10px;width:100%;padding:14px 16px;background:#fff;color:#694156;border:1px solid #dfc8d5;border-radius:14px;font:600 14px system-ui;text-align:left;cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
+        .minimal-combo-link span{flex:1}
+        .minimal-combo-link:hover,.minimal-combo-link:focus-visible{background:#f8edf3;border-color:#b56d91;transform:translateY(-2px)}
+        .minimal-combo-link:focus-visible{outline:2px solid #b56d91;outline-offset:3px}
+        .minimal-combo-link svg:last-child{transition:transform .2s}
+        .minimal-combo-link:hover svg:last-child{transform:translateX(3px)}
+        .combo-page .services-section{padding:18px 20px 30px;color:#49323f}
+        .combo-page .section-heading span{color:#94677e}
+        .combo-page .section-heading h2{color:#352534;font-family:inherit;font-size:24px;margin:6px 0 16px}
+        .combo-page .colour-category-toggle strong{color:#49323f;font-size:15px;font-weight:650}
+        .combo-page .colour-category-toggle small{color:#806c79;font-size:12px}
+        .combo-page .colour-category-toggle svg{color:#a25a7e}
+        .combo-page .colour-category-content{color:#57414f}
+        .combo-page .colour-category-content h3{color:#7c3c5a}
+        .combo-page .colour-category-content p{color:#68515e}
+        .combo-page .colour-category{margin-top:10px;transition:transform .2s,border-color .2s,box-shadow .2s}
+        .combo-page .colour-category:hover{transform:translateY(-1px);border-color:#c88daa;box-shadow:0 5px 16px #8344630d}
+        .combo-page .colour-category-content .main-wa{color:#fff;background:linear-gradient(135deg,#9b476e,#bd6b92);font-size:13px;border-radius:12px;padding:13px}
+        @media(prefers-reduced-motion:reduce){.minimal-combo-link,.minimal-combo-link svg,.combo-page .colour-category{transition:none;transform:none !important}}
         .service-page,.combo-page{background:#fcfafc}
         .service-page .content-block,.combo-page .services-section{background:#fcfafc}
         .service-page .colour-category,.combo-page .colour-category{border:1px solid #eadce4;box-shadow:none;border-radius:14px;transition:border-color .2s,box-shadow .2s}
@@ -431,33 +450,8 @@ function ServicePage({ item, go }) {
   );
 }
 
-function ComboSpotlight({ go, service }) {
-  const related = {
-    rebonding: ["combo_rebonding_keratin", "combo_rebonding_colour"],
-    keratin: ["combo_rebonding_keratin", "combo_colour_keratin"],
-    colour: ["combo_rebonding_colour", "combo_colour_keratin"],
-    treatment: ["combo_soft_scalp"],
-  };
-  const ids = related[service] || ["combo_rebonding_keratin", "combo_rebonding_colour", "combo_colour_keratin"];
-  return <aside className="combo-spotlight" aria-label="Cadangan Combo Services">
-    <style>{`
-      .combo-spotlight{margin:0 0 26px;padding:24px 20px;background:linear-gradient(145deg,#4d1231,#251627);border:2px solid #fa71b1;border-radius:26px;color:#fff;box-shadow:0 12px 32px #b92b6b24}
-      .content-block .combo-spotlight{margin-top:24px}
-      .combo-spotlight .combo-label{display:inline-flex;align-items:center;gap:7px;color:#ffd4e8;font-weight:800;font-size:12px;letter-spacing:1px;text-transform:uppercase}
-      .combo-spotlight h2,.content-block .combo-spotlight h2{font-family:inherit;font-size:30px;line-height:1.15;margin:12px 0;color:white;font-weight:900}
-      .combo-spotlight .combo-pitch{font-size:18px;font-weight:800;line-height:1.5;margin:0 0 8px;color:#ffb7d8}
-      .combo-spotlight .combo-description{font-size:14px;line-height:1.7;color:#f2deea;margin:0 0 12px}
-      .combo-spotlight .combo-suggestion{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;padding:14px;margin-top:9px;border:1px solid #ffffff40;background:#ffffff0d;border-radius:14px;color:white;font:inherit;font-size:14px;font-weight:700;line-height:1.5;cursor:pointer}
-      .combo-spotlight .combo-all{width:100%;display:flex;justify-content:center;align-items:center;gap:8px;margin-top:18px;padding:16px;border:0;border-radius:16px;background:linear-gradient(120deg,#e84d96,#ff7cba);color:#fff;font:inherit;font-size:16px;font-weight:900;cursor:pointer}
-      .combo-spotlight button:focus-visible{outline:3px solid #fff;outline-offset:3px}
-    `}</style>
-    <span className="combo-label"><Sparkles size={17} aria-hidden="true" /> Gabungkan servis pilihan anda</span>
-    <h2>COMBO SERVICES</h2>
-    <p className="combo-pitch">Lebih berbaloi, dua servis dalam satu sesi.</p>
-    <p className="combo-description">{service === "rebonding" ? "Dah nak buat rebonding atau relaxing? Lengkapkan dengan keratin atau colour untuk gaya yang anda inginkan." : service === "keratin" ? "Nak rambut lebih kemas sambil tambah warna atau pelurusan? Terokai gabungan servis keratin." : service === "colour" ? "Dah pilih colour? Gabungkan dengan keratin atau pelurusan untuk lengkapkan gaya rambut anda." : service === "treatment" ? "Jaga rambut dan kulit kepala sekali dengan gabungan Soft + Scalp Treatment." : "Nak luruskan rambut sekali dengan colour atau keratin? Lihat pilihan gabungan sebelum pilih servis anda."}</p>
-    {ids.map(id => <button type="button" key={id} className="combo-suggestion" onClick={() => go(id)}><span>{combos[id].title}</span><ChevronRight size={19} style={{flexShrink:0}} aria-hidden="true" /></button>)}
-    <button type="button" className="combo-all" onClick={() => go("combo")}>Lihat Semua Combo <ChevronRight size={20} aria-hidden="true" /></button>
-  </aside>;
+function ComboSpotlight({ go }) {
+  return <button type="button" className="minimal-combo-link" onClick={() => go('combo')}><Sparkles size={17} aria-hidden="true" /><span>Lihat Semua Combo</span><ChevronRight size={18} aria-hidden="true" /></button>;
 }
 
 function NoBleachPalette() {
