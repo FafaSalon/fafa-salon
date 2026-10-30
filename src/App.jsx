@@ -268,7 +268,7 @@ function PaymentLogo({src,name}) {
 }
 
 function PromoNote() {
-  return <p style={{fontSize:11,lineHeight:1.5,fontWeight:400,margin:"8px 0 0",opacity:.75}}>Harga promo terkini tertakluk pada terma dan syarat.</p>;
+  return <p style={{fontSize:11,lineHeight:1.5,fontWeight:400,margin:"8px 0 0",opacity:.75,textAlign:"center"}}>Harga promo terkini tertakluk pada terma dan syarat.</p>;
 }
 
 function HomePage({ go }) {
