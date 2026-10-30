@@ -525,7 +525,7 @@ function ComboDetailPage({ item, go }) {
 function ReviewsPage() {
   const branches = [
     {name:"Setapak KL", link:"https://www.google.com/searchviewer/10?output=search&svid=CCYSGioYOhYweDA6MHhjZjFiNzVhNTVjYTY0ZjVkGAo&hl=en-GB&gl=MY#sv=CAESzQEKuQEStgEKd0FERGJXZVloYTE2eVJHQnhscm9iYzhSalhUYkFFaGpVSFU5NTdXZ2g4M2JnVEhHeUxuSkkyWUJxSXhRWWllMllQcGV2TEF3UlNBb1p6ZGdTVFFyMnB0d3dzVXd2QXhXMGR6eDBxdWc0T2dna3d3Y1p5djIyWkdREhdzanprYXZQUUMtR1lzZU1QdUtLSXNBWRoiQUhOMEU3Rm5TN3NiOGRPS3g3REFoTExXSTN6eGlSNGpOURIEODA1MRoBMyoAMAA4AUAAGAAg6pDb2wFKAhAB"},
-    {name:"Selayang Batu Caves", link:"https://www.google.com/search?client=mobilesearchapp&channel=iss&cs=1&hl=en_GB&rlz=1MDAPLA_en-GBMY987MY987&sca_esv=c55da69dae0261d8&v=441.5.989047059&sxsrf=AKL5yDisHy6PdwQCWUHMU816uMrknRQoPA:1793345555758&q=fafa+salon+beauty+(selayang)+-+salon+wanita+%26+muslimah+batu+caves+reviews&uds=AE2AFgZpJUFyNGUawIocav_g9bbr5BaL_cU22tutPbtzt5uEG6tt1V0slWWImLyh9TXppMDvKde823GC_K9vTeSynOjdCFYSf7g4dUUEcQnEjl_t6DxupmKZ-Ehuh3ak8eiLoYVqEojxCEbTw-unTSGYHXTSFFgc-2Aw97ctz29FbBSJQHbcSSZYqr02Y3wgk48qZvPbJQvwmwIiHQc3Y4ieQEjNNx_sLIyLtRPBuEIbnoHH42K75Ttc6HecTHHGzAbqrBtPH5NBq4-0ItWCymaomSrohOrS5YVcQWVKUhFbijcZXLKIYme3-4WUWp2SoLtYVVoQADEk_Fj7W1i9GS9GDyKVfgbEurU9OCneSxQC64CRkc1vkGt4yA0mH72qz-l9l9CYFs-sJjav-quVvNFKdzr0gmzvgGRBlK2hnXLalglOjBl29GkzB6a0uI_KKs3Q16PtYNXqT9psnw9KOY5YlMyIiMHkBGVzlWO8IxHPVbZIRJ_d0VmLgw0iQHl3H55FOxjFyD6H3m80AJDWgH-rOAplQokm9g&si=AE1YtOqiKPb2pdLXAi8quZ9vbH4aVq_aX8-3H9iFBLpRNK95c5_vJdN_BJiG5B7vuwlwq4dpVOOp_D4JLcKo5h3fkoyLU61LhnBm-Fq1kOELWELsMjXWi_FRepVJaVTcdleW9aAhk_svyRSYICi-dqzJbqpNhsCoFLweQytlANT9H_fDj1DECUFJh9BXlsPIZmYLAUgiopb7k5vz4F6eL3TIVY19XG05rw%3D%3D&sa=X&ved=2ahUKEwj5nb3mnOGXAxV6SWwGHefRG9UQk8gLegQIHBAB&ictx=1&biw=428&bih=743&dpr=3"},
+    {name:"Selayang Batu Caves", link:"https://share.google/kfxi5w7rIcBdXJgAy"},
   ];
   return <motion.section className="page reviews-page" {...pageMotion}>
     <div className="content-block" style={{background:"#121015",color:"#fff",minHeight:"75vh",paddingBottom:120}}>
@@ -536,7 +536,7 @@ function ReviewsPage() {
         <MapPin size={22} style={{color:"#ff9bcb"}} aria-hidden="true" />
         <h2 style={{fontSize:21,color:"#fff",margin:"10px 0 6px"}}>FAFA Salon {branch.name}</h2>
         <p style={{fontSize:13,lineHeight:1.7,color:"#e0cbd8",margin:0}}>Lihat ulasan dan pengalaman pelanggan cawangan {branch.name}.</p>
-        <a className="main-wa" href={branch.link} target={branch.name === "Selayang Batu Caves" ? "_self" : "_blank"} rel="noopener noreferrer" style={{textAlign:"center",marginTop:16}}>Lihat Review {branch.name} <ChevronRight size={18} /></a>
+        <a className="main-wa" href={branch.link} target="_blank" rel="noopener noreferrer" style={{textAlign:"center",marginTop:16}}>Lihat Review {branch.name} <ChevronRight size={18} /></a>
       </section>)}
     </div>
   </motion.section>;
