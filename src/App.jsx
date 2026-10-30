@@ -658,6 +658,8 @@ function BookingPage({ go }) {
   }, []);
   const [form, setForm] = useState({ name: '', phone: '', branch: '', date: '', time: '', length: '', cutLength: '', notes: '' });
   const [error, setError] = useState('');
+  const [adviceNotes, setAdviceNotes] = useState('');
+  const adviceOnly = selected.includes(otherBookingChoice);
   const update = (key, value) => { setForm(prev => ({ ...prev, [key]: value })); };
   const canAddCut = selected.some(allowsCut);
   const hasCut = canAddCut && wantCut;
@@ -676,7 +678,7 @@ function BookingPage({ go }) {
     times.push(`${hour > 12 ? hour - 12 : hour}:${value % 1 ? '30' : '00'} ${hour >= 12 ? 'PM' : 'AM'}`);
   }
   const toggle = item => {
-    const next = selected.includes(item) ? selected.filter(value => value !== item) : [...selected, item];
+    const next = item === otherBookingChoice ? (selected.includes(item) ? [] : [item]) : (selected.includes(item) ? selected.filter(value => value !== item) : [...selected.filter(value => value !== otherBookingChoice), item]);
     setSelected(next); setError('');
     if (!next.some(allowsCut)) { setWantCut(false); setForm(prev => ({...prev, cutLength: ''})); }
     setForm(prev => ({ ...prev, time: '' }));
@@ -695,9 +697,14 @@ function BookingPage({ go }) {
     `Nota: ${form.notes.trim() || '-'}`, '',
     'Saya faham tempahan belum disahkan dan deposit RM30 seorang hanya dibayar selepas pengesahan admin.',
   ].join('\n');
-  const href = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+  const adviceMessage = `Hi FAFA Salon! Saya ingin mendapatkan nasihat.\n\nSoalan / masalah rambut:\n${adviceNotes.trim()}`;
+  const href = `https://wa.me/${phone}?text=${encodeURIComponent(adviceOnly ? adviceMessage : message)}`;
   const validate = element => {
     const node = element.closest('form');
+    if (adviceOnly) {
+      if (!adviceNotes.trim()) { setError('Sila nyatakan soalan atau masalah rambut anda.'); node.querySelector('[name=adviceNotes]')?.focus(); return false; }
+      setError(''); return true;
+    }
     if (!selected.length) { setError('Sila pilih sekurang-kurangnya satu servis.'); node.querySelector('input[type=checkbox]').focus(); return false; }
     if (!form.date) { setError('Sila pilih satu tarikh booking.'); node.querySelector('[name=bookingDate]')?.focus(); return false; }
     if (!node.reportValidity()) { setError('Sila lengkapkan semua ruangan wajib dan tandakan persetujuan.'); return false; }
@@ -774,8 +781,8 @@ function BookingPage({ go }) {
       <div className="content-block">
         <button className="booking-back" onClick={() => go('home')}><ArrowLeft size={16} /> Kembali ke Home</button>
         <span className="kicker">Booking / Semak Slot</span>
-        <h2>Jom rancang hair day anda</h2>
-        <p className="lead">Pilih servis dan waktu pilihan. Admin akan semak kekosongan serta berikan harga melalui WhatsApp.</p>
+        <h2>{adviceOnly ? "Tanya Kami" : "Jom rancang hair day anda"}</h2>
+        <p className="lead">{adviceOnly ? "Nyatakan soalan atau masalah rambut anda untuk mendapatkan nasihat daripada kami." : "Pilih servis dan waktu pilihan. Admin akan semak kekosongan serta berikan harga melalui WhatsApp."}</p>
         <form onSubmit={event => { event.preventDefault(); event.currentTarget.querySelector('[data-booking-send]').click(); }}>
           <fieldset>
             <legend>01 / PILIH SERVIS ANDA</legend>
@@ -806,11 +813,12 @@ function BookingPage({ go }) {
                 <p className="booking-note" style={{marginTop: 10}}>Pilih paras rambut yang diinginkan selepas dipotong. Hairstylist akan sahkan potongan semasa konsultasi.</p>
               </div>}
             </div>}
-            {!hasCut && <div className="booking-fields" style={{marginTop:20}}>
+            {!adviceOnly && !hasCut && <div className="booking-fields" style={{marginTop:20}}>
               <label className="booking-field">Panjang rambut sekarang *<select required value={form.length} onChange={event => update('length', event.target.value)}><option value="">Pilih paras rambut</option>{lengthChoices.map(item => <option key={item}>{item}</option>)}</select></label>
               <p className="booking-note">{hairCheckNote}</p>
             </div>}
           </fieldset>
+          {adviceOnly ? <label className="booking-field">Soalan / masalah rambut *<textarea name="adviceNotes" required maxLength={1000} value={adviceNotes} onChange={event => {setAdviceNotes(event.target.value);setError('');}} placeholder="Contoh: Rambut saya pernah bleach dan kini kering. Servis apa yang sesuai?" /></label> : <>
           <fieldset>
             <legend>02 / CAWANGAN & WAKTU</legend>
             <div className="booking-fields">
@@ -829,8 +837,9 @@ function BookingPage({ go }) {
             </div>
           </fieldset>
           <label className="booking-consent"><input type="checkbox" required /><span>Saya faham slot tertakluk kepada kekosongan dan bersetuju menghantar maklumat kepada FAFA Salon. Deposit RM30 akan dibuat selepas harga dan slot disahkan. Borang ini belum mengesahkan tempahan.</span></label>
+          </>}
           <p className="booking-error" role="alert">{error}</p>
-          <a data-booking-send className="booking-send" href={href} target="_blank" rel="noopener noreferrer" onClick={event => { if (!validate(event.currentTarget)) event.preventDefault(); }}><MessageCircle size={18} /> Hantar detail ke WhatsApp ↗</a>
+          <a data-booking-send className="booking-send" href={href} target="_blank" rel="noopener noreferrer" onClick={event => { if (!validate(event.currentTarget)) event.preventDefault(); }}><MessageCircle size={18} /> {adviceOnly ? "Tanya Kami" : "Hantar detail ke WhatsApp ↗"}</a>
         </form>
       </div>
     </motion.section>
