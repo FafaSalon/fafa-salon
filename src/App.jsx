@@ -805,8 +805,7 @@ function BookingPage({ go }) {
               <label className="booking-field">Nota tambahan<textarea maxLength={1000} value={form.notes} onChange={event => update('notes', event.target.value)} placeholder="Sejarah colour / bleach, keadaan rambut atau permintaan khas." /></label>
             </div>
           </fieldset>
-          <div className="booking-notice"><strong>Semak dahulu, baru booking.</strong><br />Harga akan diberikan oleh admin berdasarkan servis dan keadaan rambut. Deposit RM30 seorang hanya dibuat selepas harga dan slot disahkan. Borang ini belum mengesahkan tempahan.</div>
-          <label className="booking-consent"><input type="checkbox" required /><span>Saya Faham slot tertakluk kepada kekosongan dan bersetuju menghantar maklumat ini kepada Fafa Salon.</span></label>
+          <label className="booking-consent"><input type="checkbox" required /><span>Saya faham slot tertakluk kepada kekosongan dan bersetuju menghantar maklumat kepada FAFA Salon. Deposit RM30 akan dibuat selepas harga dan slot disahkan. Borang ini belum mengesahkan tempahan.</span></label>
           <p className="booking-error" role="alert">{error}</p>
           <a data-booking-send className="booking-send" href={href} target="_blank" rel="noopener noreferrer" onClick={event => { if (!validate(event.currentTarget)) event.preventDefault(); }}><MessageCircle size={18} /> Hantar detail ke WhatsApp ↗</a>
         </form>
