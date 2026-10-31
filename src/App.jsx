@@ -766,6 +766,12 @@ function initialBookingServices() {
   const requested = new URLSearchParams(window.location.hash.split('?')[1] || '').get('service');
   return bookingChoices.includes(requested) ? [requested] : [];
 }
+const guestWalkInNote = 'Servis ini disediakan secara walk-in sahaja dan tidak dianggap sebagai tempahan. Penerimaan tertakluk kepada kekosongan slot; pelanggan mungkin perlu menunggu atau tidak dapat menerima servis jika slot penuh.';
+const guestHasHair = guest => !guest.cutWash && (!guest.eyelash || guest.hairToo === 'yes');
+function guestServiceText(guest) {
+  if (guest.cutWash) return [guest.cut ? 'Hair Cut' : '',guest.wash ? 'Hair Wash' : ''].filter(Boolean).join(' + ');
+  return [guestHasHair(guest) ? guest.service : '',guest.eyelash ? 'Eyelash Perm (walk-in)' : ''].filter(Boolean).join(' + ');
+}
 function BookingPage({ go }) {
   const [selected, setSelected] = useState(initialBookingServices);
   const [wantCut, setWantCut] = useState(false);
@@ -801,7 +807,7 @@ function BookingPage({ go }) {
   const dateCount = Math.round((new Date(`${lastDate}T00:00:00Z`) - new Date(`${today}T00:00:00Z`)) / 86400000) + 1;
   const availableDates = Array.from({length:dateCount}, (_, index) => bookingDateOffset(today, index));
   const isCombo = selected.some(item => comboBookingChoices.includes(item)) || selected.length > 1;
-  const extraEarlyCutoff = morePeople === 'yes' && guests.some(guest => comboBookingChoices.includes(guest.service) || ['Highlight + Colour','Bleach + Colour'].includes(guest.service));
+  const extraEarlyCutoff = morePeople === 'yes' && guests.some(guest => guestHasHair(guest) && (comboBookingChoices.includes(guest.service) || ['Highlight + Colour','Bleach + Colour'].includes(guest.service)));
   const earlyCutoff = extraEarlyCutoff || isCombo || selected.some(item => ["Highlight + Colour", "Bleach + Colour"].includes(item));
   const end = earlyCutoff ? 15.5 : 17;
   const times = [];
@@ -826,7 +832,7 @@ function BookingPage({ go }) {
     ...(hasCut ? [`Add-on Hair Cut: potong ke paras ${form.cutLength}`] : []),
     ...(!hasCut ? [`Panjang rambut: ${form.length}`] : []),
     `Nota: ${form.notes.trim() || '-'}`, '',
-    ...(morePeople === 'yes' ? guests.flatMap((guest,index) => ['',`PELANGGAN ${index+2}`,`Nama: ${guest.name.trim()}`,`Panjang rambut: ${guest.length}`,`Servis: ${guest.service}`,'']) : []),
+    ...(morePeople === 'yes' ? guests.flatMap((guest,index) => ['',`PELANGGAN ${index+2}`,`Nama: ${guest.name.trim()}`,...(guestHasHair(guest) ? [`Panjang rambut: ${guest.length}`] : []),`Servis: ${guestServiceText(guest)}`,...(!guestHasHair(guest) ? [`Status: Walk-in sahaja — bukan tempahan. ${guestWalkInNote}`] : guest.eyelash ? ['Nota Eyelash Perm: Walk-in sahaja, tertakluk kepada kekosongan dan mungkin perlu menunggu.'] : []),'']) : []),
     dateUncertain ? 'Ini ialah pertanyaan harga sahaja, bukan tempahan slot.' : 'Saya faham tempahan belum disahkan dan deposit RM30 seorang hanya dibayar selepas pengesahan admin.',
   ].join('\n');
   const adviceMessage = `Hi FAFA Salon! Saya ingin membuat pertanyaan.\n\nPertanyaan:\n${adviceNotes.trim()}`;
@@ -840,10 +846,11 @@ function BookingPage({ go }) {
     if (!selected.length) { setError('Sila pilih sekurang-kurangnya satu servis.'); node.querySelector('input[type=checkbox]').focus(); return false; }
     if (!form.date) { setError('Sila pilih satu tarikh booking.'); node.querySelector('[name=bookingDate]')?.focus(); return false; }
     if (dateUncertain && !promoAcknowledged) { setError('Sila tick OK untuk mengesahkan peringatan harga promo.'); node.querySelector('[name=promoAcknowledged]')?.focus(); return false; }
+    if (guestStep && morePeople === 'yes' && guests.some(guest => guest.cutWash && !guest.cut && !guest.wash)) {setError('Sila tick Hair Cut atau Hair Wash untuk pelanggan walk-in.');return false;}
     if (!node.reportValidity()) { setError('Sila lengkapkan semua ruangan wajib dan tandakan persetujuan.'); return false; }
     const currentDay = malaysiaToday();
     if (!dateUncertain && (form.date < currentDay || form.date > bookingEndSunday(currentDay))) { setError('Sila pilih tarikh dalam senarai sehingga hari Ahad yang tersedia.'); return false; }
-    if (!dateUncertain && !times.includes(form.time)) { setError('Sila pilih semula masa mengikut servis.'); return false; }
+    if (!dateUncertain && !times.includes(form.time)) { if(guestStep) setGuestStep(false); setError('Servis kumpulan ini memerlukan slot sebelum atau pada 3:30 PM. Sila ubah masa pelanggan utama.'); return false; }
     setError(''); return true;
   };
   const renderChoice = item => (
@@ -1013,12 +1020,25 @@ function BookingPage({ go }) {
                 <h3 style={{fontSize:12,color:'#efbbd4',margin:'0 0 12px'}}>Pelanggan {index+2}</h3>
                 <div className="booking-fields">
                   <label className="booking-field">Nama *<input required maxLength={100} value={guest.name} onChange={event => updateGuest(index,'name',event.target.value)} placeholder="Nama pelanggan" /></label>
+                  <label className="booking-choice" style={{minHeight:42}}><input type="checkbox" checked={!!guest.cutWash} onChange={event => {const checked=event.target.checked;setGuests(prev => prev.map((g,i) => i===index ? {...g,cutWash:checked,cut:false,wash:false,eyelash:false,hairToo:'no',service:'',length:''} : g));}} /><span>Hair Cut / Hair Wash sahaja (walk-in)</span></label>
+                  {guest.cutWash ? <>
+                    <div style={{display:'flex',gap:8}}>{[['cut','Hair Cut'],['wash','Hair Wash']].map(([key,label]) => <label key={key} className="booking-choice" style={{flex:1,minHeight:42}}><input type="checkbox" checked={!!guest[key]} onChange={event => updateGuest(index,key,event.target.checked)} /><span>{label}</span></label>)}</div>
+                    <p className="booking-note">{guestWalkInNote}</p>
+                  </> : <>
+                    <label className="booking-choice" style={{minHeight:42}}><input type="checkbox" checked={!!guest.eyelash} onChange={event => {const checked=event.target.checked;setGuests(prev => prev.map((g,i) => i===index ? {...g,eyelash:checked,hairToo:'no',service:'',length:''} : g));}} /><span>Eyelash Perm (walk-in)</span></label>
+                    {guest.eyelash && <>
+                      <label className="booking-field">Nak buat servis rambut juga?<select value={guest.hairToo || 'no'} onChange={event => {updateGuest(index,'hairToo',event.target.value);updateGuest(index,'service','');updateGuest(index,'length','');}}><option value="no">Tidak — Eyelash Perm sahaja</option><option value="yes">Ya — tambah servis rambut</option></select></label>
+                      <p className="booking-note">{guestHasHair(guest) ? 'Eyelash Perm tertakluk kepada kekosongan walk-in dan mungkin perlu menunggu; ia tidak termasuk dalam tempahan servis rambut.' : guestWalkInNote} Eyelash Perm tersedia sebelum 4:00 petang.</p>
+                    </>}
+                  </>}
+                  {guestHasHair(guest) && <>
                   <label className="booking-field">Panjang rambut *<select required value={guest.length} onChange={event => updateGuest(index,'length',event.target.value)}><option value="">Pilih paras rambut</option>{lengthChoices.map(item => <option key={item}>{item}</option>)}</select></label>
                   <label className="booking-field">Servis *<select required value={guest.service} onChange={event => updateGuest(index,'service',event.target.value)}><option value="">Pilih servis</option><optgroup label="Combo Services">{comboBookingChoices.map(item => <option key={item}>{item}</option>)}</optgroup><optgroup label="Single Services">{singleBookingChoices.map(item => <option key={item}>{item}</option>)}</optgroup></select></label>
+                  </>}
                 </div>
               </section>)}
 
-            {!dateUncertain && <label className="booking-field" style={{marginTop:14}}>Masa untuk semua pelanggan *<select required value={times.includes(form.time) ? form.time : ''} onChange={event => update('time',event.target.value)}><option value="">Pilih masa</option>{times.map(time => <option key={time}>{time}</option>)}</select></label>}
+            <p className="booking-note" style={{marginTop:14}}>Masa servis rambut mengikut pelanggan utama: {dateUncertain ? 'Tarikh belum pasti' : form.time}. Servis walk-in tidak menjamin slot pada waktu tersebut.</p>
             {earlyCutoff && !dateUncertain && <p className="booking-note">Slot terakhir bagi servis dalam kumpulan ini ialah 3:30 PM.</p>}
             <button type="button" className="booking-fallback" style={{marginTop:14}} onClick={() => {setGuestStep(false);setError('');window.scrollTo({top:0,behavior:'smooth'});}}>← Edit pelanggan utama</button>
           </section>}
