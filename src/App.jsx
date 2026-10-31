@@ -807,7 +807,8 @@ function BookingPage({ go }) {
   const dateCount = Math.round((new Date(`${lastDate}T00:00:00Z`) - new Date(`${today}T00:00:00Z`)) / 86400000) + 1;
   const availableDates = Array.from({length:dateCount}, (_, index) => bookingDateOffset(today, index));
   const isCombo = selected.some(item => comboBookingChoices.includes(item)) || selected.length > 1;
-  const extraEarlyCutoff = morePeople === 'yes' && guests.some(guest => guestHasHair(guest) && (comboBookingChoices.includes(guest.service) || ['Highlight + Colour','Bleach + Colour'].includes(guest.service)));
+  const extraEyelashHair = morePeople === 'yes' && guests.some(guest => guest.eyelash && guestHasHair(guest));
+  const extraEarlyCutoff = extraEyelashHair || (morePeople === 'yes' && guests.some(guest => guestHasHair(guest) && (comboBookingChoices.includes(guest.service) || ['Highlight + Colour','Bleach + Colour'].includes(guest.service))));
   const earlyCutoff = extraEarlyCutoff || isCombo || selected.some(item => ["Highlight + Colour", "Bleach + Colour"].includes(item));
   const end = earlyCutoff ? 15.5 : 17;
   const times = [];
@@ -1039,6 +1040,11 @@ function BookingPage({ go }) {
               </section>)}
 
             <p className="booking-note" style={{marginTop:14}}>Masa servis rambut mengikut pelanggan utama: {dateUncertain ? 'Tarikh belum pasti' : form.time}. Servis walk-in tidak menjamin slot pada waktu tersebut.</p>
+            {extraEyelashHair && !dateUncertain && form.time && !times.includes(form.time) && <div role="alert" style={{marginTop:14,padding:13,border:'1px solid #d994b4',borderRadius:12,background:'#422638',color:'#ffe3ef',fontSize:12,lineHeight:1.65}}>
+              <strong style={{display:'block',fontSize:12,marginBottom:6}}>Sila ubah masa pelanggan utama</strong>
+              <p style={{margin:0,color:'inherit'}}>Pelanggan tambahan memilih Eyelash Perm bersama servis rambut. Slot terakhir ialah 3:30 petang. Sila pilih masa 3:30 petang atau lebih awal. Jika tidak meneruskan Eyelash Perm, masa akan kembali mengikut had servis rambut yang dipilih.</p>
+              <button type="button" className="booking-fallback" style={{marginTop:10}} onClick={() => {setGuestStep(false);setError('');window.scrollTo({top:0,behavior:'smooth'});}}>Ubah masa pelanggan utama</button>
+            </div>}
             {earlyCutoff && !dateUncertain && <p className="booking-note">Slot terakhir bagi servis dalam kumpulan ini ialah 3:30 PM.</p>}
             <button type="button" className="booking-fallback" style={{marginTop:14}} onClick={() => {setGuestStep(false);setError('');window.scrollTo({top:0,behavior:'smooth'});}}>← Edit pelanggan utama</button>
           </section>}
