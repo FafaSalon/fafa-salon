@@ -782,9 +782,10 @@ function BookingPage({ go }) {
   const [form, setForm] = useState({ name: '', phone: '', branch: '', date: '', time: '', length: '', cutLength: '', notes: '', bleachStyle: '', highlightStyle: '' });
   const dateUncertain = form.date === 'uncertain';
   const [morePeople, setMorePeople] = useState('no');
+  const [guestStep, setGuestStep] = useState(false);
   const [guests, setGuests] = useState([{name:'',length:'',service:''}]);
-  const updateGuest = (index, key, value) => {setGuests(prev => prev.map((guest,i) => i === index ? {...guest,[key]:value} : guest));if(key === 'service') setForm(prev => ({...prev,time:''}));};
-  const resizeGuests = total => {const count = Math.max(1,Math.min(19,Number(total)-1 || 1));setGuests(prev => Array.from({length:count},(_,i) => prev[i] || {name:'',length:'',service:''}));setForm(prev => ({...prev,time:''}));};
+  const updateGuest = (index, key, value) => {setGuests(prev => prev.map((guest,i) => i === index ? {...guest,[key]:value} : guest));};
+  const resizeGuests = total => {const count = Math.max(1,Math.min(19,Number(total)-1 || 1));setGuests(prev => Array.from({length:count},(_,i) => prev[i] || {name:'',length:'',service:''}));};
   const [error, setError] = useState('');
   const [adviceNotes, setAdviceNotes] = useState('');
   const adviceOnly = selected.includes(otherBookingChoice);
@@ -825,7 +826,7 @@ function BookingPage({ go }) {
     ...(hasCut ? [`Add-on Hair Cut: potong ke paras ${form.cutLength}`] : []),
     ...(!hasCut ? [`Panjang rambut: ${form.length}`] : []),
     `Nota: ${form.notes.trim() || '-'}`, '',
-    ...(morePeople === 'yes' ? guests.flatMap((guest,index) => [`PELANGGAN ${index+2}`,`Nama: ${guest.name.trim()}`,`Panjang rambut: ${guest.length}`,`Servis: ${guest.service}`,'']) : []),
+    ...(morePeople === 'yes' ? guests.flatMap((guest,index) => ['',`PELANGGAN ${index+2}`,`Nama: ${guest.name.trim()}`,`Panjang rambut: ${guest.length}`,`Servis: ${guest.service}`,'']) : []),
     dateUncertain ? 'Ini ialah pertanyaan harga sahaja, bukan tempahan slot.' : 'Saya faham tempahan belum disahkan dan deposit RM30 seorang hanya dibayar selepas pengesahan admin.',
   ].join('\n');
   const adviceMessage = `Hi FAFA Salon! Saya ingin membuat pertanyaan.\n\nPertanyaan:\n${adviceNotes.trim()}`;
@@ -936,11 +937,20 @@ function BookingPage({ go }) {
       <div className="content-block">
         <button className="booking-back" aria-label="Kembali ke halaman utama" onClick={() => go('home')}><ArrowLeft size={17} /></button>
         <span className="kicker">Booking / Semak Slot</span>
-        <h2>{adviceOnly ? "Tanya Kami" : dateUncertain ? "Cek Harga Dahulu" : "Jom rancang hair day anda"}</h2>
+        <h2>{adviceOnly ? "Tanya Kami" : guestStep ? "Pelanggan Tambahan" : dateUncertain ? "Cek Harga Dahulu" : "Jom rancang hair day anda"}</h2>
         <p className="lead">{adviceOnly ? "Nyatakan pertanyaan anda di bawah, kemudian tekan Tanya Kami." : dateUncertain ? "Pilih servis dan lengkapkan maklumat rambut. Admin akan berikan harga melalui WhatsApp." : "Pilih servis dan waktu pilihan. Admin akan semak kekosongan serta berikan harga melalui WhatsApp."}</p>
-        <form onSubmit={event => { event.preventDefault(); event.currentTarget.querySelector('[data-booking-send]').click(); }}>
-          {!adviceOnly && <fieldset>
-            <legend>01 / PILIH SERVIS ANDA</legend>
+        <form onSubmit={event => { event.preventDefault(); event.currentTarget.querySelector('[data-booking-send]')?.click(); }}>
+          {!adviceOnly && <fieldset className="main-customer-step" disabled={guestStep} style={{display:guestStep ? 'none' : 'grid',gap:18}}>
+          <fieldset>
+            <legend>01 / PELANGGAN UTAMA</legend>
+            <div className="booking-fields">
+              <label className="booking-field">Nama penuh *<input required maxLength={100} autoComplete="name" value={form.name} onChange={event => update('name', event.target.value)} placeholder="Nama anda" /></label>
+              <label className="booking-field">No. telefon / WhatsApp *<input required type="tel" minLength={9} maxLength={20} autoComplete="tel" value={form.phone} onChange={event => update('phone', event.target.value)} placeholder="Contoh: 0123456789" /></label>
+              <label className="booking-field">Nota tambahan<textarea maxLength={1000} value={form.notes} onChange={event => update('notes', event.target.value)} placeholder="Contoh: Warna pilihan — Ash Brown; pernah colour / bleach; rambut sensitif, kering atau rosak. Nyatakan juga sebarang permintaan khas." /></label>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>02 / PILIH SERVIS ANDA</legend>
             {selected.length > 0 ? <>
               <div id="booking-selected-services" aria-live="polite" style={{scrollMarginTop:90}}>
                 <h3 className="booking-group-title" style={{fontSize:18,marginTop:0}}>Servis pilihan anda ✓</h3>
@@ -972,10 +982,10 @@ function BookingPage({ go }) {
               <label className="booking-field">Panjang rambut sekarang *<select required value={form.length} onChange={event => update('length', event.target.value)}><option value="">Pilih paras rambut</option>{lengthChoices.map(item => <option key={item}>{item}</option>)}</select></label>
               <p className="booking-note">{hairCheckNote}</p>
             </div>}
-          </fieldset>}
-          {adviceOnly ? <label className="booking-field">Pertanyaan anda *<textarea name="adviceNotes" required maxLength={1000} value={adviceNotes} onChange={event => {setAdviceNotes(event.target.value);setError('');}} placeholder="Tulis pertanyaan anda dengan lengkap di sini." /></label> : <>
+          </fieldset>
+
           <fieldset>
-            <legend>02 / CAWANGAN & WAKTU</legend>
+            <legend>03 / CAWANGAN & WAKTU</legend>
             <div className="booking-fields">
               <label className="booking-field">Cawangan *<select value={form.branch} required onChange={event => update('branch', event.target.value)}><option value="">Pilih cawangan</option><option>Setapak, Kuala Lumpur</option><option>Selayang, Batu Caves</option></select></label>
               <label className="booking-field">Tarikh pilihan *<select name="bookingDate" required value={form.date} onChange={event => {setForm(prev => ({...prev,date:event.target.value,time:''}));setPromoAcknowledged(false);setError('');}}><option value="">Pilih tarikh</option><option value="uncertain">Belum pasti</option>{availableDates.map(date => <option key={date} value={date}>{new Date(`${date}T12:00:00Z`).toLocaleDateString('ms-MY',{weekday:'short',day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Kuala_Lumpur'})}</option>)}</select></label>
@@ -987,12 +997,18 @@ function BookingPage({ go }) {
             </div> : <p className="booking-note">{earlyCutoff && "Slot terakhir untuk servis pilihan anda ialah 3:30 PM. "}Slot tertakluk pada kekosongan. Admin akan sahkan waktu mengikut servis dan jadual cawangan.</p>}
           </fieldset>
           <fieldset>
-            <legend>03 / PELANGGAN TAMBAHAN</legend>
+            <legend>04 / TAMBAH PELANGGAN</legend>
             <p className="booking-note" style={{margin:'0 0 8px'}}>Ada orang lain yang mahu buat servis bersama?</p>
-            <div style={{display:'flex',gap:8}}>{[['no','Tidak'],['yes','Ya']].map(([value,label]) => <label key={value} className={`booking-choice ${morePeople === value ? 'selected' : ''}`} style={{flex:1,minHeight:42}}><input type="radio" name="morePeople" value={value} checked={morePeople === value} onChange={() => {setMorePeople(value);setForm(prev => ({...prev,time:''}));setError('');}} style={{width:16,height:16,minHeight:0,maxHeight:16,padding:0,margin:0,accentColor:'#df3987'}} /><span>{label}</span></label>)}</div>
+            <div style={{display:'flex',gap:8}}>{[['no','Tidak'],['yes','Ya']].map(([value,label]) => <label key={value} className={`booking-choice ${morePeople === value ? 'selected' : ''}`} style={{flex:1,minHeight:42}}><input type="radio" name="morePeople" value={value} checked={morePeople === value} onChange={() => {setMorePeople(value);setError('');}} style={{width:16,height:16,minHeight:0,maxHeight:16,padding:0,margin:0,accentColor:'#df3987'}} /><span>{label}</span></label>)}</div>
             {morePeople === 'yes' && <div style={{marginTop:12}}>
               <label className="booking-field">Jumlah orang (termasuk anda) *<select required value={guests.length+1} onChange={event => resizeGuests(event.target.value)}>{Array.from({length:19},(_,index) => index+2).map(total => <option key={total} value={total}>{total} orang</option>)}</select></label>
               <p className="booking-note">Cawangan, tarikh dan masa adalah sama untuk semua pelanggan. Admin akan sahkan kekosongan bagi jumlah yang dipilih.</p>
+            </div>}
+          </fieldset>
+          </fieldset>}
+          {!adviceOnly && guestStep && <section className="extra-customer-step" style={{padding:14,border:'1px solid #80576e',borderRadius:16,background:'#161118'}}>
+            <h3 style={{fontSize:16,margin:'0 0 8px',color:'#f3c5dd'}}>Pelanggan tambahan</h3>
+            <p className="booking-note" style={{margin:'0 0 12px'}}>Pelanggan utama: {form.name}. Jumlah {guests.length+1} orang. Cawangan dan tarikh sama seperti pelanggan utama.</p>
               {guests.map((guest,index) => <section key={index} aria-label={`Pelanggan ${index+2}`} style={{marginTop:12,padding:13,borderRadius:12,border:'1px solid #74556a',background:'#201a23',boxShadow:'0 3px 12px #00000018'}}>
                 <h3 style={{fontSize:12,color:'#efbbd4',margin:'0 0 12px'}}>Pelanggan {index+2}</h3>
                 <div className="booking-fields">
@@ -1001,20 +1017,17 @@ function BookingPage({ go }) {
                   <label className="booking-field">Servis *<select required value={guest.service} onChange={event => updateGuest(index,'service',event.target.value)}><option value="">Pilih servis</option><optgroup label="Combo Services">{comboBookingChoices.map(item => <option key={item}>{item}</option>)}</optgroup><optgroup label="Single Services">{singleBookingChoices.map(item => <option key={item}>{item}</option>)}</optgroup></select></label>
                 </div>
               </section>)}
-            </div>}
-          </fieldset>
-          <fieldset>
-            <legend>04 / MAKLUMAT ANDA</legend>
-            <div className="booking-fields">
-              <label className="booking-field">Nama penuh *<input required maxLength={100} autoComplete="name" value={form.name} onChange={event => update('name', event.target.value)} placeholder="Nama anda" /></label>
-              <label className="booking-field">No. telefon / WhatsApp *<input required type="tel" minLength={9} maxLength={20} autoComplete="tel" value={form.phone} onChange={event => update('phone', event.target.value)} placeholder="Contoh: 0123456789" /></label>
-              <label className="booking-field">Nota tambahan<textarea maxLength={1000} value={form.notes} onChange={event => update('notes', event.target.value)} placeholder="Contoh: Warna pilihan — Ash Brown; pernah colour / bleach; rambut sensitif, kering atau rosak. Nyatakan juga sebarang permintaan khas." /></label>
-            </div>
-          </fieldset>
+
+            {!dateUncertain && <label className="booking-field" style={{marginTop:14}}>Masa untuk semua pelanggan *<select required value={times.includes(form.time) ? form.time : ''} onChange={event => update('time',event.target.value)}><option value="">Pilih masa</option>{times.map(time => <option key={time}>{time}</option>)}</select></label>}
+            {earlyCutoff && !dateUncertain && <p className="booking-note">Slot terakhir bagi servis dalam kumpulan ini ialah 3:30 PM.</p>}
+            <button type="button" className="booking-fallback" style={{marginTop:14}} onClick={() => {setGuestStep(false);setError('');window.scrollTo({top:0,behavior:'smooth'});}}>← Edit pelanggan utama</button>
+          </section>}
+          {adviceOnly && <label className="booking-field">Pertanyaan anda *<textarea name="adviceNotes" required maxLength={1000} value={adviceNotes} onChange={event => {setAdviceNotes(event.target.value);setError('');}} placeholder="Tulis pertanyaan anda dengan lengkap di sini." /></label>}
+          {!adviceOnly && (morePeople !== 'yes' || guestStep) && <>
           <label className="booking-consent"><input type="checkbox" required /><span>{dateUncertain ? 'Saya bersetuju menghantar maklumat ini kepada FAFA Salon untuk semakan harga sahaja. Ini bukan tempahan slot.' : 'Saya faham slot tertakluk kepada kekosongan dan bersetuju menghantar maklumat kepada FAFA Salon. Deposit RM30 akan dibuat selepas harga dan slot disahkan. Borang ini belum mengesahkan tempahan.'}</span></label>
           </>}
           <p className="booking-error" role="alert">{error}</p>
-          <a data-booking-send className="booking-send" href={href} target="_blank" rel="noopener noreferrer" onClick={event => { if (!validate(event.currentTarget)) event.preventDefault(); }}><MessageCircle size={18} /> {adviceOnly ? "Tanya Kami" : "Hantar detail ke WhatsApp ↗"}</a>
+          {!adviceOnly && morePeople === 'yes' && !guestStep ? <button type="button" className="booking-send" onClick={event => {if(validate(event.currentTarget)){setGuestStep(true);setError('');window.scrollTo({top:0,behavior:'smooth'});}}}>Seterusnya — Pelanggan tambahan <ChevronRight size={17} /></button> : <a data-booking-send className="booking-send" href={href} target="_blank" rel="noopener noreferrer" onClick={event => { if (!validate(event.currentTarget)) event.preventDefault(); }}><MessageCircle size={18} /> {adviceOnly ? "Tanya Kami" : "Hantar detail ke WhatsApp ↗"}</a>}
         </form>
       </div>
     </motion.section>
