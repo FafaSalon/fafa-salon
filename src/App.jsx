@@ -807,22 +807,23 @@ function BookingPage({ go }) {
   const dateCount = Math.round((new Date(`${lastDate}T00:00:00Z`) - new Date(`${today}T00:00:00Z`)) / 86400000) + 1;
   const availableDates = Array.from({length:dateCount}, (_, index) => bookingDateOffset(today, index));
   const isCombo = selected.some(item => comboBookingChoices.includes(item)) || selected.length > 1;
-  const extraEyelashHair = morePeople === 'yes' && guests.some(guest => guest.eyelash && guestHasHair(guest));
-  const extraEarlyCutoff = extraEyelashHair || (morePeople === 'yes' && guests.some(guest => guestHasHair(guest) && (comboBookingChoices.includes(guest.service) || ['Highlight + Colour','Bleach + Colour'].includes(guest.service))));
+  const extraEyelash = morePeople === 'yes' && guests.some(guest => guest.eyelash && !guest.cutWash);
+  const extraEarlyCutoff = morePeople === 'yes' && guests.some(guest => guestHasHair(guest) && (comboBookingChoices.includes(guest.service) || ['Highlight + Colour','Bleach + Colour'].includes(guest.service)));
   const earlyCutoff = extraEarlyCutoff || isCombo || selected.some(item => ["Highlight + Colour", "Bleach + Colour"].includes(item));
-  const end = earlyCutoff ? 15.5 : 17;
+  const end = earlyCutoff ? 15.5 : extraEyelash ? 16 : 17;
   const times = [];
   for (let value = 11; value <= end; value += 0.5) {
     const hour = Math.floor(value);
     times.push(`${hour > 12 ? hour - 12 : hour}:${value % 1 ? '30' : '00'} ${hour >= 12 ? 'PM' : 'AM'}`);
   }
-  const needsEyelashTimeChange = extraEyelashHair && !dateUncertain && ['4:00 PM','4:30 PM','5:00 PM'].includes(form.time);
+  const adjustedEyelashTime = earlyCutoff ? '3:30 PM' : '4:00 PM';
+  const needsEyelashTimeChange = extraEyelash && !dateUncertain && !!form.time && !times.includes(form.time);
   useEffect(() => {
     if (!needsEyelashTimeChange) return;
-    window.alert('Servis Eyelash Perm tersedia sebelum jam 4:00 petang. Oleh sebab pelanggan tambahan memilih Eyelash Perm bersama servis rambut, waktu pelanggan utama dan seluruh kumpulan akan ditukar kepada slot terakhir, jam 3:30 petang. Tekan OK untuk meneruskan.');
-    setForm(prev => ({...prev,time:'3:30 PM'}));
+    window.alert(earlyCutoff ? 'Slot terakhir Eyelash Perm ialah jam 4:00 petang. Oleh sebab kumpulan ini turut memilih servis combo, bleach atau highlight, masa seluruh kumpulan akan ditukar kepada 3:30 petang. Tekan OK untuk meneruskan.' : 'Slot terakhir untuk servis Eyelash Perm ialah jam 4:00 petang. Waktu pelanggan utama dan seluruh kumpulan akan ditukar secara automatik kepada jam 4:00 petang. Tekan OK untuk meneruskan.');
+    setForm(prev => ({...prev,time:adjustedEyelashTime}));
     setError('');
-  }, [needsEyelashTimeChange]);
+  }, [needsEyelashTimeChange, adjustedEyelashTime]);
   const toggle = item => {
     const next = item === otherBookingChoice ? (selected.includes(item) ? [] : [item]) : (selected.includes(item) ? selected.filter(value => value !== item) : [...selected.filter(value => value !== otherBookingChoice), item]);
     setSelected(next); setError('');
@@ -1036,7 +1037,7 @@ function BookingPage({ go }) {
                     <label className="booking-choice" style={{minHeight:42}}><input type="checkbox" checked={!!guest.eyelash} onChange={event => {const checked=event.target.checked;setGuests(prev => prev.map((g,i) => i===index ? {...g,eyelash:checked,hairToo:'no',service:'',length:''} : g));}} /><span>Eyelash Perm (walk-in)</span></label>
                     {guest.eyelash && <>
                       <label className="booking-field">Nak buat servis rambut juga?<select value={guest.hairToo || 'no'} onChange={event => {updateGuest(index,'hairToo',event.target.value);updateGuest(index,'service','');updateGuest(index,'length','');}}><option value="no">Tidak — Eyelash Perm sahaja</option><option value="yes">Ya — tambah servis rambut</option></select></label>
-                      <p className="booking-note">{guestHasHair(guest) ? 'Eyelash Perm tertakluk kepada kekosongan walk-in dan mungkin perlu menunggu; ia tidak termasuk dalam tempahan servis rambut.' : guestWalkInNote} Eyelash Perm tersedia sebelum 4:00 petang.</p>
+                      <p className="booking-note">{guestHasHair(guest) ? 'Eyelash Perm tertakluk kepada kekosongan walk-in dan mungkin perlu menunggu; ia tidak termasuk dalam tempahan servis rambut.' : guestWalkInNote} Slot terakhir Eyelash Perm ialah 4:00 petang.</p>
                     </>}
                   </>}
                   {guestHasHair(guest) && <>
