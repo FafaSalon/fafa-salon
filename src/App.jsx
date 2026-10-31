@@ -757,6 +757,11 @@ function bookingDateOffset(date, days) {
   value.setUTCDate(value.getUTCDate() + days);
   return value.toISOString().slice(0,10);
 }
+function bookingEndSunday(today) {
+  const baseline = bookingDateOffset(today, 5);
+  const weekday = new Date(`${baseline}T00:00:00Z`).getUTCDay();
+  return bookingDateOffset(baseline, (7 - weekday) % 7);
+}
 function initialBookingServices() {
   const requested = new URLSearchParams(window.location.hash.split('?')[1] || '').get('service');
   return bookingChoices.includes(requested) ? [requested] : [];
@@ -776,6 +781,10 @@ function BookingPage({ go }) {
   }, []);
   const [form, setForm] = useState({ name: '', phone: '', branch: '', date: '', time: '', length: '', cutLength: '', notes: '', bleachStyle: '', highlightStyle: '' });
   const dateUncertain = form.date === 'uncertain';
+  const [morePeople, setMorePeople] = useState('no');
+  const [guests, setGuests] = useState([{name:'',length:'',service:''}]);
+  const updateGuest = (index, key, value) => {setGuests(prev => prev.map((guest,i) => i === index ? {...guest,[key]:value} : guest));if(key === 'service') setForm(prev => ({...prev,time:''}));};
+  const resizeGuests = total => {const count = Math.max(1,Math.min(19,Number(total)-1 || 1));setGuests(prev => Array.from({length:count},(_,i) => prev[i] || {name:'',length:'',service:''}));setForm(prev => ({...prev,time:''}));};
   const [error, setError] = useState('');
   const [adviceNotes, setAdviceNotes] = useState('');
   const adviceOnly = selected.includes(otherBookingChoice);
@@ -787,9 +796,12 @@ function BookingPage({ go }) {
     const timer = setInterval(() => setToday(malaysiaToday()), 60000);
     return () => clearInterval(timer);
   }, []);
-  const availableDates = Array.from({length:6}, (_, index) => bookingDateOffset(today, index));
+  const lastDate = bookingEndSunday(today);
+  const dateCount = Math.round((new Date(`${lastDate}T00:00:00Z`) - new Date(`${today}T00:00:00Z`)) / 86400000) + 1;
+  const availableDates = Array.from({length:dateCount}, (_, index) => bookingDateOffset(today, index));
   const isCombo = selected.some(item => comboBookingChoices.includes(item)) || selected.length > 1;
-  const earlyCutoff = isCombo || selected.some(item => ["Highlight + Colour", "Bleach + Colour"].includes(item));
+  const extraEarlyCutoff = morePeople === 'yes' && guests.some(guest => comboBookingChoices.includes(guest.service) || ['Highlight + Colour','Bleach + Colour'].includes(guest.service));
+  const earlyCutoff = extraEarlyCutoff || isCombo || selected.some(item => ["Highlight + Colour", "Bleach + Colour"].includes(item));
   const end = earlyCutoff ? 15.5 : 17;
   const times = [];
   for (let value = 11; value <= end; value += 0.5) {
@@ -805,6 +817,7 @@ function BookingPage({ go }) {
   const dateLabel = dateUncertain ? 'Belum pasti' : form.date ? new Date(`${form.date}T12:00:00`).toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
   const message = [
     dateUncertain ? 'Hi FAFA Salon! Saya nak tahu harga sahaja dahulu. Saya belum pasti bila nak buat servis dan belum mahu menempah slot.' : 'Hi FAFA Salon! Saya nak semak harga & kekosongan slot.', '',
+    ...(morePeople === 'yes' ? [`Jumlah pelanggan: ${guests.length + 1} orang`, '', 'PELANGGAN 1'] : []),
     `Nama: ${form.name.trim()}`,
     `No. telefon: ${form.phone.trim()}`,
     `Cawangan: ${form.branch}`, `Tarikh pilihan: ${dateLabel}`, ...(!dateUncertain ? [`Masa pilihan: ${form.time}`] : []), '',
@@ -812,6 +825,7 @@ function BookingPage({ go }) {
     ...(hasCut ? [`Add-on Hair Cut: potong ke paras ${form.cutLength}`] : []),
     ...(!hasCut ? [`Panjang rambut: ${form.length}`] : []),
     `Nota: ${form.notes.trim() || '-'}`, '',
+    ...(morePeople === 'yes' ? guests.flatMap((guest,index) => [`PELANGGAN ${index+2}`,`Nama: ${guest.name.trim()}`,`Panjang rambut: ${guest.length}`,`Servis: ${guest.service}`,'']) : []),
     dateUncertain ? 'Ini ialah pertanyaan harga sahaja, bukan tempahan slot.' : 'Saya faham tempahan belum disahkan dan deposit RM30 seorang hanya dibayar selepas pengesahan admin.',
   ].join('\n');
   const adviceMessage = `Hi FAFA Salon! Saya ingin membuat pertanyaan.\n\nPertanyaan:\n${adviceNotes.trim()}`;
@@ -827,7 +841,7 @@ function BookingPage({ go }) {
     if (dateUncertain && !promoAcknowledged) { setError('Sila tick OK untuk mengesahkan peringatan harga promo.'); node.querySelector('[name=promoAcknowledged]')?.focus(); return false; }
     if (!node.reportValidity()) { setError('Sila lengkapkan semua ruangan wajib dan tandakan persetujuan.'); return false; }
     const currentDay = malaysiaToday();
-    if (!dateUncertain && (form.date < currentDay || form.date > bookingDateOffset(currentDay, 5))) { setError('Sila pilih tarikh hari ini hingga 5 hari berikutnya.'); return false; }
+    if (!dateUncertain && (form.date < currentDay || form.date > bookingEndSunday(currentDay))) { setError('Sila pilih tarikh dalam senarai sehingga hari Ahad yang tersedia.'); return false; }
     if (!dateUncertain && !times.includes(form.time)) { setError('Sila pilih semula masa mengikut servis.'); return false; }
     setError(''); return true;
   };
@@ -973,7 +987,24 @@ function BookingPage({ go }) {
             </div> : <p className="booking-note">{earlyCutoff && "Slot terakhir untuk servis pilihan anda ialah 3:30 PM. "}Slot tertakluk pada kekosongan. Admin akan sahkan waktu mengikut servis dan jadual cawangan.</p>}
           </fieldset>
           <fieldset>
-            <legend>03 / MAKLUMAT ANDA</legend>
+            <legend>03 / PELANGGAN TAMBAHAN</legend>
+            <p className="booking-note" style={{margin:'0 0 8px'}}>Ada orang lain yang mahu buat servis bersama?</p>
+            <div style={{display:'flex',gap:8}}>{[['no','Tidak'],['yes','Ya']].map(([value,label]) => <label key={value} className={`booking-choice ${morePeople === value ? 'selected' : ''}`} style={{flex:1,minHeight:42}}><input type="radio" name="morePeople" value={value} checked={morePeople === value} onChange={() => {setMorePeople(value);setForm(prev => ({...prev,time:''}));setError('');}} style={{width:16,height:16,minHeight:0,maxHeight:16,padding:0,margin:0,accentColor:'#df3987'}} /><span>{label}</span></label>)}</div>
+            {morePeople === 'yes' && <div style={{marginTop:12}}>
+              <label className="booking-field">Jumlah orang (termasuk anda) *<select required value={guests.length+1} onChange={event => resizeGuests(event.target.value)}>{Array.from({length:19},(_,index) => index+2).map(total => <option key={total} value={total}>{total} orang</option>)}</select></label>
+              <p className="booking-note">Cawangan, tarikh dan masa adalah sama untuk semua pelanggan. Admin akan sahkan kekosongan bagi jumlah yang dipilih.</p>
+              {guests.map((guest,index) => <section key={index} aria-label={`Pelanggan ${index+2}`} style={{marginTop:12,padding:13,borderRadius:12,border:'1px solid #74556a',background:'#201a23',boxShadow:'0 3px 12px #00000018'}}>
+                <h3 style={{fontSize:12,color:'#efbbd4',margin:'0 0 12px'}}>Pelanggan {index+2}</h3>
+                <div className="booking-fields">
+                  <label className="booking-field">Nama *<input required maxLength={100} value={guest.name} onChange={event => updateGuest(index,'name',event.target.value)} placeholder="Nama pelanggan" /></label>
+                  <label className="booking-field">Panjang rambut *<select required value={guest.length} onChange={event => updateGuest(index,'length',event.target.value)}><option value="">Pilih paras rambut</option>{lengthChoices.map(item => <option key={item}>{item}</option>)}</select></label>
+                  <label className="booking-field">Servis *<select required value={guest.service} onChange={event => updateGuest(index,'service',event.target.value)}><option value="">Pilih servis</option><optgroup label="Combo Services">{comboBookingChoices.map(item => <option key={item}>{item}</option>)}</optgroup><optgroup label="Single Services">{singleBookingChoices.map(item => <option key={item}>{item}</option>)}</optgroup></select></label>
+                </div>
+              </section>)}
+            </div>}
+          </fieldset>
+          <fieldset>
+            <legend>04 / MAKLUMAT ANDA</legend>
             <div className="booking-fields">
               <label className="booking-field">Nama penuh *<input required maxLength={100} autoComplete="name" value={form.name} onChange={event => update('name', event.target.value)} placeholder="Nama anda" /></label>
               <label className="booking-field">No. telefon / WhatsApp *<input required type="tel" minLength={9} maxLength={20} autoComplete="tel" value={form.phone} onChange={event => update('phone', event.target.value)} placeholder="Contoh: 0123456789" /></label>
