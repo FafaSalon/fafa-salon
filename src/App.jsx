@@ -645,21 +645,48 @@ function WalkInPage() {
   );
 }
 
+const walkInServices = ['Hair Cut', 'Hair Wash', 'Hair Cut + Hair Wash', 'Eyelash', 'Hair Cut + Eyelash', 'Hair Wash + Eyelash', 'Hair Cut + Hair Wash + Eyelash'];
+function walkInLastTime(service) {
+  if (service.includes('Eyelash')) return '16:00';
+  if (service === 'Hair Cut + Hair Wash') return '17:00';
+  return service === 'Hair Wash' ? '17:30' : '18:00';
+}
+function walkInTimeLabel(value) {
+  const [hours, minutes] = value.split(':').map(Number);
+  return value ? `${hours % 12 || 12}:${String(minutes).padStart(2,'0')} ${hours >= 12 ? 'PM' : 'AM'}` : '';
+}
+function walkInTimes(service) {
+  if (!walkInServices.includes(service)) return [];
+  const end = walkInLastTime(service);
+  return Array.from({length:15},(_,index) => {
+    const minutes = 11 * 60 + index * 30;
+    return `${String(Math.floor(minutes / 60)).padStart(2,'0')}:${String(minutes % 60).padStart(2,'0')}`;
+  }).filter(time => time <= end);
+}
+
 function walkInEnquiryMessage(form) {
-  const [hours, minutes] = form.time.split(':').map(Number);
-  const time = form.time ? `${hours % 12 || 12}:${String(minutes).padStart(2,'0')} ${hours >= 12 ? 'PM' : 'AM'}` : '';
+  const time = walkInTimeLabel(form.time);
+  const service = form.service.includes('Eyelash') ? form.service.replace('Eyelash',form.eyelashType || 'Eyelash') : form.service;
   const date = new Date(`${malaysiaToday()}T12:00:00`).toLocaleDateString('ms-MY', {day:'numeric',month:'long',year:'numeric'});
   return [
     'Hi FAFA Salon, saya nak semak sama ada masih ada slot kosong hari ini.',
     `Saya ingin datang sekitar jam ${time}.`, '',
-    `Servis: ${form.service}`, `Cawangan: ${form.branch}`, `Tarikh: Hari ini (${date})`, '',
+    `Servis: ${service}`, `Cawangan: ${form.branch}`, `Tarikh: Hari ini (${date})`, '',
     'Saya faham tempahan untuk servis ini hanya diambil pada hari yang sama, 30 minit sebelum waktu kedatangan. Saya akan menunggu pengesahan kekosongan daripada admin.'
   ].join('\n');
 }
 
 function WalkInCheckPage() {
-  const [form, setForm] = useState({service:'',time:'',branch:''});
-  const update = (key,value) => setForm(prev => ({...prev,[key]:value}));
+  const [form, setForm] = useState({service:'',eyelashType:'',time:'',branch:''});
+  const update = (key,value) => setForm(prev => {
+    const next = {...prev,[key]:value};
+    if (key === 'service') {
+      if (!value.includes('Eyelash')) next.eyelashType = '';
+      if (!walkInTimes(value).includes(next.time)) next.time = '';
+    }
+    return next;
+  });
+  const times = walkInTimes(form.service);
   const href = `https://wa.me/${phone}?text=${encodeURIComponent(walkInEnquiryMessage(form))}`;
   return <motion.section className="page walkin-check-page" {...pageMotion}>
     <style>{`
@@ -677,13 +704,15 @@ function WalkInCheckPage() {
     <div className="content-block">
       <span className="kicker">Cut, Wash &amp; Eyelash</span>
       <h1>Semak Slot Hari Ini</h1>
-      <p className="walkin-intro">Pilih satu servis, waktu kedatangan dan cawangan untuk semakan melalui WhatsApp.</p>
+      <p className="walkin-intro">Pilih servis atau gabungan servis, waktu kedatangan dan cawangan untuk semakan melalui WhatsApp.</p>
       <form className="walkin-check-form" onSubmit={event => {event.preventDefault();event.currentTarget.querySelector('[data-walkin-send]')?.click();}}>
-        <label>Servis *<select required value={form.service} onChange={event => update('service',event.target.value)}><option value="">Pilih satu servis</option><option>Hair Cut</option><option>Hair Wash</option><option>Eyelash</option></select></label>
-        <label>Masa hendak datang hari ini *<input required type="time" value={form.time} onChange={event => update('time',event.target.value)} /></label>
+        <label>Servis *<select required value={form.service} onChange={event => update('service',event.target.value)}><option value="">Pilih servis</option>{walkInServices.map(service => <option key={service}>{service}</option>)}</select></label>
+        {form.service.includes('Eyelash') && <label>Jenis Eyelash *<select required value={form.eyelashType} onChange={event => update('eyelashType',event.target.value)}><option value="">Pilih jenis Eyelash</option><option>Eyelash Perm</option><option>Eyelash Extension</option></select></label>}
+        <label>Masa hendak datang hari ini *<select required disabled={!form.service} value={form.time} onChange={event => update('time',event.target.value)}><option value="">{form.service ? 'Pilih masa' : 'Pilih servis dahulu'}</option>{times.map(time => <option key={time} value={time}>{walkInTimeLabel(time)}</option>)}</select></label>
+        {form.service && <p className="walkin-note" aria-live="polite">Slot terakhir untuk pilihan anda: <strong>{walkInTimeLabel(walkInLastTime(form.service))}</strong>.</p>}
         <label>Cawangan *<select required value={form.branch} onChange={event => update('branch',event.target.value)}><option value="">Pilih cawangan</option><option>Setapak, Kuala Lumpur</option><option>Selayang, Batu Caves</option></select></label>
         <p className="walkin-note">Tempahan untuk Hair Cut, Hair Wash dan Eyelash hanya diambil pada hari yang sama, 30 minit sebelum waktu kedatangan. Admin akan memaklumkan jika ada slot kosong. Sila tunggu pengesahan admin sebelum datang.</p>
-        <a data-walkin-send className="main-wa" href={href} target="_blank" rel="noopener noreferrer" onClick={event => {if(!event.currentTarget.closest('form').reportValidity()) event.preventDefault();}}><MessageCircle size={17} /> Tanya Slot Hari Ini</a>
+        <a data-walkin-send className="main-wa" href={href} target="_blank" rel="noopener noreferrer" onClick={event => {if(!event.currentTarget.closest('form').reportValidity() || !walkInServices.includes(form.service) || !times.includes(form.time) || (form.service.includes('Eyelash') && !['Eyelash Perm','Eyelash Extension'].includes(form.eyelashType))) event.preventDefault();}}><MessageCircle size={17} /> Tanya Slot Hari Ini</a>
       </form>
     </div>
   </motion.section>;
