@@ -191,7 +191,7 @@ const pageMotion = {
 
 function pageFromHash() {
   const target = window.location.hash.slice(1).split('?')[0];
-  return ['home', 'booking', 'contact', 'location', 'walkin', 'reviews', 'combo', ...Object.keys(services), ...Object.keys(combos)].includes(target) ? target : 'home';
+  return ['home', 'booking', 'contact', 'location', 'walkin', 'walkin-check', 'reviews', 'combo', ...Object.keys(services), ...Object.keys(combos)].includes(target) ? target : 'home';
 }
 
 export default function App() {
@@ -334,13 +334,14 @@ export default function App() {
           {page === "home" && <HomePage key="home" go={go} />}
           {page === "contact" && <ContactPage key="contact" />}
           {page === "walkin" && <WalkInPage key="walkin" />}
+          {page === "walkin-check" && <WalkInCheckPage key="walkin-check" />}
           {page === "reviews" && <ReviewsPage key="reviews" />}
           {page === "location" && <LocationPage key="location" />}
           {page === "combo" && <ComboPage key="combo" go={go} />}
           {currentCombo && <ComboDetailPage key={page} item={currentCombo} go={go} />}
           {current && <ServicePage key={page} item={current} go={go} />}
         </AnimatePresence>
-        {(['booking','combo','contact'].includes(page) || current || currentCombo) && <button className="floating-home-back" aria-label="Kembali ke halaman utama" onClick={() => go('home')}><ArrowLeft size={20} /></button>}
+        {(['booking','combo','contact','walkin-check'].includes(page) || current || currentCombo) && <button className="floating-home-back" aria-label="Kembali ke halaman utama" onClick={() => go('home')}><ArrowLeft size={20} /></button>}
         <BottomBar go={go} page={page} />
       </div>
     </main>
@@ -634,16 +635,58 @@ function WalkInPage() {
           <a className="main-wa" href="#booking" style={{marginTop:18,textAlign:"center"}}><CalendarDays size={18} /> Semak Slot &amp; Harga Promo</a>
         </div>
         <div style={{padding:20,borderRadius:20,border:"1px solid #85516d",background:"#241923",lineHeight:1.8,fontSize:14,marginTop:18}}>
-          <h2 style={{fontSize:19,color:"#ff9bcb",margin:"0 0 10px"}}>Hair Cut, Hair Wash &amp; Eyelash Extension</h2>
-          <p style={{color:"#f4eaf0",margin:0}}>Servis ini disediakan secara walk-in sahaja dan tertakluk pada terma dan syarat. Hubungi kami pada hari yang sama untuk pertanyaan sebelum datang.</p>
-          <a className="main-wa" href={bookingLink(otherBookingChoice)} style={{marginTop:18,textAlign:"center"}}><MessageCircle size={18} /> Contact Us — Cut, Wash &amp; Eyelash Extension</a>
-          <p style={{color:"#f4eaf0",marginTop:14}}>Eyelash Perm boleh booking tanpa deposit RM30. Slot terakhir jam 4:00 petang.</p>
-          <a className="main-wa" href={bookingLink("Eyelash Perm")}>Tempah Eyelash Perm</a>
+          <h2 style={{fontSize:19,color:"#ff9bcb",margin:"0 0 10px"}}>Hair Cut, Hair Wash &amp; Eyelash</h2>
+          <p style={{color:"#f4eaf0",margin:0}}>Untuk tiga servis ini, sila semak kekosongan pada hari yang sama, 30 minit sebelum waktu kedatangan. Admin akan memaklumkan jika ada slot.</p>
+          <a className="main-wa" href="#walkin-check" style={{marginTop:18,textAlign:"center"}}><MessageCircle size={18} /> Contact Us — Cut, Wash &amp; Eyelash</a>
         </div>
         <p style={{fontSize:13,lineHeight:1.8,color:"#e0cbd8",padding:"16px 4px",margin:0}}>Semua servis walk-in bergantung pada kekosongan slot. Pelanggan mungkin perlu menunggu giliran, atau servis tidak dapat diterima jika slot penuh.</p>
       </div>
     </motion.section>
   );
+}
+
+function walkInEnquiryMessage(form) {
+  const [hours, minutes] = form.time.split(':').map(Number);
+  const time = form.time ? `${hours % 12 || 12}:${String(minutes).padStart(2,'0')} ${hours >= 12 ? 'PM' : 'AM'}` : '';
+  const date = new Date(`${malaysiaToday()}T12:00:00`).toLocaleDateString('ms-MY', {day:'numeric',month:'long',year:'numeric'});
+  return [
+    'Hi FAFA Salon, saya nak semak sama ada masih ada slot kosong hari ini.',
+    `Saya ingin datang sekitar jam ${time}.`, '',
+    `Servis: ${form.service}`, `Cawangan: ${form.branch}`, `Tarikh: Hari ini (${date})`, '',
+    'Saya faham tempahan untuk servis ini hanya diambil pada hari yang sama, 30 minit sebelum waktu kedatangan. Saya akan menunggu pengesahan kekosongan daripada admin.'
+  ].join('\n');
+}
+
+function WalkInCheckPage() {
+  const [form, setForm] = useState({service:'',time:'',branch:''});
+  const update = (key,value) => setForm(prev => ({...prev,[key]:value}));
+  const href = `https://wa.me/${phone}?text=${encodeURIComponent(walkInEnquiryMessage(form))}`;
+  return <motion.section className="page walkin-check-page" {...pageMotion}>
+    <style>{`
+      .walkin-check-page{background:#121015;color:#f6edf3;min-height:80vh}
+      .walkin-check-page .content-block{background:transparent;padding:26px 22px 100px}
+      .walkin-check-page h1{font-size:25px;line-height:1.25;color:#fff;margin:10px 0}
+      .walkin-check-page .walkin-intro{font-size:13px;line-height:1.7;color:#d8cad3;margin:0 0 20px}
+      .walkin-check-form{display:grid;gap:16px;border:1px solid #604452;border-radius:18px;background:#211b22;padding:18px;box-shadow:0 8px 24px #0002}
+      .walkin-check-form label{display:grid;gap:8px;font-size:12px;font-weight:600;color:#f6edf3}
+      .walkin-check-form select,.walkin-check-form input{display:block;width:100%;min-width:0;box-sizing:border-box;height:46px;padding:10px 12px;border:1px solid #dfd2da;border-radius:10px;background:#fbf8fa;color:#302530;-webkit-text-fill-color:#302530;color-scheme:light;font:16px system-ui}
+      .walkin-check-form select:focus-visible,.walkin-check-form input:focus-visible,.walkin-check-form a:focus-visible{outline:2px solid #f1a6cb;outline-offset:3px}
+      .walkin-check-form .walkin-note{font-size:12px;line-height:1.7;color:#e2cfdb;background:#342631;border:1px solid #674659;border-radius:12px;padding:12px;margin:0}
+      .walkin-check-form .main-wa{font-size:13px;text-align:center;margin:0;padding:13px 12px;background:linear-gradient(135deg,#9c416b,#c66b97);color:#fff;border-radius:12px}
+    `}</style>
+    <div className="content-block">
+      <span className="kicker">Cut, Wash &amp; Eyelash</span>
+      <h1>Semak Slot Hari Ini</h1>
+      <p className="walkin-intro">Pilih satu servis, waktu kedatangan dan cawangan untuk semakan melalui WhatsApp.</p>
+      <form className="walkin-check-form" onSubmit={event => {event.preventDefault();event.currentTarget.querySelector('[data-walkin-send]')?.click();}}>
+        <label>Servis *<select required value={form.service} onChange={event => update('service',event.target.value)}><option value="">Pilih satu servis</option><option>Hair Cut</option><option>Hair Wash</option><option>Eyelash</option></select></label>
+        <label>Masa hendak datang hari ini *<input required type="time" value={form.time} onChange={event => update('time',event.target.value)} /></label>
+        <label>Cawangan *<select required value={form.branch} onChange={event => update('branch',event.target.value)}><option value="">Pilih cawangan</option><option>Setapak, Kuala Lumpur</option><option>Selayang, Batu Caves</option></select></label>
+        <p className="walkin-note">Tempahan untuk Hair Cut, Hair Wash dan Eyelash hanya diambil pada hari yang sama, 30 minit sebelum waktu kedatangan. Admin akan memaklumkan jika ada slot kosong. Sila tunggu pengesahan admin sebelum datang.</p>
+        <a data-walkin-send className="main-wa" href={href} target="_blank" rel="noopener noreferrer" onClick={event => {if(!event.currentTarget.closest('form').reportValidity()) event.preventDefault();}}><MessageCircle size={17} /> Tanya Slot Hari Ini</a>
+      </form>
+    </div>
+  </motion.section>;
 }
 
 function ContactPage() {
@@ -724,7 +767,7 @@ function ServiceVisual({ type, compact = false }) {
 }
 
 function BottomBar({ go, page }) {
-  if (page === "booking" || page === "combo" || page === "contact" || services[page] || combos[page]) return null;
+  if (page === "booking" || page === "combo" || page === "contact" || page === "walkin-check" || services[page] || combos[page]) return null;
   return <>
     <style>{`
       .site-shell .page{padding-bottom:185px}
