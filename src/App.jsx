@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft,
@@ -853,6 +853,8 @@ function guestServiceText(guest) {
 }
 function BookingPage({ go }) {
   const [selected, setSelected] = useState(initialBookingServices);
+  const [submitting,setSubmitting]=useState(false);
+  const intakeAttempt=useRef(null);
   const [wantCut, setWantCut] = useState(false);
   const [promoAcknowledged, setPromoAcknowledged] = useState(false);
   useLayoutEffect(() => {
@@ -944,6 +946,17 @@ function BookingPage({ go }) {
     if (!dateUncertain && (form.date < currentDay || form.date > bookingEndSunday(currentDay))) { setError('Sila pilih tarikh dalam senarai sehingga hari Ahad yang tersedia.'); return false; }
     if (!dateUncertain && !times.includes(form.time)) { if(guestStep) setGuestStep(false); setError('Servis kumpulan ini memerlukan slot sebelum atau pada 3:30 PM. Sila ubah masa pelanggan utama.'); return false; }
     setError(''); return true;
+  };
+  const submitIntake = async event => {
+    if(!validate(event.currentTarget)){event.preventDefault();return;}
+    if(adviceOnly)return;
+    event.preventDefault();if(submitting)return;
+    const popup=window.open('about:blank','_blank');if(popup)popup.opener=null;
+    setSubmitting(true);setError('');
+    const members=[{name:form.name.trim(),services:selected,length:hasCut?form.cutLength:form.length,cut:hasCut,walkin:false,notes:[form.bleachStyle,form.highlightStyle].filter(Boolean).join(' / ')},...(morePeople==='yes'?guests.map(g=>({name:g.name.trim(),services:g.cutWash?[g.cut?'Hair Cut':'',g.wash?'Hair Wash':''].filter(Boolean):[guestHasHair(g)?g.service:'',g.eyelash?'Eyelash Perm':''].filter(Boolean),length:g.length,cut:false,walkin:!!g.cutWash})):[])];
+    const raw={branch:form.branch,phone:form.phone.trim(),date:form.date,time:form.time,notes:form.notes,members};
+    const signature=JSON.stringify(raw);if(!intakeAttempt.current||intakeAttempt.current.signature!==signature)intakeAttempt.current={signature,id:crypto.randomUUID()};
+    try{const response=await fetch('https://fafa-appointment.vercel.app/api/booking-request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...raw,submissionId:intakeAttempt.current.id})});const result=await response.json();if(!response.ok)throw Error(result.error||'Permintaan belum dapat disimpan.');if(popup)popup.location.href=href;else window.location.href=href;setError('Permintaan diterima untuk semakan. Slot belum disahkan sehingga PIC mengesahkan deposit. Tekan Hantar dalam WhatsApp.');}catch(error){popup?.close();setError(error.message+' Sila cuba semula.');}finally{setSubmitting(false);}
   };
   const renderChoice = item => (
     <div className={`booking-service-item ${item === otherBookingChoice ? 'booking-other' : ''}`} key={item}>
@@ -1136,10 +1149,10 @@ function BookingPage({ go }) {
           </section>}
           {adviceOnly && <label className="booking-field">Pertanyaan anda *<textarea name="adviceNotes" required maxLength={1000} value={adviceNotes} onChange={event => {setAdviceNotes(event.target.value);setError('');}} placeholder="Tulis pertanyaan anda dengan lengkap di sini." /></label>}
           {!adviceOnly && (morePeople !== 'yes' || guestStep) && <>
-          <label className="booking-consent"><input type="checkbox" required /><span>{dateUncertain ? 'Saya bersetuju menghantar maklumat ini kepada FAFA Salon untuk semakan harga sahaja. Ini bukan tempahan slot.' : `Saya faham slot tertakluk kepada kekosongan dan bersetuju menghantar maklumat kepada FAFA Salon. ${depositNote} Borang ini belum mengesahkan tempahan.`}</span></label>
+          <label className="booking-consent"><input type="checkbox" required /><span>{dateUncertain ? 'Saya bersetuju maklumat ini disimpan untuk semakan harga PIC dan dihantar melalui WhatsApp. Ini bukan tempahan slot; permintaan tanpa tarikh dipadam selepas 7 hari.' : `Saya faham slot tertakluk kepada kekosongan dan bersetuju maklumat ini disimpan untuk semakan PIC serta dihantar melalui WhatsApp. ${depositNote} Borang ini belum mengesahkan tempahan.`}</span></label>
           </>}
           <p className="booking-error" role="alert">{error}</p>
-          {!adviceOnly && morePeople === 'yes' && !guestStep ? <button type="button" className="booking-send" onClick={event => {if(validate(event.currentTarget)){setGuestStep(true);setError('');window.scrollTo({top:0,behavior:'smooth'});}}}>Seterusnya — Pelanggan tambahan <ChevronRight size={17} /></button> : <a data-booking-send className="booking-send" href={href} target="_blank" rel="noopener noreferrer" onClick={event => { if (!validate(event.currentTarget)) event.preventDefault(); }}><MessageCircle size={18} /> {adviceOnly ? "Tanya Kami" : "Hantar detail ke WhatsApp ↗"}</a>}
+          {!adviceOnly && morePeople === 'yes' && !guestStep ? <button type="button" className="booking-send" onClick={event => {if(validate(event.currentTarget)){setGuestStep(true);setError('');window.scrollTo({top:0,behavior:'smooth'});}}}>Seterusnya — Pelanggan tambahan <ChevronRight size={17} /></button> : <a data-booking-send className="booking-send" href={href} target="_blank" rel="noopener noreferrer" aria-disabled={submitting} onClick={submitIntake}><MessageCircle size={18} /> {submitting ? "Menyimpan permintaan…" : adviceOnly ? "Tanya Kami" : "Hantar detail ke WhatsApp ↗"}</a>}
         </form>
       </div>
     </motion.section>
