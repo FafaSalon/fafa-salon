@@ -1,7 +1,11 @@
-# Sambungan Pending pelanggan
+# Kemas kini Booking / Semak Slot sahaja
 
-Source app pelanggan menggunakan versi App.jsx yang tersedia dalam chat ini. Upload kandungan ke repository fafa-salon-mobile. Vercel: Framework Vite, Build npm run build, Output dist.
+Upload semua isi ZIP ini ke root repo Mobile melalui GitHub Chrome, kemudian Commit changes. Jangan upload ZIP terus atau masukkan satu lagi folder pembungkus.
 
-Pasang Appointment v57 dan run PENDING-TEMPAHAN.sql dahulu. Submit borang menyimpan permintaan Pending melalui endpoint public Appointment (hanya menerima origin app pelanggan). WhatsApp masih dibuka dengan mesej asal. Tiada database key atau WhatsApp API diperlukan.
+Tetapan Vercel sedia ada: Framework Vite, build `npm run build`, output `dist`.
 
-Satu permintaan boleh merangkumi pelanggan utama dan tetamu. Belum pasti tarikh juga disimpan dan luput selepas 7 hari. Jika sumber borang yang sedang live telah diubah selepas salinan chat ini, semak perubahan tersebut sebelum menggantikan source.
+Perubahan: dropdown kategori, pilihan servis kekal merentas kategori, ringkasan servis dengan butang Buang, serta tema cerah dan lebar responsif untuk bahagian Booking sahaja. Semua halaman lain, senarai servis, harga, syarat, validasi, mesej WhatsApp dan endpoint Appointment dikekalkan.
+
+Tiada perubahan backend atau SQL Supabase diperlukan. Tidak perlu kemas kini Staff atau Appointment untuk perubahan ini.
+
+Build dan ujian interaksi DOM lulus. CSS disemak pada 390/768/1024/1366/1440px. Rupa browser/peranti sebenar belum disahkan.

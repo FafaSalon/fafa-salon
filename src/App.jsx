@@ -1,3 +1,4 @@
+import bookingTheme from './booking.css?inline';
 import React, { useEffect, useLayoutEffect, useState, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -853,6 +854,7 @@ function guestServiceText(guest) {
 }
 function BookingPage({ go }) {
   const [selected, setSelected] = useState(initialBookingServices);
+  const [serviceCategory,setServiceCategory]=useState(()=>{const first=initialBookingServices()[0];return comboBookingChoices.includes(first)?'combo':keratinBookingChoices.includes(first)?'keratin':first===otherBookingChoice?'other':first?'single':'';});
   const [submitting,setSubmitting]=useState(false);
   const intakeAttempt=useRef(null);
   const [wantCut, setWantCut] = useState(false);
@@ -958,10 +960,10 @@ function BookingPage({ go }) {
     const signature=JSON.stringify(raw);if(!intakeAttempt.current||intakeAttempt.current.signature!==signature)intakeAttempt.current={signature,id:crypto.randomUUID()};
     try{const response=await fetch('https://fafa-appointment.vercel.app/api/booking-request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...raw,submissionId:intakeAttempt.current.id})});const result=await response.json();if(!response.ok)throw Error(result.error||'Permintaan belum dapat disimpan.');if(popup)popup.location.href=href;else window.location.href=href;setError('Permintaan diterima untuk semakan. Slot belum disahkan sehingga PIC mengesahkan deposit. Tekan Hantar dalam WhatsApp.');}catch(error){popup?.close();setError(error.message+' Sila cuba semula.');}finally{setSubmitting(false);}
   };
-  const renderChoice = item => (
+  const renderChoice = (item, showStyle = true) => (
     <div className={`booking-service-item ${item === otherBookingChoice ? 'booking-other' : ''}`} key={item}>
       <label className={`booking-choice ${selected.includes(item) ? 'selected' : ''}`}><input type="checkbox" checked={selected.includes(item)} onChange={() => toggle(item)} /><span>{item}</span></label>
-      {selected.includes(item) && ['Bleach + Colour', 'Highlight + Colour'].includes(item) && <div className="booking-style-options">
+      {showStyle && selected.includes(item) && ['Bleach + Colour', 'Highlight + Colour'].includes(item) && <div className="booking-style-options">
         <span className="booking-style-title">Pilihan gaya</span>
         {(item === 'Bleach + Colour' ? ['Bleach + Colour Biasa', 'Peek-a-boo'] : ['Chunky Highlight', 'Highlight Colour', 'Balayage Highlight']).map(style => {
           const field = item === 'Bleach + Colour' ? 'bleachStyle' : 'highlightStyle';
@@ -970,10 +972,16 @@ function BookingPage({ go }) {
       </div>}
     </div>
   );
-  const renderKeratin = () => <details className="booking-keratin" open={selected.some(item => keratinBookingChoices.includes(item)) || undefined}>
-    <summary><Sparkles size={16} /><span>Keratin<small>Pilih jenis keratin</small></span><ChevronRight size={16} /></summary>
-    <div className="booking-keratin-options">{keratinBookingChoices.map(renderChoice)}</div>
-  </details>;
+  const categoryChoices={combo:comboBookingChoices,single:singleBookingChoices.filter(item=>!keratinBookingChoices.includes(item)),keratin:keratinBookingChoices,other:[otherBookingChoice]};
+  const servicePicker=<div className="booking-service-picker">
+    <p className="booking-note">Boleh pilih lebih daripada satu servis.</p>
+    <label className="booking-field">Pilih kategori servis<select aria-label="Pilih kategori servis" value={serviceCategory} onChange={event=>setServiceCategory(event.target.value)}><option value="">Pilih kategori servis</option><option value="combo">Combo Services</option><option value="single">Single Services</option><option value="keratin">Keratin</option><option value="other">Lain-lain / Perlukan nasihat</option></select></label>
+    {serviceCategory&&<div className="booking-category-results"><div className="booking-services">{categoryChoices[serviceCategory].map(item=>renderChoice(item,false))}</div></div>}
+    <section id="booking-selected-services" className="booking-selected-summary" aria-live="polite">
+      <h3 className="booking-group-title">Servis dipilih ({selected.length})</h3>
+      {!selected.length?<p className="booking-note">Belum ada servis dipilih. Pilih kategori untuk melihat servis.</p>:<div className="booking-services">{selected.map(item=><div className="booking-selected-item" key={item}>{renderChoice(item,true)}<button type="button" className="booking-remove-service" aria-label={'Buang '+item} onClick={()=>toggle(item)}>Buang</button></div>)}</div>}
+    </section>
+  </div>;
   return (
     <motion.section className="page booking-page" {...pageMotion}>
       <style>{`
@@ -1046,6 +1054,7 @@ function BookingPage({ go }) {
         .booking-page .booking-cut-card .booking-field{color:#27222b}
         .booking-page .booking-cut-card .booking-note{color:#62586a}
       `}</style>
+      <style>{bookingTheme}</style>
       <div className="content-block">
         <button className="booking-back" aria-label="Kembali ke halaman utama" onClick={() => go('home')}><ArrowLeft size={17} /></button>
         <span className="kicker">Booking / Semak Slot</span>
@@ -1063,26 +1072,7 @@ function BookingPage({ go }) {
           </fieldset>
           <fieldset>
             <legend>02 / PILIH SERVIS ANDA</legend>
-            {selected.length > 0 ? <>
-              <div id="booking-selected-services" aria-live="polite" style={{scrollMarginTop:90}}>
-                <h3 className="booking-group-title" style={{fontSize:18,marginTop:0}}>Servis pilihan anda ✓</h3>
-                <p className="booking-note" style={{margin:'0 0 12px'}}>Servis di bawah sudah ditick. Semak pilihan anda, kemudian terus isi detail di bawah.</p>
-                <div className="booking-services">{selected.filter(item => !keratinBookingChoices.includes(item)).map(renderChoice)}{selected.some(item => keratinBookingChoices.includes(item)) && renderKeratin()}</div>
-              </div>
-              <details style={{margin:'16px 0',color:'#ff99c9'}}>
-                <summary style={{cursor:'pointer',padding:'10px 0',fontWeight:700}}>Tambah atau pilih servis lain</summary>
-                <h3 className="booking-group-title">Combo Services</h3>
-                <div className="booking-services">{comboBookingChoices.filter(item => !selected.includes(item)).map(renderChoice)}</div>
-                <h3 className="booking-group-title">Single Services</h3>
-                <div className="booking-services">{singleBookingChoices.filter(item => !selected.includes(item) && !keratinBookingChoices.includes(item)).map(renderChoice)}{!selected.some(item => keratinBookingChoices.includes(item)) && renderKeratin()}{!selected.includes(otherBookingChoice) && renderChoice(otherBookingChoice)}</div>
-              </details>
-            </> : <>
-              <p className="booking-note" style={{margin:'0 0 12px'}}>Boleh pilih lebih daripada satu servis.</p>
-              <h3 className="booking-group-title">Combo Services</h3>
-              <div className="booking-services">{comboBookingChoices.map(renderChoice)}</div>
-              <h3 className="booking-group-title">Single Services</h3>
-              <div className="booking-services">{singleBookingChoices.filter(item => !keratinBookingChoices.includes(item)).map(renderChoice)}{renderKeratin()}{renderChoice(otherBookingChoice)}</div>
-            </>}
+            {servicePicker}
             {canAddCut && <div className={`booking-addons booking-cut-card ${hasCut ? 'active' : ''}`}>
               <label className="booking-cut-toggle"><input type="checkbox" checked={wantCut} onChange={event => { const checked = event.target.checked; setWantCut(checked); if (!checked) update('cutLength', ''); }} /><span><strong>Add-on Hair Cut</strong><small>Tick jika mahu potong rambut. Nyatakan gaya potongan yang diinginkan dalam Nota tambahan.</small></span></label>
               {hasCut && <div className="booking-cut-target">
@@ -1147,6 +1137,7 @@ function BookingPage({ go }) {
             {earlyCutoff && !dateUncertain && <p className="booking-note">Slot terakhir bagi servis dalam kumpulan ini ialah 3:30 PM.</p>}
             <button type="button" className="booking-fallback" style={{marginTop:14}} onClick={() => {setGuestStep(false);setError('');window.scrollTo({top:0,behavior:'smooth'});}}>← Edit pelanggan utama</button>
           </section>}
+          {adviceOnly && <fieldset><legend>02 / PILIH SERVIS ANDA</legend>{servicePicker}</fieldset>}
           {adviceOnly && <label className="booking-field">Pertanyaan anda *<textarea name="adviceNotes" required maxLength={1000} value={adviceNotes} onChange={event => {setAdviceNotes(event.target.value);setError('');}} placeholder="Tulis pertanyaan anda dengan lengkap di sini." /></label>}
           {!adviceOnly && (morePeople !== 'yes' || guestStep) && <>
           <label className="booking-consent"><input type="checkbox" required /><span>{dateUncertain ? 'Saya bersetuju maklumat ini disimpan untuk semakan harga PIC dan dihantar melalui WhatsApp. Ini bukan tempahan slot; permintaan tanpa tarikh dipadam selepas 7 hari.' : `Saya faham slot tertakluk kepada kekosongan dan bersetuju maklumat ini disimpan untuk semakan PIC serta dihantar melalui WhatsApp. ${depositNote} Borang ini belum mengesahkan tempahan.`}</span></label>
