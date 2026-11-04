@@ -1056,7 +1056,7 @@ function BookingPage({ go }) {
           <fieldset>
             <legend>01 / PELANGGAN UTAMA</legend>
             <div className="booking-fields">
-              <label className="booking-field">Nama penuh *<input required maxLength={100} autoComplete="name" value={form.name} onChange={event => update('name', event.target.value)} placeholder="Nama anda" /></label>
+              <label className="booking-field">Nama *<input required maxLength={100} autoComplete="name" value={form.name} onChange={event => update('name', event.target.value)} placeholder="Nama anda" /></label>
               <label className="booking-field">No. telefon / WhatsApp *<input required type="tel" minLength={9} maxLength={20} autoComplete="tel" value={form.phone} onChange={event => update('phone', event.target.value)} placeholder="Contoh: 0123456789" /></label>
               <label className="booking-field">Nota tambahan<textarea maxLength={1000} value={form.notes} onChange={event => update('notes', event.target.value)} placeholder="Contoh: Warna pilihan — Ash Brown; pernah colour / bleach; rambut sensitif, kering atau rosak. Nyatakan juga sebarang permintaan khas." /></label>
             </div>
