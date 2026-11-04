@@ -1,3 +1,4 @@
+import responsiveTheme from './responsive.css?inline';
 import bookingTheme from './booking.css?inline';
 import React, { useEffect, useLayoutEffect, useState, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -344,6 +345,7 @@ export default function App() {
         </AnimatePresence>
         {(['booking','combo','contact','walkin-check'].includes(page) || current || currentCombo) && <button className="floating-home-back" aria-label="Kembali ke halaman utama" onClick={() => go('home')}><ArrowLeft size={20} /></button>}
         <BottomBar go={go} page={page} />
+        <style>{responsiveTheme}</style>
       </div>
     </main>
   );

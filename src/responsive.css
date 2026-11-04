@@ -1,0 +1,58 @@
+/* Shared shell sizing. Booking retains its own existing page styles. */
+html body .site-shell .phone-frame{width:100%;max-width:1100px;min-width:0}
+html body .site-shell .top-nav{width:100%;padding-inline:24px}
+html body .site-shell .nav-drawer{max-height:calc(100dvh - 90px);overflow-y:auto;overscroll-behavior:contain}
+html body .site-shell .bottom-bar{width:calc(100% - 32px);max-width:1068px;box-sizing:border-box}
+html body .site-shell:has(.bottom-bar) .page:not(.booking-page){padding-bottom:calc(190px + env(safe-area-inset-bottom,0px))}
+html body .site-shell .page:not(.booking-page){min-width:0;overflow-wrap:anywhere}
+html body .site-shell .page:not(.booking-page) p{max-width:70ch}
+html body .site-shell .home-page .hero p.salon-intro{max-width:64ch;margin-inline:auto}
+html body .site-shell .home-page .hero{padding:28px 24px}
+html body .site-shell .home-page .hero-bg{background-position:50% 45% !important}
+html body .site-shell .page:not(.booking-page) .content-block,
+html body .site-shell .page:not(.booking-page) .services-section,
+html body .site-shell .page:not(.booking-page) .category-intro{padding-inline:24px}
+html body .site-shell .page:not(.booking-page) .category-intro p{max-width:65ch}
+html body .site-shell .page:not(.booking-page) .category-buttons,
+html body .site-shell .page:not(.booking-page) .service-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+html body .site-shell .page:not(.booking-page) .category-buttons>*{min-width:0}
+html body .site-shell .page:not(.booking-page) .colour-category-toggle{width:100%;min-width:0;text-align:left}
+html body .site-shell .page:not(.booking-page) .colour-category-toggle strong{overflow-wrap:anywhere}
+html body .site-shell .page:not(.booking-page) .real-service-visual img{object-fit:contain}
+html body .site-shell .page:not(.booking-page) .location-card>div{min-width:0}
+html body .site-shell .page:not(.booking-page) .main-wa{white-space:normal;overflow-wrap:anywhere}
+@media(min-width:700px){
+ html body .site-shell .page:not(.booking-page) .category-buttons,
+ html body .site-shell .page:not(.booking-page) .service-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+ html body .site-shell .page:not(.booking-page) .quick-links{grid-template-columns:repeat(2,minmax(0,1fr));padding-inline:24px}
+ html body .site-shell .page:not(.booking-page) .content-block{padding-block:28px}
+ html body .site-shell .home-page .hero{padding-block:40px}
+ html body .site-shell .home-page .hero h1.salon-headline{font-size:40px}
+ html body .site-shell .page:not(.booking-page) .category-intro h1{font-size:32px}
+ html body .site-shell .page:not(.booking-page) .lead,
+ html body .site-shell .page:not(.booking-page) .colour-category-content p,
+ html body .site-shell .page:not(.booking-page) .info-panel p{font-size:14px;line-height:1.7}
+ html body .site-shell .page:not(.booking-page) .colour-category-toggle strong{font-size:16px}
+ html body .site-shell .bottom-bar{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+ html body .site-shell .bottom-bar .bottom-price{grid-column:auto;min-height:48px}
+ html body .site-shell:has(.bottom-bar) .page:not(.booking-page){padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}
+ html body .site-shell .nav-drawer{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:699px){
+ html body .site-shell .top-nav{padding-inline:16px}
+ html body .site-shell .page:not(.booking-page) .content-block,
+ html body .site-shell .page:not(.booking-page) .services-section,
+ html body .site-shell .page:not(.booking-page) .category-intro,
+ html body .site-shell .home-page .hero{padding-inline:16px}
+ html body .site-shell .bottom-bar{width:calc(100% - 24px)}
+}
+@media(max-height:500px) and (orientation:landscape){
+ html body .site-shell .bottom-bar{position:static;transform:none;margin:12px auto}
+ html body .site-shell:has(.bottom-bar) .page:not(.booking-page){padding-bottom:16px}
+}
+html body .site-shell:not(:has(.booking-page)) .floating-home-back{left:max(16px,calc(50% - 526px))}
+@media(min-width:700px){
+ html body .site-shell .walkin-check-form{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+ html body .site-shell .walkin-check-form>.walkin-note,
+ html body .site-shell .walkin-check-form>.main-wa{grid-column:1/-1}
+}

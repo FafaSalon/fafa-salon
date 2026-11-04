@@ -1,11 +1,13 @@
-# Kemas kini Booking / Semak Slot sahaja
+# FAFA Mobile — susun atur responsif
 
-Upload semua isi ZIP ini ke root repo Mobile melalui GitHub Chrome, kemudian Commit changes. Jangan upload ZIP terus atau masukkan satu lagi folder pembungkus.
+Extract ZIP, upload semua isinya ke root repo Mobile melalui GitHub Chrome, kemudian Commit changes. Jangan upload ZIP terus atau masukkan folder pembungkus.
 
-Tetapan Vercel sedia ada: Framework Vite, build `npm run build`, output `dist`.
+Vercel: Framework Vite; build `npm run build`; output `dist`.
 
-Perubahan: dropdown kategori, pilihan servis kekal merentas kategori, ringkasan servis dengan butang Buang, serta tema cerah dan lebar responsif untuk bahagian Booking sahaja. Semua halaman lain, senarai servis, harga, syarat, validasi, mesej WhatsApp dan endpoint Appointment dikekalkan.
+Container seluruh app maksimum 1100px. Header dan navigasi mengikut container, kategori menggunakan dua lajur apabila ruang mencukupi, dan telefon kekal satu lajur. Menu boleh ditatal dan ruang bawah disediakan untuk navigasi serta safe area. Orientasi landskap rendah menggunakan navigasi dalam aliran halaman.
 
-Tiada perubahan backend atau SQL Supabase diperlukan. Tidak perlu kemas kini Staff atau Appointment untuk perubahan ini.
+Warna, logo, teks, gambar, animasi dan logik aplikasi dikekalkan. Booking mengekalkan reka bentuk dan fungsi terdahulu. Perubahan terhad kepada CSS responsif dan import stylesheet tersebut.
 
-Build dan ujian interaksi DOM lulus. CSS disemak pada 390/768/1024/1366/1440px. Rupa browser/peranti sebenar belum disahkan.
+Tiada perubahan backend, Appointment, WhatsApp atau SQL Supabase diperlukan.
+
+Build serta ujian DOM interaksi Booking, pelanggan tambahan, kategori, pautan dan halaman lulus. Aturan CSS disemak pada 390/768/1024/1366/1440px. Ini bukan pengesahan visual browser atau peranti sebenar; screenshot browser tidak disediakan. Belum deploy.
