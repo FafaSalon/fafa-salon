@@ -56,3 +56,9 @@ html body .site-shell:not(:has(.booking-page)) .floating-home-back{left:max(16px
  html body .site-shell .walkin-check-form>.walkin-note,
  html body .site-shell .walkin-check-form>.main-wa{grid-column:1/-1}
 }
+/* Registration footer only; leave existing page content unchanged. */
+html body .site-shell .business-registration{width:100%;padding:20px 16px 28px;text-align:center;font-size:12px;line-height:1.7;font-weight:400;color:#e4dbe2;overflow-wrap:anywhere}
+html body .site-shell:has(.booking-page) .business-registration{color:#625762}
+html body .site-shell:has(.bottom-bar) .business-registration{padding-bottom:calc(190px + env(safe-area-inset-bottom,0px))}
+@media(min-width:700px){html body .site-shell:has(.bottom-bar) .business-registration{padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}}
+@media(max-height:500px) and (orientation:landscape){html body .site-shell:has(.bottom-bar) .business-registration{padding-bottom:20px}}

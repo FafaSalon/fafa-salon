@@ -344,6 +344,7 @@ export default function App() {
           {current && <ServicePage key={page} item={current} go={go} />}
         </AnimatePresence>
         {(['booking','combo','contact','walkin-check'].includes(page) || current || currentCombo) && <button className="floating-home-back" aria-label="Kembali ke halaman utama" onClick={() => go('home')}><ArrowLeft size={20} /></button>}
+        <footer className="business-registration" aria-label="Pendaftaran perniagaan"><div>FAFABCC ENTERPRISE</div><div>No. SSM: 202103328033 (KT0508936-W)</div></footer>
         <BottomBar go={go} page={page} />
         <style>{responsiveTheme}</style>
       </div>
