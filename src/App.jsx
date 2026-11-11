@@ -505,13 +505,43 @@ function ServicePage({ item, go }) {
       <section className="content-block">
         <p className="lead">{item.intro}</p>
         <div className="time-pill"><Clock3 size={17} /> {item.time}</div>
-        <h3 style={{color:"#8b1744",marginTop:16}}>{item.visual === "eyelash" ? "Pilihan Eyelash" : item.walkinOnly ? "Walk-in sahaja • Tak perlu booking" : "Single Services"}</h3>
-        <ServiceCategories item={item} />
+        {item.visual === "haircut" ? <HairCutWashPriceBoard /> : <>
+          <h3 style={{color:"#8b1744",marginTop:16}}>{item.visual === "eyelash" ? "Pilihan Eyelash" : item.walkinOnly ? "Walk-in sahaja • Tak perlu booking" : "Single Services"}</h3>
+          <ServiceCategories item={item} />
+        </>}
         {!item.walkinOnly && <p className="lead" style={{marginTop:20}}>Hairstylist akan cek keadaan rambut dan cadangkan servis yang sesuai.</p>}
         {!item.walkinOnly && <div style={{marginTop:16}}><ComboSpotlight go={go} service={item.visual} /></div>}
       </section>
     </motion.section>
   );
+}
+
+function HairCutWashPriceBoard() {
+  const services = [
+    ["Hair Cut", "RM38"],
+    ["Hair Wash & Blow", "RM38"],
+    ["Hair Cut + Wash & Blow", "RM49"],
+    ["Curl Sahaja", "RM28"],
+  ];
+  const row = {display:"flex",justifyContent:"space-between",alignItems:"center",gap:14};
+  return <section aria-label="Senarai harga Hair Cut, Wash & Styling" style={{background:"#000",color:"#f4f4f4",border:"1px solid #303030",borderRadius:17,padding:"16px 13px 20px",marginTop:20,fontFamily:"Arial, sans-serif"}}>
+    <div style={{fontSize:10,letterSpacing:0.2,marginBottom:9,color:"#d4d4d4"}}>FAFA SALON - OUR SERVICES</div>
+    <h2 style={{fontSize:20,fontWeight:700,color:"#f4f4f4",margin:"0 0 5px"}}>Hair Cut, Wash &amp; Styling</h2>
+    <p style={{fontSize:14,color:"#bfbfbf",margin:"0 0 20px"}}>Walk-in sahaja · Tak perlu booking</p>
+    <div style={{borderTop:"1px solid #292929"}}>
+      {services.map(([name,price]) => <div key={name} style={{...row,padding:"25px 0 17px",borderBottom:"1px solid #1e1e1e"}}>
+        <div><div style={{fontSize:16,fontWeight:700,lineHeight:1.4}}>{name}</div><div style={{fontSize:12,color:"#cecece",marginTop:6}}>Sebahu – dada · Lebih dada +RM10</div></div>
+        <strong style={{fontSize:17,whiteSpace:"nowrap"}}>{price}</strong>
+      </div>)}
+    </div>
+    <h3 style={{fontSize:16,color:"#f4f4f4",margin:"26px 0 15px"}}>Add-On — Bersama Servis Cut atau Wash</h3>
+    <div style={{...row,marginBottom:16,fontSize:14}}><span>Hair Iron</span><strong style={{fontSize:15}}>RM10–RM20</strong></div>
+    <div style={{...row,marginBottom:27,fontSize:14}}><span>Hair Curl</span><strong style={{fontSize:15}}>RM18–RM28</strong></div>
+    <h3 style={{fontSize:16,color:"#f4f4f4",margin:"0 0 14px"}}>Caj Tambahan Jika Ada</h3>
+    <div style={{...row,fontSize:14}}><span>Rambut tebal</span><strong style={{fontSize:15}}>+RM10++</strong></div>
+    <p style={{fontSize:12,color:"#c7c7c7",lineHeight:1.6,margin:"7px 0 18px"}}>Harga bergantung pada panjang dan ketebalan rambut.</p>
+    <div style={{borderTop:"1px solid #292929",paddingTop:15,fontSize:12,lineHeight:1.8,color:"#d0d0d0"}}>Mesej admin sekurang-kurangnya 30 minit sebelum datang untuk semak slot.<div>Slot terakhir: Hair Wash 5:30 PM · Hair Cut 6:00 PM</div></div>
+  </section>;
 }
 
 function ComboSpotlight({ go }) {
