@@ -500,9 +500,9 @@ function CategoryHeader({ item }) {
 function ServicePage({ item, go }) {
   useLayoutEffect(() => { window.scrollTo({top:0,behavior:"instant"}); }, [item.title]);
   return (
-    <motion.section className="page service-page" {...pageMotion}>
-      <CategoryHeader item={item} />
-      <section className="content-block" style={item.visual === "haircut" ? {background:"#09090b",padding:"0",borderRadius:22,overflow:"hidden",boxShadow:"0 20px 55px rgba(0,0,0,.2)"} : undefined}>
+    <motion.section className={item.visual === "haircut" ? "page service-page haircut-dark-page" : "page service-page"} style={item.visual === "haircut" ? {background:"#09090b",minHeight:"100vh",color:"#fff"} : undefined} {...pageMotion}>
+      {item.visual !== "haircut" && <CategoryHeader item={item} />}
+      <section className="content-block" style={item.visual === "haircut" ? {background:"#09090b",borderRadius:0,boxShadow:"none"} : undefined}>
         {item.visual !== "haircut" && <><p className="lead">{item.intro}</p><div className="time-pill"><Clock3 size={17} /> {item.time}</div></>}
         {item.visual === "haircut" ? <HairCutWashPriceBoard /> : <>
           <h3 style={{color:"#8b1744",marginTop:16}}>{item.visual === "eyelash" ? "Pilihan Eyelash" : item.walkinOnly ? "Walk-in sahaja • Tak perlu booking" : "Single Services"}</h3>
@@ -523,7 +523,7 @@ function HairCutWashPriceBoard() {
     {name:"Hair Cut + Wash & Blow",price:"RM49",desc:"Pakej potong, cuci dan blow"},
     {name:"Curl Sahaja",price:"RM28",desc:"Gaya keriting untuk rambut cantik"},
   ];
-  return <section aria-label="Senarai harga Hair Cut, Wash & Styling" style={{background:"#09090b",color:"#fff",padding:"clamp(22px, 5vw, 42px)",fontFamily:"inherit"}}>
+  return <section aria-label="Senarai harga Hair Cut, Wash & Styling" style={{background:"#09090b",color:"#fff",fontFamily:"inherit"}}>
     <div style={{display:"flex",alignItems:"center",gap:9,marginBottom:14}}><span style={{width:22,height:2,background:pink,borderRadius:5}}/><span style={{fontSize:11,fontWeight:800,letterSpacing:2,color:pink}}>FAFA SALON · PRICE MENU</span></div>
     <h2 style={{fontSize:"clamp(24px, 4vw, 34px)",fontWeight:850,letterSpacing:-.8,lineHeight:1.15,color:"#fff",margin:"0 0 10px"}}>Hair Cut, Wash <span style={{color:pink}}>&amp; Styling</span></h2>
     <p style={{fontSize:13,color:"#d7d7dd",margin:"0 0 20px",lineHeight:1.6}}>Walk-in sahaja · Tak perlu booking</p>
