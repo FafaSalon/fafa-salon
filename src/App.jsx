@@ -104,11 +104,18 @@ const services = {
   },
 
   haircut: {
-    no:"05",title:"Hair Cut & Hair Wash",cardTitle:"Hair Cut & Hair Wash",visual:"haircut",walkinOnly:true,
-    short:"Potongan dan cucian rambut. Walk-in sahaja.",
-    intro:"Tak perlu booking. Boleh walk-in atau mesej 30 minit sebelum datang pada hari yang sama untuk semak kekosongan. Mungkin perlu menunggu giliran.",
+    no:"05",title:"Hair Cut, Wash & Styling",cardTitle:"Hair Cut & Hair Wash",visual:"haircut",walkinOnly:true,
+    short:"Harga Hair Cut, Wash & Blow serta Curl. Walk-in sahaja.",
+    intro:"Tak perlu booking. Mesej admin sekurang-kurangnya 30 minit sebelum datang untuk semak slot. Servis tertakluk pada kekosongan dan mungkin perlu menunggu giliran.",
     time:"Slot terakhir: Hair Wash 5:30 PM • Hair Cut 6:00 PM",
-    panels:[{title:"Hair Cut & Styling",text:"Potongan untuk ubah paras, bentuk, layer atau gaya rambut. Bincangkan gaya dengan hairstylist sebelum mula. Potong banyak walaupun lurus tetap dikira Hair Cut. Mungkin perlu menunggu giliran."},{title:"Hair Wash",text:"Cucian rambut untuk rasa bersih dan segar. Jika mahu tambah potongan atau styling, maklumkan dahulu untuk semakan caj. Mungkin perlu menunggu giliran."}]
+    panels:[
+      {title:"Hair Cut — RM38",text:"Harga untuk rambut paras sebahu hingga dada. Lebih daripada paras dada: tambah RM10. Bincangkan gaya potongan dengan hairstylist sebelum servis."},
+      {title:"Hair Wash & Blow — RM38",text:"Cuci rambut dan blow kering. Harga untuk rambut paras sebahu hingga dada. Lebih daripada paras dada: tambah RM10."},
+      {title:"Hair Cut + Wash & Blow — RM49",text:"Potong rambut, cuci dan blow kering. Harga untuk rambut paras sebahu hingga dada. Lebih daripada paras dada: tambah RM10."},
+      {title:"Curl Sahaja — RM28",text:"Servis curl sahaja. Harga untuk rambut paras sebahu hingga dada. Lebih daripada paras dada: tambah RM10."},
+      {title:"Add-On bersama Cut atau Wash",text:"Hair Iron: RM10–RM20. Hair Curl: RM18–RM28. Add-on ini hanya bersama servis Hair Cut atau Hair Wash."},
+      {title:"Caj tambahan jika ada",text:"Rambut tebal: tambah RM10++ mengikut ketebalan rambut. Caj tambahan akan dimaklumkan selepas semakan rambut."}
+    ]
   },
   eyelash: {
     no:"06",title:"Eyelash",cardTitle:"Eyelash",visual:"eyelash",walkinOnly:true,
