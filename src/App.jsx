@@ -905,6 +905,8 @@ function BookingPage({ go }) {
   const [selected, setSelected] = useState(initialBookingServices);
   const [serviceCategory,setServiceCategory]=useState(()=>{const first=initialBookingServices()[0];return comboBookingChoices.includes(first)?'combo':keratinBookingChoices.includes(first)?'keratin':first===otherBookingChoice?'other':first?'single':'';});
   const [submitting,setSubmitting]=useState(false);
+  const [bookingQuote,setBookingQuote]=useState(null);
+  const [quoteError,setQuoteError]=useState('');
   const intakeAttempt=useRef(null);
   const [wantCut, setWantCut] = useState(false);
   const [promoAcknowledged, setPromoAcknowledged] = useState(false);
@@ -998,16 +1000,32 @@ function BookingPage({ go }) {
     if (!dateUncertain && !times.includes(form.time)) { if(guestStep) setGuestStep(false); setError('Servis kumpulan ini memerlukan slot sebelum atau pada 3:30 PM. Sila ubah masa pelanggan utama.'); return false; }
     setError(''); return true;
   };
+  const bookingMembers=[{name:form.name.trim(),services:selected,length:hasCut?form.cutLength:form.length,cut:hasCut,walkin:false,notes:[form.bleachStyle,form.highlightStyle].filter(Boolean).join(' / ')},...(morePeople==='yes'?guests.map(g=>({name:g.name.trim(),services:g.cutWash?[g.cut?'Hair Cut':'',g.wash?'Hair Wash':''].filter(Boolean):[guestHasHair(g)?g.service:'',g.eyelash?'Eyelash Perm':''].filter(Boolean),length:g.length,cut:false,walkin:!!g.cutWash})):[])];
+  const bookingRaw={branch:form.branch,phone:form.phone.trim(),date:form.date,time:form.time,notes:form.notes,members:bookingMembers};
+  const bookingKey=JSON.stringify(bookingRaw);
+  const bookingAPI=import.meta.env.VITE_BOOKING_API || 'https://fafa-appointment.vercel.app/api/booking-request';
+  const readyForQuote=!adviceOnly&&!!form.branch&&/^\+?[\d ()-]{9,24}$/.test(form.phone.trim())&&!!form.date&&(dateUncertain||!!form.time)&&bookingMembers.every(m=>m.name&&m.services.length&&m.services.every(Boolean)&&(m.walkin||m.services.every(s=>s==='Eyelash Perm')||!!m.length));
+  useEffect(()=>{
+    setBookingQuote(null);setQuoteError('');
+    if(!readyForQuote)return;
+    const input=JSON.parse(bookingKey),controller=new AbortController();
+    if(!intakeAttempt.current||intakeAttempt.current.signature!==bookingKey)intakeAttempt.current={signature:bookingKey,id:crypto.randomUUID()};
+    const submissionId=intakeAttempt.current.id;
+    const timer=setTimeout(async()=>{
+      try{const capability=await fetch(bookingAPI,{signal:controller.signal});const info=await capability.json();if(!capability.ok||info.bookingPreviewVersion!==1)throw Error('Semakan harga sedang dikemas kini. Sila cuba semula sebentar lagi.');const response=await fetch(bookingAPI,{method:'POST',headers:{'Content-Type':'application/json'},signal:controller.signal,body:JSON.stringify({...input,submissionId,action:'preview'})});const result=await response.json();if(!response.ok)throw Error(result.error||'Anggaran belum tersedia.');if(!controller.signal.aborted)setBookingQuote({...result,key:bookingKey});}
+      catch(e){if(!controller.signal.aborted)setQuoteError(e.message||'Anggaran belum tersedia. Sila cuba semula.');}
+    },400);
+    return()=>{clearTimeout(timer);controller.abort();};
+  },[bookingKey,readyForQuote,bookingAPI]);
   const submitIntake = async event => {
     if(!validate(event.currentTarget)){event.preventDefault();return;}
     if(adviceOnly)return;
     event.preventDefault();if(submitting)return;
     const popup=window.open('about:blank','_blank');if(popup)popup.opener=null;
     setSubmitting(true);setError('');
-    const members=[{name:form.name.trim(),services:selected,length:hasCut?form.cutLength:form.length,cut:hasCut,walkin:false,notes:[form.bleachStyle,form.highlightStyle].filter(Boolean).join(' / ')},...(morePeople==='yes'?guests.map(g=>({name:g.name.trim(),services:g.cutWash?[g.cut?'Hair Cut':'',g.wash?'Hair Wash':''].filter(Boolean):[guestHasHair(g)?g.service:'',g.eyelash?'Eyelash Perm':''].filter(Boolean),length:g.length,cut:false,walkin:!!g.cutWash})):[])];
-    const raw={branch:form.branch,phone:form.phone.trim(),date:form.date,time:form.time,notes:form.notes,members};
-    const signature=JSON.stringify(raw);if(!intakeAttempt.current||intakeAttempt.current.signature!==signature)intakeAttempt.current={signature,id:crypto.randomUUID()};
-    try{const response=await fetch('https://fafa-appointment.vercel.app/api/booking-request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...raw,submissionId:intakeAttempt.current.id})});const result=await response.json();if(!response.ok)throw Error(result.error||'Permintaan belum dapat disimpan.');if(popup)popup.location.href=href;else window.location.href=href;setError('Permintaan diterima untuk semakan. Slot belum disahkan sehingga PIC mengesahkan deposit. Tekan Hantar dalam WhatsApp.');}catch(error){popup?.close();setError(error.message+' Sila cuba semula.');}finally{setSubmitting(false);}
+    const raw=bookingRaw;
+    if(!bookingQuote||bookingQuote.key!==bookingKey||!bookingQuote.bookingPrice){popup?.close();setSubmitting(false);setError(quoteError||'Sila tunggu anggaran harga siap sebelum hantar.');return;}
+    try{const response=await fetch(bookingAPI,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...raw,submissionId:intakeAttempt.current.id,bookingPrice:bookingQuote.bookingPrice})});const result=await response.json();if(!response.ok)throw Error(result.error||'Permintaan belum dapat disimpan.');if(popup)popup.location.href=href;else window.location.href=href;setError('Permintaan diterima untuk semakan. Slot belum disahkan sehingga PIC mengesahkan deposit. Tekan Hantar dalam WhatsApp.');}catch(error){popup?.close();setError(error.message+' Sila cuba semula.');}finally{setSubmitting(false);}
   };
   const renderChoice = (item, showStyle = true) => (
     <div className={`booking-service-item ${item === otherBookingChoice ? 'booking-other' : ''}`} key={item}>
@@ -1189,6 +1207,13 @@ function BookingPage({ go }) {
           {adviceOnly && <fieldset><legend>02 / PILIH SERVIS ANDA</legend>{servicePicker}</fieldset>}
           {adviceOnly && <label className="booking-field">Pertanyaan anda *<textarea name="adviceNotes" required maxLength={1000} value={adviceNotes} onChange={event => {setAdviceNotes(event.target.value);setError('');}} placeholder="Tulis pertanyaan anda dengan lengkap di sini." /></label>}
           {!adviceOnly && (morePeople !== 'yes' || guestStep) && <>
+          {!adviceOnly&&<section className="booking-live-estimate" aria-live="polite" style={{padding:16,border:'1px solid #eac4d7',borderRadius:12,background:'#fff9fc',color:'#211b22'}}>
+            <strong style={{color:'#211b22',fontSize:14}}>Anggaran mengikut servis &amp; paras rambut</strong>
+            {bookingQuote?.key===bookingKey?<>
+              {bookingQuote.quotes.map((q,i)=><div key={i} style={{display:'flex',justifyContent:'space-between',gap:12,padding:'10px 0',borderBottom:'1px solid #f2d9e5',fontSize:13}}><span>{bookingMembers[i].name}<small style={{display:'block',color:'#746c75'}}>{q.record.serviceName} · {bookingMembers[i].length||'Tanpa paras'}</small></span><b style={{color:'#e91e83',whiteSpace:'nowrap'}}>{q.estimate==null?'Semakan PIC':'RM'+Number(q.estimate).toFixed(2)}</b></div>)}
+              <small style={{display:'block',color:'#746c75',marginTop:10,lineHeight:1.6}}>Anggaran ini disimpan bersama permintaan anda. Caj tebal dan tambahan disahkan selepas pemeriksaan rambut. {dateUncertain?'Belum termasuk caj hujung minggu/cuti umum.':''}</small>
+            </>:<p style={{fontSize:12,color:'#746c75'}}>{quoteError||(readyForQuote?'Menyemak katalog terkini…':'Lengkapkan maklumat pelanggan, cawangan, tarikh, servis dan paras untuk melihat anggaran.')}</p>}
+          </section>}
           <label className="booking-consent"><input type="checkbox" required /><span>{dateUncertain ? 'Saya bersetuju maklumat ini disimpan untuk semakan harga PIC dan dihantar melalui WhatsApp. Ini bukan tempahan slot; permintaan tanpa tarikh dipadam selepas 7 hari.' : `Saya faham slot tertakluk kepada kekosongan dan bersetuju maklumat ini disimpan untuk semakan PIC serta dihantar melalui WhatsApp. ${depositNote} Borang ini belum mengesahkan tempahan.`}</span></label>
           </>}
           <p className="booking-error" role="alert">{error}</p>
@@ -1198,3 +1223,4 @@ function BookingPage({ go }) {
     </motion.section>
   );
 }
+
