@@ -980,19 +980,8 @@ function BookingPage({ go }) {
     setForm(prev => ({ ...prev, time: '', bleachStyle: next.includes('Bleach + Colour') ? prev.bleachStyle : '', highlightStyle: next.includes('Highlight + Colour') ? prev.highlightStyle : '' }));
   };
   const dateLabel = dateUncertain ? 'Belum pasti' : form.date ? new Date(`${form.date}T12:00:00`).toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
-  const message = [
-    dateUncertain ? 'Hi FAFA Salon! Saya nak tahu harga sahaja dahulu. Saya belum pasti bila nak buat servis dan belum mahu menempah slot.' : 'Hi FAFA Salon! Saya nak semak harga & kekosongan slot.', '',
-    ...(morePeople === 'yes' ? [`Jumlah pelanggan: ${guests.length + 1} orang`, '', 'PELANGGAN 1'] : []),
-    `Nama: ${form.name.trim()}`,
-    `No. telefon: ${form.phone.trim()}`,
-    `Cawangan: ${form.branch}`, `Tarikh pilihan: ${dateLabel}`, ...(!dateUncertain ? [`Masa pilihan: ${form.time}`] : []), '',
-    `Servis: ${selected.map(item => item === 'Bleach + Colour' && form.bleachStyle ? `${item} (${form.bleachStyle})` : item === 'Highlight + Colour' && form.highlightStyle ? `${item} (${form.highlightStyle})` : item).join(' + ')}`,
-    ...(hasCut ? [`Add-on Hair Cut: potong ke paras ${form.cutLength}`] : []),
-    ...(!hasCut && primaryHasHair ? [`Panjang rambut: ${form.length}`] : []),
-    `Nota: ${form.notes.trim() || '-'}`, '',
-    ...(morePeople === 'yes' ? guests.flatMap((guest,index) => ['',`PELANGGAN ${index+2}`,`Nama: ${guest.name.trim()}`,...(guestHasHair(guest) ? [`Panjang rambut: ${guest.length}`] : []),`Servis: ${guestServiceText(guest)}`,...(guest.cutWash ? [`Status: Walk-in sahaja — bukan tempahan. ${guestWalkInNote}`] : guest.eyelash ? ['Nota Eyelash Perm: Boleh booking tanpa deposit RM30; tertakluk kepada pengesahan admin.'] : []),'']) : []),
-    dateUncertain ? 'Ini ialah pertanyaan harga sahaja, bukan tempahan slot.' : `Saya faham tempahan belum disahkan. ${depositNote}`,
-  ].join('\n');
+  const messageMembers=[{name:form.name.trim(),services:selected,length:hasCut?form.cutLength:form.length,cut:hasCut,walkin:false,notes:[form.bleachStyle,form.highlightStyle].filter(Boolean).join(' / ')},...(morePeople==='yes'?guests.map(g=>({name:g.name.trim(),services:g.cutWash?[g.cut?'Hair Cut':'',g.wash?'Hair Wash':''].filter(Boolean):[guestHasHair(g)?g.service:'',g.eyelash?'Eyelash Perm':''].filter(Boolean),length:g.length,cut:false,walkin:!!g.cutWash})):[])];
+  const message=bookingWhatsApp({language,form,members:messageMembers,dateUncertain,t});
   const adviceMessage = language==='en' ? `Hi FAFA Salon! I would like to make an enquiry.\n\nEnquiry:\n${adviceNotes.trim()}` : `Hi FAFA Salon! Saya ingin membuat pertanyaan.\n\nPertanyaan:\n${adviceNotes.trim()}`;
   const href = `https://wa.me/${phone}?text=${encodeURIComponent(adviceOnly ? adviceMessage : message)}`;
   const validate = element => {

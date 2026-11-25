@@ -1,0 +1,6 @@
+import assert from 'node:assert/strict';
+import {bookingWhatsApp} from './src/booking-whatsapp.js';
+const input={form:{name:'Aina',phone:'0100000000',branch:'Setapak',date:'2026-11-28',time:'11:00 AM',notes:'Please keep my notes'},members:[{name:'Aina',services:['Combo Rebonding + Colour','Scalp Treatment'],length:'1 — Sebahu',cut:true,notes:'Balayage Highlight'}],dateUncertain:false,booking:[{lines:[{label:'AutoPrice',value:238}],total:345}],depositNote:'Deposit RM30'};
+for(const language of ['ms','en']){const message=bookingWhatsApp({...input,language});assert(message.includes('Aina'));assert(message.includes('Setapak'));assert(message.includes('Combo Rebonding + Colour + Scalp Treatment'));assert(message.includes('Balayage Highlight'));assert(message.includes('Please keep my notes'));assert(message.includes('Add-on Hair Cut'));assert(!/RM\s*\d|Estimated total|Anggaran jumlah|AutoPrice/.test(message));}
+const note=bookingWhatsApp({...input,language:'en',form:{...input.form,notes:'My own budget is RM200'}});assert(note.includes('My own budget is RM200'),'Customer-entered text must remain intact');
+console.log('PASS Mobile BM/EN enquiry: original customer details/styles/cut retained; server service prices, estimates, totals and automatic deposit amount absent; customer-entered amounts retained.');
