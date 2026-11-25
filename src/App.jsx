@@ -1,3 +1,4 @@
+import {fetchBookingCatalog,findChoice,catalogGroups,groupKey,earliestTime} from './booking-catalog.js';
 import {bookingWhatsApp} from './booking-whatsapp.js';
 import { createBookingSender, readBookingDraft, saveBookingDraft, openBookingWhatsApp } from './booking-submit';
 import { bookingText, bookingErrorText } from './booking-i18n';
@@ -909,10 +910,14 @@ function BookingPage({ go }) {
   const [language, setLanguage] = useState('ms');
   const t = text => bookingText(text, language);
   const formElement = useRef(null);
-  const [consented, setConsented] = useState(!!initialDraft?.consented);
+  const [consented, setConsented] = useState(initialDraft?.agreementVersion===2&&!!initialDraft?.consented);
   const [savedLink, setSavedLink] = useState('');
-  const [selected, setSelected] = useState(() => initialBookingServices().length ? initialBookingServices() : (initialDraft?.selected || []).filter(item => bookingChoices.includes(item)));
-  const [serviceCategory,setServiceCategory]=useState(()=>{const first=initialBookingServices()[0]||(initialDraft?.selected||[])[0];return comboBookingChoices.includes(first)?'combo':keratinBookingChoices.includes(first)?'keratin':first===otherBookingChoice?'other':first?'single':'';});
+  const [selected, setSelected] = useState(() => initialBookingServices().length ? initialBookingServices() : (initialDraft?.selected || []).filter(item => typeof item==='string'&&item.trim()));
+  const [serviceCategory,setServiceCategory]=useState(()=>{const first=initialBookingServices()[0]||(initialDraft?.selected||[])[0];return comboBookingChoices.includes(first)?'combo':keratinBookingChoices.includes(first)?'single':first===otherBookingChoice?'':first?'single':'';});
+  const [catalogServices,setCatalogServices]=useState([]),[catalogLoaded,setCatalogLoaded]=useState(false),[catalogError,setCatalogError]=useState(''),[catalogRetry,setCatalogRetry]=useState(0);const catalogInitialized=useRef(false);
+  const choiceFor=name=>findChoice(catalogServices,name),isService=(name,alias)=>{const a=choiceFor(name),b=choiceFor(alias);return a&&b?a.id===b.id:name===alias;};
+  const isSelected=item=>selected.some(name=>isService(name,item));
+  useEffect(()=>{let closed=false,busy=false;let controller;async function load(){if(busy)return;busy=true;controller=new AbortController();const timer=setTimeout(()=>controller.abort(),10000);try{const choices=await fetchBookingCatalog({url:import.meta.env.VITE_BOOKING_CATALOG_API||undefined,signal:controller.signal});if(closed)return;setCatalogServices(choices);setCatalogLoaded(true);setCatalogError('');if(!catalogInitialized.current){catalogInitialized.current=true;const requested=new URLSearchParams(window.location.hash.split('?')[1]||'').get('service'),first=findChoice(choices,selected[0]||requested);if(first){setServiceCategory(groupKey(first.group));if(!selected.length&&requested)setSelected([first.name]);}}}catch{if(!closed)setCatalogError('Katalog belum dapat dimuatkan. Cuba lagi.');}finally{clearTimeout(timer);busy=false;}}void load();const timer=setInterval(()=>void load(),60000);window.addEventListener('focus',load);return()=>{closed=true;controller?.abort();clearInterval(timer);window.removeEventListener('focus',load);};},[catalogRetry]);
   const [submitting,setSubmitting]=useState(false);
   const submittingLock=useRef(false);
   const sender=useRef(null);
@@ -928,7 +933,7 @@ function BookingPage({ go }) {
     });
     return () => cancelAnimationFrame(frame);
   }, []);
-  const [form, setForm] = useState(() => Object.fromEntries(['name','phone','branch','date','time','length','cutLength','notes','bleachStyle','highlightStyle'].map(key => [key, typeof initialDraft?.form?.[key] === 'string' ? initialDraft.form[key] : ''])));
+  const [form, setForm] = useState(() => Object.fromEntries(['name','phone','branch','date','time','length','cutLength','notes','bleachStyle','highlightStyle'].map(key => [key, typeof initialDraft?.form?.[key] === 'string' ? (key==='date'&&initialDraft.form[key]==='uncertain'?'':initialDraft.form[key]) : ''])));
   const dateUncertain = form.date === 'uncertain';
   const [morePeople, setMorePeople] = useState(initialDraft?.morePeople==='yes'?'yes':'no');
   const [guestStep, setGuestStep] = useState(!!initialDraft?.guestStep);
@@ -937,12 +942,13 @@ function BookingPage({ go }) {
   const resizeGuests = total => {const count = Math.max(1,Math.min(19,Number(total)-1 || 1));setGuests(prev => Array.from({length:count},(_,i) => prev[i] || {name:'',length:'',service:''}));};
   const [error, setError] = useState('');
   const [adviceNotes, setAdviceNotes] = useState(typeof initialDraft?.adviceNotes==='string'?initialDraft.adviceNotes:'');
-  useEffect(() => {saveBookingDraft({form,selected,morePeople,guestStep,guests,wantCut,promoAcknowledged,adviceNotes,consented,attempt:sender.current.getAttempt()});}, [form,selected,morePeople,guestStep,guests,wantCut,promoAcknowledged,adviceNotes,consented,submitting]);
+  useEffect(() => {saveBookingDraft({agreementVersion:2,form,selected,morePeople,guestStep,guests,wantCut,promoAcknowledged,adviceNotes,consented,attempt:sender.current.getAttempt()});}, [form,selected,morePeople,guestStep,guests,wantCut,promoAcknowledged,adviceNotes,consented,submitting]);
   useEffect(() => {if(formElement.current)for(const field of formElement.current.elements)field.setCustomValidity?.('');},[language]);
   const adviceOnly = selected.includes(otherBookingChoice);
   const update = (key, value) => { setForm(prev => ({ ...prev, [key]: value })); };
-  const canAddCut = selected.some(allowsCut);
+  const canAddCut=selected.some(name=>{const c=choiceFor(name);return c&&!['Eyelash','Facial','Cut, Wash & Styling'].includes(c.group);});
   const hasCut = canAddCut && wantCut;
+  const primaryWalkIn=selected.length>0&&selected.every(name=>choiceFor(name)?.group==='Cut, Wash & Styling');
   const [today, setToday] = useState(malaysiaToday);
   useEffect(() => {
     const timer = setInterval(() => setToday(malaysiaToday()), 60000);
@@ -951,36 +957,23 @@ function BookingPage({ go }) {
   const lastDate = bookingEndSunday(today);
   const dateCount = Math.round((new Date(`${lastDate}T00:00:00Z`) - new Date(`${today}T00:00:00Z`)) / 86400000) + 1;
   const availableDates = Array.from({length:dateCount}, (_, index) => bookingDateOffset(today, index));
-  const primaryHasHair = selected.some(allowsCut);
+  const primaryHasHair=selected.some(name=>choiceFor(name)?.pricingKind!=='flat'&&name!==otherBookingChoice);
   const hasDepositServices = primaryHasHair || (morePeople === 'yes' && guests.some(guest => guestHasHair(guest) && guest.service));
   const depositNote = hasDepositServices ? 'Deposit RM30 seorang untuk servis rambut hanya dibayar selepas pengesahan admin. Eyelash Perm tidak memerlukan deposit.' : 'Eyelash Perm tidak memerlukan deposit RM30.';
-  const isCombo = selected.some(item => comboBookingChoices.includes(item)) || selected.filter(allowsCut).length > 1;
-  const extraEyelash = morePeople === 'yes' && guests.some(guest => guest.eyelash && !guest.cutWash);
-  const extraEarlyCutoff = morePeople === 'yes' && guests.some(guest => guestHasHair(guest) && (comboBookingChoices.includes(guest.service) || ['Highlight + Colour','Bleach + Colour'].includes(guest.service)));
-  const earlyCutoff = extraEarlyCutoff || isCombo || selected.some(item => ["Highlight + Colour", "Bleach + Colour"].includes(item));
-  const hasEyelash = selected.includes('Eyelash Perm') || extraEyelash;
-  const end = earlyCutoff ? 15.5 : hasEyelash ? 16 : 17;
-  const times = [];
-  for (let value = 11; value <= end; value += 0.5) {
-    const hour = Math.floor(value);
-    times.push(`${hour > 12 ? hour - 12 : hour}:${value % 1 ? '30' : '00'} ${hour >= 12 ? 'PM' : 'AM'}`);
-  }
-  const adjustedEyelashTime = earlyCutoff ? '3:30 PM' : '4:00 PM';
-  const needsEyelashTimeChange = hasEyelash && !dateUncertain && !!form.time && !times.includes(form.time);
-  useEffect(() => {
-    if (!needsEyelashTimeChange) return;
-    window.alert(earlyCutoff ? t('Slot terakhir Eyelash Perm ialah jam 4:00 petang. Oleh sebab kumpulan ini turut memilih servis combo, bleach atau highlight, masa seluruh kumpulan akan ditukar kepada 3:30 petang. Tekan OK untuk meneruskan.') : t('Slot terakhir untuk servis Eyelash Perm ialah jam 4:00 petang. Waktu pelanggan utama dan seluruh kumpulan akan ditukar secara automatik kepada jam 4:00 petang. Tekan OK untuk meneruskan.'));
-    setForm(prev => ({...prev,time:adjustedEyelashTime}));
-    setError('');
-  }, [needsEyelashTimeChange, adjustedEyelashTime]);
+  const groupServices=[...selected,...(morePeople==='yes'?guests.flatMap(g=>g.cutWash?[g.cut?'Hair Cut':'',g.wash?'Hair Wash':''].filter(Boolean):[guestHasHair(g)?g.service:'',g.eyelash?'Eyelash Perm':''].filter(Boolean)):[])];
+  const end=earliestTime(catalogServices,groupServices),earlyCutoff=end<=15.5,endLabel=end===15?'3:00 PM':end===15.5?'3:30 PM':end===16?'4:00 PM':'5:00 PM';
+  const times=[];for(let value=11;value<=end;value+=0.5){const hour=Math.floor(value);times.push(`${hour>12?hour-12:hour}:${value%1?'30':'00'} ${hour>=12?'PM':'AM'}`);}
+  useEffect(()=>{if(form.time&&!times.includes(form.time)){setForm(prev=>({...prev,time:''}));setError('Pilihan servis berubah. Sila pilih masa semula mengikut had servis.');}},[form.time,end]);
+  const variantsFor=name=>{const c=choiceFor(name);return c?.variantLabels?.length?c.variantLabels.map((label,i)=>(i+1)+' — '+label):['1 — Sebahu','2 — Ketiak–atas bra line','3 — Bawah bra line–atas pinggang','4 — Bawah pinggang'];};
+  const lengthChoices=variantsFor(selected.find(name=>choiceFor(name)?.pricingKind!=='flat'));
   const toggle = item => {
-    const next = item === otherBookingChoice ? (selected.includes(item) ? [] : [item]) : (selected.includes(item) ? selected.filter(value => value !== item) : [...selected.filter(value => value !== otherBookingChoice), item]);
+    const next = item === otherBookingChoice ? (selected.includes(item) ? [] : [item]) : (isSelected(item) ? selected.filter(value => !isService(value,item)) : [...selected.filter(value => value !== otherBookingChoice), item]);
     setSelected(next); setError('');
     if (!next.some(allowsCut)) { setWantCut(false); setForm(prev => ({...prev, cutLength: ''})); }
-    setForm(prev => ({ ...prev, time: '', bleachStyle: next.includes('Bleach + Colour') ? prev.bleachStyle : '', highlightStyle: next.includes('Highlight + Colour') ? prev.highlightStyle : '' }));
+    setForm(prev => ({ ...prev, bleachStyle: next.some(n=>isService(n,'Bleach + Colour')) ? prev.bleachStyle : '', highlightStyle: next.some(n=>isService(n,'Highlight + Colour')) ? prev.highlightStyle : '' }));
   };
   const dateLabel = dateUncertain ? 'Belum pasti' : form.date ? new Date(`${form.date}T12:00:00`).toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
-  const messageMembers=[{name:form.name.trim(),services:selected,length:hasCut?form.cutLength:form.length,cut:hasCut,walkin:false,notes:[form.bleachStyle,form.highlightStyle].filter(Boolean).join(' / ')},...(morePeople==='yes'?guests.map(g=>({name:g.name.trim(),services:g.cutWash?[g.cut?'Hair Cut':'',g.wash?'Hair Wash':''].filter(Boolean):[guestHasHair(g)?g.service:'',g.eyelash?'Eyelash Perm':''].filter(Boolean),length:g.length,cut:false,walkin:!!g.cutWash})):[])];
+  const messageMembers=[{name:form.name.trim(),services:selected,length:hasCut?form.cutLength:form.length,cut:hasCut,walkin:primaryWalkIn,notes:[form.bleachStyle,form.highlightStyle].filter(Boolean).join(' / ')},...(morePeople==='yes'?guests.map(g=>({name:g.name.trim(),services:g.cutWash?[g.cut?'Hair Cut':'',g.wash?'Hair Wash':''].filter(Boolean):[guestHasHair(g)?g.service:'',g.eyelash?'Eyelash Perm':''].filter(Boolean),length:g.length,cut:false,walkin:!!g.cutWash})):[])];
   const message=bookingWhatsApp({language,form,members:messageMembers,dateUncertain,t});
   const adviceMessage = language==='en' ? `Hi FAFA Salon! I would like to make an enquiry.\n\nEnquiry:\n${adviceNotes.trim()}` : `Hi FAFA Salon! Saya ingin membuat pertanyaan.\n\nPertanyaan:\n${adviceNotes.trim()}`;
   const href = `https://wa.me/${phone}?text=${encodeURIComponent(adviceOnly ? adviceMessage : message)}`;
@@ -990,6 +983,8 @@ function BookingPage({ go }) {
       if (!adviceNotes.trim()) { setError('Sila nyatakan pertanyaan anda.'); node.querySelector('[name=adviceNotes]')?.focus(); return false; }
       setError(''); return true;
     }
+    if(!catalogLoaded){setError('Katalog belum dapat dimuatkan. Cuba lagi.');return false;}
+    if(selected.some(name=>!choiceFor(name))&&!sender.current.getAttempt()?.saved){setError('Servis berubah dalam katalog. Semak pilihan servis dan cuba lagi.');return false;}
     if (!selected.length) { setError('Sila pilih sekurang-kurangnya satu servis.'); node.querySelector('input[type=checkbox]').focus(); return false; }
     if (!form.date) { setError('Sila pilih satu tarikh booking.'); node.querySelector('[name=bookingDate]')?.focus(); return false; }
     if (dateUncertain && !promoAcknowledged) { setError('Sila tick OK untuk mengesahkan peringatan harga promo.'); node.querySelector('[name=promoAcknowledged]')?.focus(); return false; }
@@ -997,7 +992,7 @@ function BookingPage({ go }) {
     if (!node.reportValidity()) { setError('Sila lengkapkan semua ruangan wajib dan tandakan persetujuan.'); return false; }
     const currentDay = malaysiaToday();
     if (!dateUncertain && (form.date < currentDay || form.date > bookingEndSunday(currentDay))) { setError('Sila pilih tarikh dalam senarai sehingga hari Ahad yang tersedia.'); return false; }
-    if (!dateUncertain && !times.includes(form.time)) { if(guestStep) setGuestStep(false); setError('Servis kumpulan ini memerlukan slot sebelum atau pada 3:30 PM. Sila ubah masa pelanggan utama.'); return false; }
+    if (!times.includes(form.time)) { if(guestStep) setGuestStep(false); setError('Masa pilihan melebihi had servis. Sila pilih masa semula.'); return false; }
     setError(''); return true;
   };
   const submitIntake = async event => {
@@ -1005,8 +1000,8 @@ function BookingPage({ go }) {
     if(adviceOnly)return;
     event.preventDefault();if(submittingLock.current)return;
     submittingLock.current=true;setSubmitting(true);setError('');
-    const members=[{name:form.name.trim(),services:selected,length:hasCut?form.cutLength:form.length,cut:hasCut,walkin:false,notes:[form.bleachStyle,form.highlightStyle].filter(Boolean).join(' / ')},...(morePeople==='yes'?guests.map(g=>({name:g.name.trim(),services:g.cutWash?[g.cut?'Hair Cut':'',g.wash?'Hair Wash':''].filter(Boolean):[guestHasHair(g)?g.service:'',g.eyelash?'Eyelash Perm':''].filter(Boolean),length:g.length,cut:false,walkin:!!g.cutWash})):[])];
-    const raw={branch:form.branch,phone:form.phone.trim(),date:form.date,time:form.time,notes:form.notes,members,language};
+    const members=[{name:form.name.trim(),services:selected,length:hasCut?form.cutLength:form.length,cut:hasCut,walkin:primaryWalkIn,notes:[form.bleachStyle,form.highlightStyle].filter(Boolean).join(' / ')},...(morePeople==='yes'?guests.map(g=>({name:g.name.trim(),services:g.cutWash?[g.cut?'Hair Cut':'',g.wash?'Hair Wash':''].filter(Boolean):[guestHasHair(g)?g.service:'',g.eyelash?'Eyelash Perm':''].filter(Boolean),length:g.length,cut:false,walkin:!!g.cutWash})):[])];
+    const raw={branch:form.branch,phone:form.phone.trim(),date:form.date,time:form.time,notes:form.notes,members,language,bookingPolicyVersion:2};
     let whatsappUrl=href;
     try{const result=await sender.current.send(raw);whatsappUrl='https://wa.me/'+phone+'?text='+encodeURIComponent(bookingWhatsApp({language,form,members,dateUncertain,depositNote,booking:result.booking||[],t}));setSavedLink(whatsappUrl);setError('Permintaan diterima untuk semakan. Slot belum disahkan sehingga PIC mengesahkan deposit. Tekan Hantar dalam WhatsApp.');if(!openBookingWhatsApp(whatsappUrl))setError('Booking sudah diterima. Jika WhatsApp tidak terbuka, tekan Buka WhatsApp.');}
     catch(error){setError(error.message||'Penghantaran belum dapat disahkan. Maklumat anda masih di borang ini. Cuba lagi.');}
@@ -1014,26 +1009,25 @@ function BookingPage({ go }) {
   };
   const renderChoice = (item, showStyle = true) => (
     <div className={`booking-service-item ${item === otherBookingChoice ? 'booking-other' : ''}`} key={item}>
-      <label className={`booking-choice ${selected.includes(item) ? 'selected' : ''}`}><input type="checkbox" checked={selected.includes(item)} onChange={() => toggle(item)} /><span>{t(item)}</span></label>
-      {showStyle && selected.includes(item) && ['Bleach + Colour', 'Highlight + Colour'].includes(item) && <div className="booking-style-options">
+      <label className={`booking-choice ${isSelected(item) ? 'selected' : ''}`}><input type="checkbox" checked={isSelected(item)} onChange={() => toggle(item)} /><span>{t(choiceFor(item)?.label||item)}</span></label>
+      {showStyle && isSelected(item) && ['Bleach + Colour', 'Highlight + Colour'].some(n=>isService(item,n)) && <div className="booking-style-options">
         <span className="booking-style-title">{t("Pilihan gaya")}</span>
-        {(item === 'Bleach + Colour' ? ['Bleach + Colour Biasa', 'Peek-a-boo'] : ['Chunky Highlight', 'Highlight Colour', 'Balayage Highlight']).map(style => {
-          const field = item === 'Bleach + Colour' ? 'bleachStyle' : 'highlightStyle';
+        {(isService(item,'Bleach + Colour') ? ['Bleach + Colour Biasa', 'Peek-a-boo'] : ['Chunky Highlight', 'Highlight Colour', 'Balayage Highlight']).map(style => {
+          const field = isService(item,'Bleach + Colour') ? 'bleachStyle' : 'highlightStyle';
           return <label key={style}><input type="radio" name={field} checked={form[field] === style} onChange={() => update(field, style)} /><span>{style}</span></label>;
         })}
       </div>}
     </div>
   );
-  const categoryChoices={combo:comboBookingChoices,single:singleBookingChoices.filter(item=>!keratinBookingChoices.includes(item)),keratin:keratinBookingChoices,other:[otherBookingChoice]};
+  const liveGroups=catalogGroups(catalogServices),categoryChoices=Object.fromEntries(liveGroups.map(g=>[g.key,catalogServices.filter(c=>groupKey(c.group)===g.key).map(c=>c.name)]));
   const servicePicker=<div className="booking-service-picker">
-    <p className="booking-note">{t("Boleh pilih lebih daripada satu servis.")}</p>
-    <label className="booking-field">{t("Pilih kategori servis")}<select aria-label={t("Pilih kategori servis")} value={serviceCategory} onChange={event=>setServiceCategory(event.target.value)}><option value="">{t("Pilih kategori servis")}</option><option value="combo">Combo Services</option><option value="single">Single Services</option><option value="keratin">Keratin</option><option value="other">{t("Lain-lain / Perlukan nasihat")}</option></select></label>
-    {serviceCategory&&<div className="booking-category-results"><div className="booking-services">{categoryChoices[serviceCategory].map(item=>renderChoice(item,false))}</div></div>}
+    <p className="booking-note">{t("Boleh pilih lebih daripada satu servis.")}</p>{!catalogLoaded&&<p className="booking-note">{t("Memuatkan katalog V2…")}</p>}{catalogError&&<p role="status" className="booking-error">{t(catalogError)} <button type="button" className="booking-fallback" onClick={()=>setCatalogRetry(n=>n+1)}>{t("Cuba Lagi")}</button></p>}
+    <label className="booking-field">{t("Pilih kategori servis")}<select aria-label={t("Pilih kategori servis")} value={serviceCategory} onChange={event=>setServiceCategory(event.target.value)}><option value="">{t("Pilih kategori servis")}</option>{liveGroups.map(g=><option key={g.key} value={g.key}>{g.label}</option>)}</select></label>
+    {serviceCategory&&categoryChoices[serviceCategory]&&<div className="booking-category-results"><div className="booking-services">{categoryChoices[serviceCategory].map(item=>renderChoice(item,false))}</div></div>}
     <section id="booking-selected-services" className="booking-selected-summary" aria-live="polite">
       <h3 className="booking-group-title">{t("Servis dipilih (")}{selected.length})</h3>
       {!selected.length?<p className="booking-note">{t("Belum ada servis dipilih. Pilih kategori untuk melihat servis.")}</p>:<div className="booking-services">{selected.map(item=><div className="booking-selected-item" key={item}>{renderChoice(item,true)}<button type="button" className="booking-remove-service" aria-label={t('Buang')+' '+item} onClick={()=>toggle(item)}>{t("Buang")}</button></div>)}</div>}
     </section>
-    {!adviceOnly&&<button type="button" className="booking-fallback" onClick={()=>{setServiceCategory('');const select=formElement.current?.querySelector('[aria-label="'+t('Pilih kategori servis')+'"]');select?.focus();select?.scrollIntoView?.({block:'center'});}}>{language==='en'?'+ Add Service':'+ Tambah Servis'}</button>}
   </div>;
   return (
     <motion.section className="page booking-page" lang={language} {...pageMotion}>
@@ -1128,6 +1122,7 @@ function BookingPage({ go }) {
           <fieldset>
             <legend>{t("02 / PILIH SERVIS ANDA")}</legend>
             {servicePicker}
+            {primaryWalkIn&&<p className="booking-note">{t(guestWalkInNote)}</p>}
             {canAddCut && <div className={`booking-addons booking-cut-card ${hasCut ? 'active' : ''}`}>
               <label className="booking-cut-toggle"><input type="checkbox" checked={wantCut} onChange={event => { const checked = event.target.checked; setWantCut(checked); if (!checked) update('cutLength', ''); }} /><span><strong>Add-on Hair Cut</strong><small>{t("Tick jika mahu potong rambut. Nyatakan gaya potongan yang diinginkan dalam Nota tambahan.")}</small></span></label>
               {hasCut && <div className="booking-cut-target">
@@ -1145,13 +1140,13 @@ function BookingPage({ go }) {
             <legend>{t("03 / CAWANGAN & WAKTU")}</legend>
             <div className="booking-fields">
               <label className="booking-field">{t("Cawangan *")}<select value={form.branch} required onChange={event => update('branch', event.target.value)}><option value="">{t("Pilih cawangan")}</option><option>Setapak, Kuala Lumpur</option><option>Selayang, Batu Caves</option></select></label>
-              <label className="booking-field">{t("Tarikh pilihan *")}<select name="bookingDate" required value={form.date} onChange={event => {setForm(prev => ({...prev,date:event.target.value,time:''}));setPromoAcknowledged(false);setError('');}}><option value="">{t("Pilih tarikh")}</option><option value="uncertain">{t("Belum pasti")}</option>{availableDates.map(date => <option key={date} value={date}>{new Date(`${date}T12:00:00Z`).toLocaleDateString(language==='en'?'en-MY':'ms-MY',{weekday:'short',day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Kuala_Lumpur'})}</option>)}</select></label>
+              <label className="booking-field">{t("Tarikh pilihan *")}<select name="bookingDate" required value={form.date} onChange={event => {setForm(prev => ({...prev,date:event.target.value,time:''}));setPromoAcknowledged(false);setError('');}}><option value="">{t("Pilih tarikh")}</option>{availableDates.map(date => <option key={date} value={date}>{new Date(`${date}T12:00:00Z`).toLocaleDateString(language==='en'?'en-MY':'ms-MY',{weekday:'short',day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Kuala_Lumpur'})}</option>)}</select></label>
               {!dateUncertain && <label className="booking-field">{t("Masa pilihan *")}<select value={form.time} required onChange={event => update('time', event.target.value)}><option value="">{t("Pilih masa")}</option>{times.map(time => <option key={time}>{time}</option>)}</select></label>}
             </div>
             {dateUncertain ? <div className="booking-promo-reminder" role="note" style={{marginTop:12,padding:13,border:'1px solid #ba7294',borderRadius:12,background:'#30212b',color:'#f4e8ef',fontSize:12,lineHeight:1.65}}>
               <p style={{margin:'0 0 10px',color:'inherit'}}>{t("Harga promo yang diberikan adalah berdasarkan promosi semasa dan tertakluk kepada perubahan. Jika tarikh belum pasti, sila hubungi admin semula apabila bersedia untuk membuat tempahan. Admin akan mengesahkan sama ada harga promo tersebut masih sah atau memaklumkan harga terkini.")}</p>
               <label style={{display:'flex',gap:9,alignItems:'center',cursor:'pointer'}}><input name="promoAcknowledged" type="checkbox" required checked={promoAcknowledged} onChange={event => {setPromoAcknowledged(event.target.checked);setError('');}} /><span>{t("OK, saya faham.")}</span></label>
-            </div> : <p className="booking-note">{earlyCutoff && t("Slot terakhir untuk servis pilihan anda ialah 3:30 PM. ")}{t("Slot tertakluk pada kekosongan. Admin akan sahkan waktu mengikut servis dan jadual cawangan.")}</p>}
+            </div> : <p className="booking-note">{earlyCutoff && t("Slot terakhir untuk servis pilihan anda ialah ")+endLabel+". "}{t("Slot tertakluk pada kekosongan. Admin akan sahkan waktu mengikut servis dan jadual cawangan.")}</p>}
           </fieldset>
           <fieldset>
             <legend>{t("04 / TAMBAH PELANGGAN")}</legend>
@@ -1182,20 +1177,20 @@ function BookingPage({ go }) {
                     </>}
                   </>}
                   {guestHasHair(guest) && <>
-                  <label className="booking-field">{t("Panjang rambut *")}<select required value={guest.length} onChange={event => updateGuest(index,'length',event.target.value)}><option value="">{t("Pilih paras rambut")}</option>{lengthChoices.map(item => <option key={item} value={item}>{t(item)}</option>)}</select></label>
-                  <label className="booking-field">{t("Servis *")}<select required value={guest.service} onChange={event => updateGuest(index,'service',event.target.value)}><option value="">{t("Pilih servis")}</option><optgroup label="Combo Services">{comboBookingChoices.map(item => <option key={item} value={item}>{t(item)}</option>)}</optgroup><optgroup label="Single Services">{singleBookingChoices.filter(item => item !== 'Eyelash Perm').map(item => <option key={item} value={item}>{t(item)}</option>)}</optgroup></select></label>
+                  {choiceFor(guest.service)?.pricingKind!=='flat'&&<label className="booking-field">{t("Panjang rambut *")}<select required value={guest.length} onChange={event => updateGuest(index,'length',event.target.value)}><option value="">{t("Pilih paras rambut")}</option>{variantsFor(guest.service).map(item => <option key={item} value={item}>{t(item)}</option>)}</select></label>}
+                  <label className="booking-field">{t("Servis *")}<select required value={guest.service} onChange={event => updateGuest(index,'service',event.target.value)}><option value="">{t("Pilih servis")}</option>{liveGroups.map(g=><optgroup key={g.key} label={g.label}>{catalogServices.filter(c=>groupKey(c.group)===g.key&&!/eyelash perm/i.test(c.name)).map(c=><option key={c.id} value={c.name}>{c.label}</option>)}</optgroup>)}</select></label>
                   </>}
                 </div>
               </section>)}
 
             <p className="booking-note" style={{marginTop:14}}>{t("Masa tempahan mengikut pelanggan utama:")+" "}{dateUncertain ? t("Tarikh belum pasti") : form.time}{t(". Hair Cut / Hair Wash sahaja masih walk-in dan tidak menjamin slot pada waktu tersebut.")}</p>
-            {earlyCutoff && !dateUncertain && <p className="booking-note">{t("Slot terakhir bagi servis dalam kumpulan ini ialah 3:30 PM.")}</p>}
+            {earlyCutoff && !dateUncertain && <p className="booking-note">{t("Slot terakhir untuk servis pilihan anda ialah ")+endLabel+"."}</p>}
             <button type="button" className="booking-fallback" style={{marginTop:14}} onClick={() => {setGuestStep(false);setConsented(false);setError('');window.scrollTo({top:0,behavior:'smooth'});}}>{t("← Edit pelanggan utama")}</button>
           </section>}
           {adviceOnly && <fieldset><legend>{t("02 / PILIH SERVIS ANDA")}</legend>{servicePicker}</fieldset>}
           {adviceOnly && <label className="booking-field">{t("Pertanyaan anda *")}<textarea name="adviceNotes" required maxLength={1000} value={adviceNotes} onChange={event => {setAdviceNotes(event.target.value);setError('');}} placeholder={t("Tulis pertanyaan anda dengan lengkap di sini.")} /></label>}
           {!adviceOnly && (morePeople !== 'yes' || guestStep) && <>
-          <label className="booking-consent"><input type="checkbox" required checked={consented} onChange={event=>setConsented(event.target.checked)} /><span>{dateUncertain ? t("Saya bersetuju maklumat ini disimpan untuk semakan harga PIC dan dihantar melalui WhatsApp. Ini bukan tempahan slot; permintaan tanpa tarikh dipadam selepas 7 hari.") : (""+t("Saya faham slot tertakluk kepada kekosongan dan bersetuju maklumat ini disimpan untuk semakan PIC serta dihantar melalui WhatsApp.")+" "+t(depositNote)+" "+t("Borang ini belum mengesahkan tempahan.")+"")}</span></label>
+          <label className="booking-consent"><input type="checkbox" required checked={consented} onChange={event=>setConsented(event.target.checked)} /><span>{t("Saya bersetuju maklumat ini disimpan untuk semakan harga oleh PIC dan dihantar melalui WhatsApp. Permintaan slot disimpan selama 3 hari. Jika deposit belum diterima selepas tempoh ini, permintaan akan dikeluarkan daripada senarai permintaan aktif.")}</span></label>
           </>}
           <p className="booking-error" role="alert">{bookingErrorText(error,language)}</p>
           {savedLink&&<a className="booking-fallback" href={savedLink} rel="noopener noreferrer">{t("Buka WhatsApp")}</a>}

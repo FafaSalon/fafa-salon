@@ -1,4 +1,13 @@
 export const bookingEnglish={
+"Saya bersetuju maklumat ini disimpan untuk semakan harga oleh PIC dan dihantar melalui WhatsApp. Permintaan slot disimpan selama 3 hari. Jika deposit belum diterima selepas tempoh ini, permintaan akan dikeluarkan daripada senarai permintaan aktif.":"I agree that this information may be stored for a price review by the PIC and sent via WhatsApp. Slot requests are kept for 3 days. If the deposit has not been received after this period, the request will be removed from the active request list.",
+"Katalog belum dapat dimuatkan. Cuba lagi.":"The V2 catalog could not be loaded. Please try again.",
+"Memuatkan katalog V2…":"Loading the V2 catalog…",
+"Cuba Lagi":"Try Again",
+"Pilihan servis berubah. Sila pilih masa semula mengikut had servis.":"Your services have changed. Please choose a time again within the service time limit.",
+"Servis berubah dalam katalog. Semak pilihan servis dan cuba lagi.":"The service catalog has changed. Please review your service choices and try again.",
+"Slot terakhir untuk servis pilihan anda ialah ":"The latest time for your selected services is ",
+"Masa pilihan melebihi had servis. Sila pilih masa semula.":"The selected time is after the service limit. Please choose another time.",
+
 'Preview belum dapat dihubungi. Maklumat anda masih di borang ini. Cuba lagi.':'The preview could not be reached. Your details are still in this form. Please try again.',
 'Pilihan gaya':'Style options',
 'Boleh pilih lebih daripada satu servis.':'You may select more than one service.',
