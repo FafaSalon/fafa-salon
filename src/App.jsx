@@ -1,4 +1,4 @@
-import {fetchBookingCatalog,findChoice,catalogGroups,groupKey,earliestTime} from './booking-catalog.js';
+import {fetchBookingCatalog,findChoice,catalogGroups,groupKey,earliestTime,serviceRequirements} from './booking-catalog.js';
 import {bookingWhatsApp} from './booking-whatsapp.js';
 import { createBookingSender, readBookingDraft, saveBookingDraft, openBookingWhatsApp } from './booking-submit';
 import { bookingText, bookingErrorText } from './booking-i18n';
@@ -954,13 +954,17 @@ function BookingPage({ go }) {
     const timer = setInterval(() => setToday(malaysiaToday()), 60000);
     return () => clearInterval(timer);
   }, []);
-  const lastDate = bookingEndSunday(today);
+  const groupServices=[...selected,...(morePeople==='yes'?guests.flatMap(g=>g.cutWash?[g.cut?'Hair Cut':'',g.wash?'Hair Wash':''].filter(Boolean):[guestHasHair(g)?g.service:'',g.eyelash?'Eyelash Perm':''].filter(Boolean)):[])];
+  const {sameDay:sameDayOnly,depositFree:allDepositFree}=serviceRequirements(catalogServices,groupServices);
+  const sameDayNote='Servis ini boleh dimohon untuk hari ini sahaja. Tiada deposit booking untuk servis ini. Admin akan maklumkan jika ada slot pada waktu yang anda pilih.';
+  const lastDate = sameDayOnly?today:bookingEndSunday(today);
   const dateCount = Math.round((new Date(`${lastDate}T00:00:00Z`) - new Date(`${today}T00:00:00Z`)) / 86400000) + 1;
   const availableDates = Array.from({length:dateCount}, (_, index) => bookingDateOffset(today, index));
   const primaryHasHair=selected.some(name=>choiceFor(name)?.pricingKind!=='flat'&&name!==otherBookingChoice);
-  const hasDepositServices = primaryHasHair || (morePeople === 'yes' && guests.some(guest => guestHasHair(guest) && guest.service));
-  const depositNote = hasDepositServices ? 'Deposit RM30 seorang untuk servis rambut hanya dibayar selepas pengesahan admin. Eyelash Perm tidak memerlukan deposit.' : 'Eyelash Perm tidak memerlukan deposit RM30.';
-  const groupServices=[...selected,...(morePeople==='yes'?guests.flatMap(g=>g.cutWash?[g.cut?'Hair Cut':'',g.wash?'Hair Wash':''].filter(Boolean):[guestHasHair(g)?g.service:'',g.eyelash?'Eyelash Perm':''].filter(Boolean)):[])];
+  const hasDepositServices=groupServices.some(name=>!serviceRequirements(catalogServices,[name]).depositFree);
+  const depositNote = hasDepositServices ? 'Deposit RM30 seorang untuk servis rambut hanya dibayar selepas pengesahan admin. Eyelash Perm tidak memerlukan deposit.' : 'Servis pilihan ini tidak memerlukan deposit booking.';
+
+  useEffect(()=>{if(sameDayOnly&&form.date&&form.date!==today){setForm(prev=>({...prev,date:'',time:''}));setError('Servis ini boleh dimohon untuk hari ini sahaja. Sila pilih tarikh dan masa semula.');}},[sameDayOnly,today,form.date]);
   const end=earliestTime(catalogServices,groupServices),earlyCutoff=end<=15.5,endLabel=end===15?'3:00 PM':end===15.5?'3:30 PM':end===16?'4:00 PM':'5:00 PM';
   const times=[];for(let value=11;value<=end;value+=0.5){const hour=Math.floor(value);times.push(`${hour>12?hour-12:hour}:${value%1?'30':'00'} ${hour>=12?'PM':'AM'}`);}
   useEffect(()=>{if(form.time&&!times.includes(form.time)){setForm(prev=>({...prev,time:''}));setError('Pilihan servis berubah. Sila pilih masa semula mengikut had servis.');}},[form.time,end]);
@@ -992,6 +996,7 @@ function BookingPage({ go }) {
     if (!node.reportValidity()) { setError('Sila lengkapkan semua ruangan wajib dan tandakan persetujuan.'); return false; }
     const currentDay = malaysiaToday();
     if (!dateUncertain && (form.date < currentDay || form.date > bookingEndSunday(currentDay))) { setError('Sila pilih tarikh dalam senarai sehingga hari Ahad yang tersedia.'); return false; }
+    if(sameDayOnly&&form.date!==currentDay){setForm(prev=>({...prev,date:'',time:''}));setError('Servis ini boleh dimohon untuk hari ini sahaja. Sila pilih tarikh dan masa semula.');return false;}
     if (!times.includes(form.time)) { if(guestStep) setGuestStep(false); setError('Masa pilihan melebihi had servis. Sila pilih masa semula.'); return false; }
     setError(''); return true;
   };
@@ -1003,7 +1008,7 @@ function BookingPage({ go }) {
     const members=[{name:form.name.trim(),services:selected,length:hasCut?form.cutLength:form.length,cut:hasCut,walkin:primaryWalkIn,notes:[form.bleachStyle,form.highlightStyle].filter(Boolean).join(' / ')},...(morePeople==='yes'?guests.map(g=>({name:g.name.trim(),services:g.cutWash?[g.cut?'Hair Cut':'',g.wash?'Hair Wash':''].filter(Boolean):[guestHasHair(g)?g.service:'',g.eyelash?'Eyelash Perm':''].filter(Boolean),length:g.length,cut:false,walkin:!!g.cutWash})):[])];
     const raw={branch:form.branch,phone:form.phone.trim(),date:form.date,time:form.time,notes:form.notes,members,language,bookingPolicyVersion:2};
     let whatsappUrl=href;
-    try{const result=await sender.current.send(raw);whatsappUrl='https://wa.me/'+phone+'?text='+encodeURIComponent(bookingWhatsApp({language,form,members,dateUncertain,depositNote,booking:result.booking||[],t}));setSavedLink(whatsappUrl);setError('Permintaan diterima untuk semakan. Slot belum disahkan sehingga PIC mengesahkan deposit. Tekan Hantar dalam WhatsApp.');if(!openBookingWhatsApp(whatsappUrl))setError('Booking sudah diterima. Jika WhatsApp tidak terbuka, tekan Buka WhatsApp.');}
+    try{const result=await sender.current.send(raw);whatsappUrl='https://wa.me/'+phone+'?text='+encodeURIComponent(bookingWhatsApp({language,form,members,dateUncertain,depositNote,booking:result.booking||[],t}));setSavedLink(whatsappUrl);setError(allDepositFree?'Permintaan diterima untuk semakan. Slot hanya disahkan selepas admin semak kekosongan. Tekan Hantar dalam WhatsApp.':'Permintaan diterima untuk semakan. Slot belum disahkan sehingga PIC mengesahkan deposit. Tekan Hantar dalam WhatsApp.');if(!openBookingWhatsApp(whatsappUrl))setError('Booking sudah diterima. Jika WhatsApp tidak terbuka, tekan Buka WhatsApp.');}
     catch(error){setError(error.message||'Penghantaran belum dapat disahkan. Maklumat anda masih di borang ini. Cuba lagi.');}
     finally{submittingLock.current=false;setSubmitting(false);}
   };
@@ -1142,6 +1147,7 @@ function BookingPage({ go }) {
               <label className="booking-field">{t("Cawangan *")}<select value={form.branch} required onChange={event => update('branch', event.target.value)}><option value="">{t("Pilih cawangan")}</option><option>Setapak, Kuala Lumpur</option><option>Selayang, Batu Caves</option></select></label>
               <label className="booking-field">{t("Tarikh pilihan *")}<select name="bookingDate" required value={form.date} onChange={event => {setForm(prev => ({...prev,date:event.target.value,time:''}));setPromoAcknowledged(false);setError('');}}><option value="">{t("Pilih tarikh")}</option>{availableDates.map(date => <option key={date} value={date}>{new Date(`${date}T12:00:00Z`).toLocaleDateString(language==='en'?'en-MY':'ms-MY',{weekday:'short',day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Kuala_Lumpur'})}</option>)}</select></label>
               {!dateUncertain && <label className="booking-field">{t("Masa pilihan *")}<select value={form.time} required onChange={event => update('time', event.target.value)}><option value="">{t("Pilih masa")}</option>{times.map(time => <option key={time}>{time}</option>)}</select></label>}
+              {sameDayOnly&&<p className="booking-note" data-same-day-note>{t(sameDayNote)}</p>}
             </div>
             {dateUncertain ? <div className="booking-promo-reminder" role="note" style={{marginTop:12,padding:13,border:'1px solid #ba7294',borderRadius:12,background:'#30212b',color:'#f4e8ef',fontSize:12,lineHeight:1.65}}>
               <p style={{margin:'0 0 10px',color:'inherit'}}>{t("Harga promo yang diberikan adalah berdasarkan promosi semasa dan tertakluk kepada perubahan. Jika tarikh belum pasti, sila hubungi admin semula apabila bersedia untuk membuat tempahan. Admin akan mengesahkan sama ada harga promo tersebut masih sah atau memaklumkan harga terkini.")}</p>
@@ -1184,13 +1190,14 @@ function BookingPage({ go }) {
               </section>)}
 
             <p className="booking-note" style={{marginTop:14}}>{t("Masa tempahan mengikut pelanggan utama:")+" "}{dateUncertain ? t("Tarikh belum pasti") : form.time}{t(". Hair Cut / Hair Wash sahaja masih walk-in dan tidak menjamin slot pada waktu tersebut.")}</p>
+            {sameDayOnly&&hasDepositServices&&<p className="booking-note">{t(depositNote)}</p>}
             {earlyCutoff && !dateUncertain && <p className="booking-note">{t("Slot terakhir untuk servis pilihan anda ialah ")+endLabel+"."}</p>}
             <button type="button" className="booking-fallback" style={{marginTop:14}} onClick={() => {setGuestStep(false);setConsented(false);setError('');window.scrollTo({top:0,behavior:'smooth'});}}>{t("← Edit pelanggan utama")}</button>
           </section>}
           {adviceOnly && <fieldset><legend>{t("02 / PILIH SERVIS ANDA")}</legend>{servicePicker}</fieldset>}
           {adviceOnly && <label className="booking-field">{t("Pertanyaan anda *")}<textarea name="adviceNotes" required maxLength={1000} value={adviceNotes} onChange={event => {setAdviceNotes(event.target.value);setError('');}} placeholder={t("Tulis pertanyaan anda dengan lengkap di sini.")} /></label>}
           {!adviceOnly && (morePeople !== 'yes' || guestStep) && <>
-          <label className="booking-consent"><input type="checkbox" required checked={consented} onChange={event=>setConsented(event.target.checked)} /><span>{t("Saya bersetuju maklumat ini disimpan untuk semakan harga oleh PIC dan dihantar melalui WhatsApp. Permintaan slot disimpan selama 3 hari. Jika deposit belum diterima selepas tempoh ini, permintaan akan dikeluarkan daripada senarai permintaan aktif.")}</span></label>
+          <label className="booking-consent"><input type="checkbox" required checked={consented} onChange={event=>setConsented(event.target.checked)} /><span>{t(allDepositFree?"Saya bersetuju maklumat ini disimpan untuk semakan harga oleh PIC dan dihantar melalui WhatsApp.":"Saya bersetuju maklumat ini disimpan untuk semakan harga oleh PIC dan dihantar melalui WhatsApp. Permintaan slot disimpan selama 3 hari. Jika deposit belum diterima selepas tempoh ini, permintaan akan dikeluarkan daripada senarai permintaan aktif.")}</span></label>
           </>}
           <p className="booking-error" role="alert">{bookingErrorText(error,language)}</p>
           {savedLink&&<a className="booking-fallback" href={savedLink} rel="noopener noreferrer">{t("Buka WhatsApp")}</a>}

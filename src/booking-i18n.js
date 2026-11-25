@@ -1,4 +1,9 @@
 export const bookingEnglish={
+"Saya bersetuju maklumat ini disimpan untuk semakan harga oleh PIC dan dihantar melalui WhatsApp.":"I agree that this information may be stored for a price review by the PIC and sent via WhatsApp.",
+"Servis ini boleh dimohon untuk hari ini sahaja. Tiada deposit booking untuk servis ini. Admin akan maklumkan jika ada slot pada waktu yang anda pilih.":"These services can only be requested for today. No booking deposit is required for these services. Our admin will let you know if a slot is available at your selected time.",
+"Servis ini boleh dimohon untuk hari ini sahaja. Sila pilih tarikh dan masa semula.":"These services can only be requested for today. Please select today's date and choose a time again.",
+"Servis pilihan ini tidak memerlukan deposit booking.":"Your selected services do not require a booking deposit.",
+"Permintaan diterima untuk semakan. Slot hanya disahkan selepas admin semak kekosongan. Tekan Hantar dalam WhatsApp.":"Your request has been received for review. The slot is only confirmed after our admin checks availability. Tap Send in WhatsApp.",
 "Saya bersetuju maklumat ini disimpan untuk semakan harga oleh PIC dan dihantar melalui WhatsApp. Permintaan slot disimpan selama 3 hari. Jika deposit belum diterima selepas tempoh ini, permintaan akan dikeluarkan daripada senarai permintaan aktif.":"I agree that this information may be stored for a price review by the PIC and sent via WhatsApp. Slot requests are kept for 3 days. If the deposit has not been received after this period, the request will be removed from the active request list.",
 "Katalog belum dapat dimuatkan. Cuba lagi.":"The V2 catalog could not be loaded. Please try again.",
 "Memuatkan katalog V2…":"Loading the V2 catalog…",
