@@ -1,3 +1,4 @@
+import {bookingWhatsApp} from './booking-whatsapp.js';
 import { createBookingSender, readBookingDraft, saveBookingDraft, openBookingWhatsApp } from './booking-submit';
 import { bookingText, bookingErrorText } from './booking-i18n';
 import responsiveTheme from './responsive.css?inline';
@@ -992,7 +993,7 @@ function BookingPage({ go }) {
     ...(morePeople === 'yes' ? guests.flatMap((guest,index) => ['',`PELANGGAN ${index+2}`,`Nama: ${guest.name.trim()}`,...(guestHasHair(guest) ? [`Panjang rambut: ${guest.length}`] : []),`Servis: ${guestServiceText(guest)}`,...(guest.cutWash ? [`Status: Walk-in sahaja — bukan tempahan. ${guestWalkInNote}`] : guest.eyelash ? ['Nota Eyelash Perm: Boleh booking tanpa deposit RM30; tertakluk kepada pengesahan admin.'] : []),'']) : []),
     dateUncertain ? 'Ini ialah pertanyaan harga sahaja, bukan tempahan slot.' : `Saya faham tempahan belum disahkan. ${depositNote}`,
   ].join('\n');
-  const adviceMessage = `Hi FAFA Salon! Saya ingin membuat pertanyaan.\n\nPertanyaan:\n${adviceNotes.trim()}`;
+  const adviceMessage = language==='en' ? `Hi FAFA Salon! I would like to make an enquiry.\n\nEnquiry:\n${adviceNotes.trim()}` : `Hi FAFA Salon! Saya ingin membuat pertanyaan.\n\nPertanyaan:\n${adviceNotes.trim()}`;
   const href = `https://wa.me/${phone}?text=${encodeURIComponent(adviceOnly ? adviceMessage : message)}`;
   const validate = element => {
     const node = element.closest('form');
@@ -1016,9 +1017,9 @@ function BookingPage({ go }) {
     event.preventDefault();if(submittingLock.current)return;
     submittingLock.current=true;setSubmitting(true);setError('');
     const members=[{name:form.name.trim(),services:selected,length:hasCut?form.cutLength:form.length,cut:hasCut,walkin:false,notes:[form.bleachStyle,form.highlightStyle].filter(Boolean).join(' / ')},...(morePeople==='yes'?guests.map(g=>({name:g.name.trim(),services:g.cutWash?[g.cut?'Hair Cut':'',g.wash?'Hair Wash':''].filter(Boolean):[guestHasHair(g)?g.service:'',g.eyelash?'Eyelash Perm':''].filter(Boolean),length:g.length,cut:false,walkin:!!g.cutWash})):[])];
-    const raw={branch:form.branch,phone:form.phone.trim(),date:form.date,time:form.time,notes:form.notes,members};
-    const whatsappUrl=href;
-    try{await sender.current.send(raw);setSavedLink(whatsappUrl);setError('Permintaan diterima untuk semakan. Slot belum disahkan sehingga PIC mengesahkan deposit. Tekan Hantar dalam WhatsApp.');if(!openBookingWhatsApp(whatsappUrl))setError('Booking sudah diterima. Jika WhatsApp tidak terbuka, tekan Buka WhatsApp.');}
+    const raw={branch:form.branch,phone:form.phone.trim(),date:form.date,time:form.time,notes:form.notes,members,language};
+    let whatsappUrl=href;
+    try{const result=await sender.current.send(raw);whatsappUrl='https://wa.me/'+phone+'?text='+encodeURIComponent(bookingWhatsApp({language,form,members,dateUncertain,depositNote,booking:result.booking||[],t}));setSavedLink(whatsappUrl);setError('Permintaan diterima untuk semakan. Slot belum disahkan sehingga PIC mengesahkan deposit. Tekan Hantar dalam WhatsApp.');if(!openBookingWhatsApp(whatsappUrl))setError('Booking sudah diterima. Jika WhatsApp tidak terbuka, tekan Buka WhatsApp.');}
     catch(error){setError(error.message||'Penghantaran belum dapat disahkan. Maklumat anda masih di borang ini. Cuba lagi.');}
     finally{submittingLock.current=false;setSubmitting(false);}
   };
@@ -1043,6 +1044,7 @@ function BookingPage({ go }) {
       <h3 className="booking-group-title">{t("Servis dipilih (")}{selected.length})</h3>
       {!selected.length?<p className="booking-note">{t("Belum ada servis dipilih. Pilih kategori untuk melihat servis.")}</p>:<div className="booking-services">{selected.map(item=><div className="booking-selected-item" key={item}>{renderChoice(item,true)}<button type="button" className="booking-remove-service" aria-label={t('Buang')+' '+item} onClick={()=>toggle(item)}>{t("Buang")}</button></div>)}</div>}
     </section>
+    {!adviceOnly&&<button type="button" className="booking-fallback" onClick={()=>{setServiceCategory('');const select=formElement.current?.querySelector('[aria-label="'+t('Pilih kategori servis')+'"]');select?.focus();select?.scrollIntoView?.({block:'center'});}}>{language==='en'?'+ Add Service':'+ Tambah Servis'}</button>}
   </div>;
   return (
     <motion.section className="page booking-page" lang={language} {...pageMotion}>
