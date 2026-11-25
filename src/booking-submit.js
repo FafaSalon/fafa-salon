@@ -1,0 +1,18 @@
+// Booking transport only. Canonical payloads and the V2 endpoint are unchanged.
+export const BOOKING_ENDPOINT = 'https://fafa-appointment-v2.vercel.app/api/v2-booking-request';
+const DRAFT_KEY='fafa-mobile-booking-draft-v1';let memoryDraft=null;
+export function readBookingDraft(){try{const raw=window.sessionStorage.getItem(DRAFT_KEY);if(raw&&raw.length<=60000){const data=JSON.parse(raw);if(data?.version===1&&data.form&&typeof data.form==='object'&&Array.isArray(data.selected)&&Array.isArray(data.guests))memoryDraft=data;}}catch{}return memoryDraft;}
+export function saveBookingDraft(data){try{const raw=JSON.stringify({...data,version:1});if(raw.length>60000)return;memoryDraft=JSON.parse(raw);try{window.sessionStorage.setItem(DRAFT_KEY,raw);}catch{}}catch{}}
+export function makeSubmissionId(scope=globalThis){try{if(typeof scope.crypto?.randomUUID==='function')return scope.crypto.randomUUID();}catch{}try{const bytes=new Uint8Array(16);scope.crypto.getRandomValues(bytes);return 'web-'+Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');}catch{}return 'web-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2).padEnd(13,'0')+'-'+Math.random().toString(36).slice(2).padEnd(13,'0');}
+function bookingError(message,code){return Object.assign(new Error(message),{code});}
+export function createBookingSender({endpoint=BOOKING_ENDPOINT,fetcher=(...args)=>fetch(...args),makeId=makeSubmissionId,timeoutMs=20000,initialAttempt=null}={}){
+ let attempt=initialAttempt&&/^[-a-zA-Z0-9]{16,64}$/.test(initialAttempt.id)&&typeof initialAttempt.signature==='string'?{...initialAttempt}:null,inflight=null;
+ function send(raw){const signature=JSON.stringify(raw);if(inflight)return inflight;if(!attempt||attempt.signature!==signature)attempt={signature,id:makeId(),saved:false};if(attempt.saved)return Promise.resolve({ok:true,id:attempt.id,already:true});
+  const current=attempt;let timer,controller;try{if(typeof AbortController==='function')controller=new AbortController();}catch{}
+  const request=(async()=>{try{const response=await fetcher(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...raw,submissionId:current.id}),...(controller?{signal:controller.signal}:{})});let result;try{result=await response.json();}catch{throw bookingError('Respons server belum dapat disahkan. Maklumat anda masih di borang ini. Cuba lagi.','response');}if(!response.ok)throw bookingError(typeof result?.error==='string'?result.error:'Permintaan belum dapat disimpan.','server');if(result?.ok!==true||result.id!==current.id)throw bookingError('Respons server belum dapat disahkan. Maklumat anda masih di borang ini. Cuba lagi.','response');return result;}catch(error){if(typeof error.code==='string'&&['response','server','network','timeout'].includes(error.code))throw error;throw bookingError('Penghantaran belum dapat disahkan. Maklumat anda masih di borang ini. Cuba lagi.','network');}})();
+  const timeout=new Promise((_,reject)=>{timer=setTimeout(()=>{try{controller?.abort();}catch{}reject(bookingError('Server belum memberi respons. Maklumat anda masih di borang ini. Cuba lagi dengan rujukan yang sama.','timeout'));},timeoutMs);});
+  inflight=Promise.race([request,timeout]).then(result=>{current.saved=true;return result;}).finally(()=>{clearTimeout(timer);inflight=null;});return inflight;
+ }
+ return {send,getAttempt:()=>attempt?{...attempt}:null};
+}
+export function openBookingWhatsApp(url,navigate=value=>window.location.assign(value)){try{const target=new URL(url);if(target.protocol!=='https:'||target.hostname!=='wa.me')return false;navigate(target.href);return true;}catch{return false;}}
